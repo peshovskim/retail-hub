@@ -1,5 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
-using RetailHub.BuildingBlocks.Application.Common.Results;
+using RetailHub.SharedKernel.Application.Common.Results;
 
 namespace RetailHub.Api.Common.Http;
 

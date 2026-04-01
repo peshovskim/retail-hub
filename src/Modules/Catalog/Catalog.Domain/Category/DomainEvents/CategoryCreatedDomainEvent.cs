@@ -1,4 +1,4 @@
-using RetailHub.BuildingBlocks.Domain;
+using RetailHub.SharedKernel.Domain;
 
 namespace Catalog.Domain.Category.DomainEvents;
 

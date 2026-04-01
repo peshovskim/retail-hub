@@ -1,6 +1,6 @@
 using Catalog.Domain.Category.DomainEvents;
 using MediatR;
-using RetailHub.BuildingBlocks.Application.Common.DomainEvents;
+using RetailHub.SharedKernel.Application.Common.DomainEvents;
 
 namespace Catalog.Application.Category.DomainEventHandlers;
 

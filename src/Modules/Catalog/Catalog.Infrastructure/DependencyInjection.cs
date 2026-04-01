@@ -4,8 +4,8 @@ using Catalog.Infrastructure.Read.Category.Queries;
 using Catalog.Infrastructure.Write.Category.Repositories;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using RetailHub.BuildingBlocks.Infrastructure;
-using RetailHub.BuildingBlocks.Infrastructure.Persistence.Interceptors;
+using RetailHub.SharedKernel.Infrastructure;
+using RetailHub.SharedKernel.Infrastructure.Persistence.Interceptors;
 
 namespace Catalog.Infrastructure;
 

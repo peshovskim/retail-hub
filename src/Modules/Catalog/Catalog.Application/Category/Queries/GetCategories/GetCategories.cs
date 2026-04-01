@@ -1,8 +1,8 @@
 using Catalog.Application.Category.Interfaces;
 using Catalog.Contracts.Category.Responses;
 using MediatR;
-using RetailHub.BuildingBlocks.Application.Common.Cqrs;
-using RetailHub.BuildingBlocks.Application.Common.Results;
+using RetailHub.SharedKernel.Application.Common.Cqrs;
+using RetailHub.SharedKernel.Application.Common.Results;
 
 namespace Catalog.Application.Category.Queries.GetCategories;
 

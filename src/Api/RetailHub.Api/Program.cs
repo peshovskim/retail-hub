@@ -8,21 +8,21 @@ using Microsoft.AspNetCore.Hosting.Server.Features;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using RetailHub.BuildingBlocks.Application;
+using RetailHub.SharedKernel.Application;
 
 var builder = WebApplication.CreateBuilder(args);
 
 var connectionString = builder.Configuration.GetConnectionString("RetailHubDatabase");
 ArgumentException.ThrowIfNullOrEmpty(connectionString);
 
-builder.Services.AddBuildingBlocksApplication();
+builder.Services.AddSharedKernelApplication();
 builder.Services.AddCatalogApplication();
 builder.Services.AddCatalogInfrastructure(connectionString);
 
 builder.Services.AddMediatR(cfg =>
 {
     cfg.RegisterServicesFromAssembly(typeof(GetCategoriesQuery).Assembly);
-    cfg.AddBuildingBlocksBehaviors();
+    cfg.AddSharedKernelBehaviors();
 });
 
 builder.Services.AddControllers();
