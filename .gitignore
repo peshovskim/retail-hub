@@ -1,0 +1,26 @@
+# Build outputs
+**/bin/
+**/obj/
+**/out/
+**/TestResults/
+
+# IDE/editor files
+.vs/
+.vscode/
+.idea/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# Logs and local environment
+*.log
+.env
+.env.*
+
+# Local tool/cache artifacts
+.cursor/
+
+# OS files
+.DS_Store
+Thumbs.db
