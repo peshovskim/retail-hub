@@ -1,6 +1,10 @@
 # Build outputs
 **/bin/
 **/obj/
+
+# SQL Server / SSDT (VS locks these; not source)
+*.dbmdl
+*.jfm
 **/out/
 **/TestResults/
 
