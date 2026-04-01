@@ -6,14 +6,13 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Catalog.Infrastructure.Read.Category.Queries;
 
-internal sealed class CategoryQueries(CatalogDbContext db, CategoryReadFactory readFactory)
+internal sealed class CategoryQueries(CatalogReadDbContext db, CategoryReadFactory readFactory)
     : ICategoryReadRepository
 {
     public async Task<IReadOnlyList<CategoryResponse>> GetRootCategoriesAsync(
         CancellationToken cancellationToken = default)
     {
         var rows = await db.Set<CategoryEntity>()
-            .AsNoTracking()
             .Where(c => c.ParentId == null && c.DeletedOn == null)
             .OrderBy(c => c.Name)
             .ToListAsync(cancellationToken)

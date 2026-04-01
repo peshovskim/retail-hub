@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Catalog.Infrastructure.Write.Category.Repositories;
 
-internal sealed class CategoryRepository(CatalogDbContext db) : ICategoryRepository
+internal sealed class CategoryRepository(CatalogWriteDbContext db) : ICategoryRepository
 {
     public async Task AddAsync(CategoryEntity category, CancellationToken cancellationToken = default)
     {

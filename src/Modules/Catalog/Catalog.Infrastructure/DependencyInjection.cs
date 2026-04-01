@@ -13,11 +13,16 @@ public static class DependencyInjection
 {
     public static IServiceCollection AddCatalogInfrastructure(this IServiceCollection services, string connectionString)
     {
-        services.AddDomainEventDispatchInterceptor<CatalogDbContext>();
-        services.AddDbContext<CatalogDbContext>((serviceProvider, options) =>
+        services.AddDomainEventDispatchInterceptor<CatalogWriteDbContext>();
+        services.AddDbContext<CatalogWriteDbContext>((serviceProvider, options) =>
         {
             options.UseSqlServer(connectionString)
-                .AddInterceptors(serviceProvider.GetRequiredService<DomainEventDispatchInterceptor<CatalogDbContext>>());
+                .AddInterceptors(serviceProvider.GetRequiredService<DomainEventDispatchInterceptor<CatalogWriteDbContext>>());
+        });
+        services.AddDbContext<CatalogReadDbContext>(options =>
+        {
+            options.UseSqlServer(connectionString)
+                .UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking);
         });
         services.AddScoped<CategoryReadFactory>();
         services.AddScoped<ICategoryReadRepository, CategoryQueries>();

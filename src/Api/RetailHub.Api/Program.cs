@@ -35,7 +35,7 @@ if (app.Environment.IsDevelopment())
 {
     await using (var scope = app.Services.CreateAsyncScope())
     {
-        var catalogDb = scope.ServiceProvider.GetRequiredService<CatalogDbContext>();
+        var catalogDb = scope.ServiceProvider.GetRequiredService<CatalogWriteDbContext>();
         await catalogDb.Database.EnsureCreatedAsync();
     }
 
