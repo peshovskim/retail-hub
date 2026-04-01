@@ -1,34 +1,76 @@
+using System.Diagnostics;
+using Catalog.Application;
+using Catalog.Application.Category.Queries.GetCategories;
+using Catalog.Infrastructure;
+using MediatR;
+using Microsoft.AspNetCore.Hosting.Server;
+using Microsoft.AspNetCore.Hosting.Server.Features;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using RetailHub.BuildingBlocks.Application;
+
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
+var connectionString = builder.Configuration.GetConnectionString("RetailHubDatabase");
+ArgumentException.ThrowIfNullOrEmpty(connectionString);
+
+builder.Services.AddBuildingBlocksApplication();
+builder.Services.AddCatalogApplication();
+builder.Services.AddCatalogInfrastructure(connectionString);
+
+builder.Services.AddMediatR(cfg =>
+{
+    cfg.RegisterServicesFromAssembly(typeof(GetCategoriesQuery).Assembly);
+    cfg.AddBuildingBlocksBehaviors();
+});
+
+builder.Services.AddControllers();
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
+if (app.Environment.IsDevelopment())
+{
+    await using (var scope = app.Services.CreateAsyncScope())
+    {
+        var catalogDb = scope.ServiceProvider.GetRequiredService<CatalogDbContext>();
+        await catalogDb.Database.EnsureCreatedAsync();
+    }
+
+    app.UseSwagger();
+    app.UseSwaggerUI();
+    app.Services.GetRequiredService<IHostApplicationLifetime>().ApplicationStarted.Register(() =>
+        TryOpenSwaggerInBrowser(app));
+}
+
 app.UseHttpsRedirection();
-
-var summaries = new[]
-{
-    "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
-};
-
-app.MapGet("/weatherforecast", () =>
-{
-    var forecast =  Enumerable.Range(1, 5).Select(index =>
-        new WeatherForecast
-        (
-            DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
-            Random.Shared.Next(-20, 55),
-            summaries[Random.Shared.Next(summaries.Length)]
-        ))
-        .ToArray();
-    return forecast;
-})
-.WithName("GetWeatherForecast");
-
+app.MapControllers();
 app.Run();
 
-record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary)
+static void TryOpenSwaggerInBrowser(WebApplication webApp)
 {
-    public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
+    try
+    {
+        var server = webApp.Services.GetRequiredService<IServer>();
+        var addresses = server.Features.Get<IServerAddressesFeature>()?.Addresses;
+        if (addresses is null || addresses.Count == 0)
+        {
+            return;
+        }
+
+        var baseUrl = addresses.FirstOrDefault(static a => a.StartsWith("https://", StringComparison.OrdinalIgnoreCase))
+            ?? addresses.FirstOrDefault();
+        if (baseUrl is null)
+        {
+            return;
+        }
+
+        var swaggerUrl = $"{baseUrl.TrimEnd('/')}/swagger";
+        Process.Start(new ProcessStartInfo { FileName = swaggerUrl, UseShellExecute = true });
+    }
+    catch
+    {
+    }
 }
