@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build">
+  <!-- 2.1.0 targets pass AcceleratedDatabaseRecovery; some VS builds ship an older SqlBuildTask → MSB4064. 2.0.0 matches CommerceHub.Database. -->
+  <Sdk Name="Microsoft.Build.Sql" Version="2.0.0" />
+  <PropertyGroup>
+    <TargetFramework>netstandard2.1</TargetFramework>
+  </PropertyGroup>
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <Name>RetailHub.Database</Name>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectVersion>4.1</ProjectVersion>
+    <ProjectGuid>{2c9e4b1a-7f3d-4e85-9c12-0a1b2c3d4e5f}</ProjectGuid>
+    <DSP>Microsoft.Data.Tools.Schema.Sql.Sql170DatabaseSchemaProvider</DSP>
+    <OutputType>Database</OutputType>
+    <RootPath />
+    <RootNamespace>RetailHub.Database</RootNamespace>
+    <AssemblyName>RetailHub.Database</AssemblyName>
+    <ModelCollation>1033, CI</ModelCollation>
+    <DefaultFileStructure>BySchemaAndSchemaType</DefaultFileStructure>
+    <DeployToDatabase>True</DeployToDatabase>
+    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
+    <TargetLanguage>CS</TargetLanguage>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <SqlServerVerification>False</SqlServerVerification>
+    <IncludeCompositeObjects>True</IncludeCompositeObjects>
+    <TargetDatabaseSet>True</TargetDatabaseSet>
+    <TargetFrameworkProfile />
+    <EnableDefaultSqlItems>false</EnableDefaultSqlItems>
+  </PropertyGroup>
+  <ItemGroup>
+    <Folder Include="Schemas\" />
+    <Folder Include="Tables\" />
+    <Folder Include="Tables\Cart\" />
+    <Folder Include="Tables\Cart\Table\" />
+    <Folder Include="Tables\Cart\Seed\" />
+    <Folder Include="Tables\Category\" />
+    <Folder Include="Tables\Category\Table\" />
+    <Folder Include="Tables\Category\Seed\" />
+    <Folder Include="Tables\Order\" />
+    <Folder Include="Tables\Order\Table\" />
+    <Folder Include="Tables\Order\Seed\" />
+    <Folder Include="Tables\User\" />
+    <Folder Include="Tables\User\Table\" />
+    <Folder Include="Tables\User\Seed\" />
+  </ItemGroup>
+  <!-- Convention: Tables/{Entity}/Table/{Entity}.sql (Build); Tables/{Entity}/Seed/{Entity}.Test.Seed.sql (None, :r from post-deploy) -->
+  <ItemGroup>
+    <Build Include="Schemas\identity.sql" />
+    <Build Include="Schemas\catalog.sql" />
+    <Build Include="Schemas\cart.sql" />
+    <Build Include="Schemas\orders.sql" />
+    <Build Include="Tables\Cart\Table\Cart.sql" />
+    <Build Include="Tables\Category\Table\Category.sql" />
+    <Build Include="Tables\Order\Table\Order.sql" />
+    <Build Include="Tables\User\Table\User.sql" />
+    <None Include="Tables\Cart\Seed\Cart.Test.Seed.sql" />
+    <None Include="Tables\Category\Seed\Category.Test.Seed.sql" />
+    <None Include="Tables\Order\Seed\Order.Test.Seed.sql" />
+    <None Include="Tables\User\Seed\User.Test.Seed.sql" />
+    <None Include="RetailHub.Database.publish.xml" />
+    <PostDeploy Include="Script.PostDeployment.sql" />
+  </ItemGroup>
+</Project>
