@@ -1,5 +1,9 @@
 import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
+import { MatBadgeModule } from '@angular/material/badge';
+import { MatButtonModule } from '@angular/material/button';
+import { MatIconModule } from '@angular/material/icon';
+import { MatToolbarModule } from '@angular/material/toolbar';
 
 import { CatalogMenuModule } from '../features/catalog/catalog-menu.module';
 import { SharedModule } from '../shared/shared.module';
@@ -11,6 +15,15 @@ import { MainLayoutPage } from './pages/main-layout.page';
 
 @NgModule({
   declarations: [MainLayoutPage, NavbarComponent, SidebarComponent, FooterComponent],
-  imports: [CommonModule, SharedModule, LayoutRoutingModule, CatalogMenuModule],
+  imports: [
+    CommonModule,
+    SharedModule,
+    LayoutRoutingModule,
+    CatalogMenuModule,
+    MatToolbarModule,
+    MatButtonModule,
+    MatIconModule,
+    MatBadgeModule,
+  ],
 })
 export class LayoutModule {}

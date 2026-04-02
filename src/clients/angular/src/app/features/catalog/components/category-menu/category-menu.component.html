@@ -1,11 +1,23 @@
-<nav class="category-menu" aria-label="Categories">
+<div class="category-menu" aria-label="Categories">
   @if (loading$ | async) {
     <span class="category-menu__hint">Loading…</span>
   } @else if (error$ | async; as err) {
     <span class="category-menu__hint" role="alert">{{ err }}</span>
   } @else {
-    @for (c of (menu$ | async) ?? []; track c.id) {
-      <a [routerLink]="['/catalog', 'category', c.slug]" class="category-menu__link">{{ c.name }}</a>
-    }
+    <button
+      type="button"
+      mat-button
+      [matMenuTriggerFor]="rootMenu.menu"
+      class="category-menu__trigger"
+    >
+      <span>Категории</span>
+      <span class="category-menu__sep" aria-hidden="true">/</span>
+      <span>Categories</span>
+    </button>
+    <app-category-nested-menu
+      #rootMenu
+      [nodes]="(menu$ | async) ?? []"
+      panelClass="category-menu-panel"
+    />
   }
-</nav>
+</div>

@@ -1,21 +1,20 @@
 .category-menu {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem 1rem;
+  display: inline-flex;
   align-items: center;
 }
 
-.category-menu__link {
-  text-decoration: none;
-  color: #333;
-  font-size: 0.9375rem;
+.category-menu__trigger {
+  text-transform: none;
+  letter-spacing: normal;
+}
 
-  &:hover {
-    text-decoration: underline;
-  }
+.category-menu__sep {
+  margin: 0 0.25rem;
+  opacity: 0.85;
 }
 
 .category-menu__hint {
   font-size: 0.875rem;
-  color: #666;
+  opacity: 0.9;
+  white-space: nowrap;
 }

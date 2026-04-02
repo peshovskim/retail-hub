@@ -34,3 +34,9 @@ body {
   background-color: var(--mat-sys-surface);
   color: var(--mat-sys-on-surface);
 }
+
+/* Scrollable category menu panels (many roots or long child lists). */
+.mat-mdc-menu-panel.category-menu-panel {
+  max-height: min(70vh, 28rem);
+  overflow-y: auto;
+}

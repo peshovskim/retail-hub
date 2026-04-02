@@ -1,0 +1,17 @@
+<mat-menu
+  #panel="matMenu"
+  [overlapTrigger]="false"
+  [class]="panelClass || ''"
+>
+  @for (n of nodes; track n.id) {
+    @if (n.children.length) {
+      <button type="button" mat-menu-item [matMenuTriggerFor]="sub.menu">
+        <span>{{ n.name }}</span>
+        <mat-icon iconPositionEnd>chevron_right</mat-icon>
+      </button>
+      <app-category-nested-menu #sub [nodes]="n.children" [panelClass]="panelClass" />
+    } @else {
+      <a mat-menu-item [routerLink]="['/catalog', 'category', n.slug]">{{ n.name }}</a>
+    }
+  }
+</mat-menu>

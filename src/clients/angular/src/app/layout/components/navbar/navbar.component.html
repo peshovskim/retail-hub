@@ -1,4 +1,28 @@
-<header class="navbar">
-  <a routerLink="/catalog" class="navbar__brand">Retail Hub</a>
-  <app-category-menu />
-</header>
+<mat-toolbar color="primary" class="app-toolbar">
+  <a mat-button routerLink="/catalog" class="app-toolbar__brand">Retail Hub</a>
+
+  <nav class="app-toolbar__nav" aria-label="Primary">
+    <a mat-button routerLink="/catalog" class="app-toolbar__link">Всички продукти</a>
+    <a mat-button routerLink="/catalog" class="app-toolbar__link">Отстъпки</a>
+    <app-category-menu />
+  </nav>
+
+  <span class="app-toolbar__fill"></span>
+
+  <div class="app-toolbar__search" role="search">
+    <mat-icon class="app-toolbar__search-icon" aria-hidden="true">search</mat-icon>
+    <input
+      type="search"
+      class="app-toolbar__search-input"
+      placeholder="Search"
+      disabled
+      aria-label="Search (coming soon)"
+    />
+  </div>
+
+  <button mat-icon-button type="button" aria-label="Shopping cart (coming soon)" disabled>
+    <mat-icon matBadge="0" matBadgeSize="small" matBadgeColor="accent" aria-hidden="true"
+      >shopping_cart</mat-icon
+    >
+  </button>
+</mat-toolbar>
