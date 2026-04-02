@@ -1,10 +1,10 @@
 using Catalog.Application.Category.Interfaces;
 using Catalog.Application.Category.Responses;
-using Catalog.Infrastructure.Read.Category.Factories;
+using Catalog.Infrastructure.Persistence.Read.Category.Factories;
 using CategoryEntity = Catalog.Domain.Category.Domain.Category;
 using Microsoft.EntityFrameworkCore;
 
-namespace Catalog.Infrastructure.Read.Category.Queries;
+namespace Catalog.Infrastructure.Persistence.Read.Category.Queries;
 
 internal sealed class CategoryQueries(CatalogReadDbContext db, CategoryReadFactory readFactory)
     : ICategoryReadRepository

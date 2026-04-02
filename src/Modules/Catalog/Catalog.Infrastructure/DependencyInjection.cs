@@ -1,7 +1,7 @@
 using Catalog.Application.Category.Interfaces;
-using Catalog.Infrastructure.Read.Category.Factories;
-using Catalog.Infrastructure.Read.Category.Queries;
-using Catalog.Infrastructure.Write.Category.Repositories;
+using Catalog.Infrastructure.Persistence.Read.Category.Factories;
+using Catalog.Infrastructure.Persistence.Read.Category.Queries;
+using Catalog.Infrastructure.Persistence.Write.Category.Repositories;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using RetailHub.SharedKernel.Infrastructure;

@@ -1,6 +1,6 @@
 using CategoryEntity = Catalog.Domain.Category.Domain.Category;
 
-namespace Catalog.Infrastructure.Write.Category.Factories;
+namespace Catalog.Infrastructure.Persistence.Write.Category.Factories;
 
 public static class CategoryFactory
 {

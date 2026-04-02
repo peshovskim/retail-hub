@@ -1,7 +1,7 @@
 using Catalog.Application.Category.Responses;
 using CategoryEntity = Catalog.Domain.Category.Domain.Category;
 
-namespace Catalog.Infrastructure.Read.Category.Factories;
+namespace Catalog.Infrastructure.Persistence.Read.Category.Factories;
 
 public sealed class CategoryReadFactory
 {
