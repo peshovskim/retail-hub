@@ -5,7 +5,6 @@ using Catalog.Infrastructure;
 using MediatR;
 using Microsoft.AspNetCore.Hosting.Server;
 using Microsoft.AspNetCore.Hosting.Server.Features;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using RetailHub.SharedKernel.Application.Common.Abstractions.DomainEvents;
@@ -35,12 +34,6 @@ var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
 {
-    await using (var scope = app.Services.CreateAsyncScope())
-    {
-        var catalogDb = scope.ServiceProvider.GetRequiredService<CatalogWriteDbContext>();
-        await catalogDb.Database.EnsureCreatedAsync();
-    }
-
     app.UseSwagger();
     app.UseSwaggerUI();
     app.Services.GetRequiredService<IHostApplicationLifetime>().ApplicationStarted.Register(() =>

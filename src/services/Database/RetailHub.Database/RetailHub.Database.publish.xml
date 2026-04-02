@@ -11,6 +11,6 @@
     <DropObjectsNotInSource>False</DropObjectsNotInSource>
     <IgnoreColumnOrder>True</IgnoreColumnOrder>
     <CreateNewDatabase>True</CreateNewDatabase>
-    <TargetConnectionString>Data Source=localhost\MSSQLSERVER01;Initial Catalog=RetailHub;Integrated Security=True;Persist Security Info=False;Pooling=False;MultipleActiveResultSets=False;Connect Timeout=60;Encrypt=True;TrustServerCertificate=True</TargetConnectionString>
+    <TargetConnectionString>Data Source=(localdb)\mssqllocaldb;Initial Catalog=RetailHub;Integrated Security=True;Persist Security Info=False;Pooling=False;MultipleActiveResultSets=True;Connect Timeout=60;Encrypt=True;TrustServerCertificate=True</TargetConnectionString>
   </PropertyGroup>
 </Project>
