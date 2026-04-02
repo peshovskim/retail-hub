@@ -1,5 +1,5 @@
 using Catalog.Application.Category.Interfaces;
-using Catalog.Contracts.Category.Responses;
+using Catalog.Application.Category.Responses;
 using Catalog.Infrastructure.Read.Category.Factories;
 using CategoryEntity = Catalog.Domain.Category.Domain.Category;
 using Microsoft.EntityFrameworkCore;
@@ -20,3 +20,4 @@ internal sealed class CategoryQueries(CatalogReadDbContext db, CategoryReadFacto
         return rows.Select(readFactory.ToResponse).ToList();
     }
 }
+

@@ -1,5 +1,5 @@
 using Catalog.Application.Category.Interfaces;
-using Catalog.Contracts.Category.Responses;
+using Catalog.Application.Category.Responses;
 using MediatR;
 using RetailHub.SharedKernel.Application.Common.Cqrs;
 using RetailHub.SharedKernel.Application.Common.Results;
@@ -19,3 +19,4 @@ public sealed class GetCategoriesQueryHandler(ICategoryReadRepository repository
         return Result<IReadOnlyList<CategoryResponse>>.Success(responses);
     }
 }
+

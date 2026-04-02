@@ -10,7 +10,6 @@
   <ItemGroup>
     <ProjectReference Include="..\..\BuildingBlocks\Application\SharedKernel.Application\SharedKernel.Application.csproj" />
     <ProjectReference Include="..\..\Modules\Catalog\Catalog.Application\Catalog.Application.csproj" />
-    <ProjectReference Include="..\..\Modules\Catalog\Catalog.Contracts\Catalog.Contracts.csproj" />
     <ProjectReference Include="..\..\Modules\Catalog\Catalog.Infrastructure\Catalog.Infrastructure.csproj" />
   </ItemGroup>
 

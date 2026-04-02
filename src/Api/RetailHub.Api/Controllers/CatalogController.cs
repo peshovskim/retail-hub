@@ -1,5 +1,5 @@
 using Catalog.Application.Category.Queries.GetCategories;
-using Catalog.Contracts.Category.Responses;
+using Catalog.Application.Category.Responses;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using RetailHub.Api.Common.Http;
@@ -18,3 +18,4 @@ public sealed class CatalogController(IMediator mediator) : ControllerBase
         return result.ToActionResult();
     }
 }
+

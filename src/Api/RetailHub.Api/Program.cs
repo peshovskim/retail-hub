@@ -8,21 +8,23 @@ using Microsoft.AspNetCore.Hosting.Server.Features;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using RetailHub.SharedKernel.Application;
+using RetailHub.SharedKernel.Application.Common.Abstractions.DomainEvents;
+using RetailHub.SharedKernel.Application.Common.Behaviors;
+using RetailHub.SharedKernel.Application.Common.DomainEvents;
 
 var builder = WebApplication.CreateBuilder(args);
 
 var connectionString = builder.Configuration.GetConnectionString("RetailHubDatabase");
 ArgumentException.ThrowIfNullOrEmpty(connectionString);
 
-builder.Services.AddSharedKernelApplication();
+builder.Services.AddScoped<IDomainEventDispatcher, MediatRDomainEventDispatcher>();
 builder.Services.AddCatalogApplication();
 builder.Services.AddCatalogInfrastructure(connectionString);
 
 builder.Services.AddMediatR(cfg =>
 {
     cfg.RegisterServicesFromAssembly(typeof(GetCategoriesQuery).Assembly);
-    cfg.AddSharedKernelBehaviors();
+    cfg.AddOpenBehavior(typeof(ValidationBehavior<,>));
 });
 
 builder.Services.AddControllers();
