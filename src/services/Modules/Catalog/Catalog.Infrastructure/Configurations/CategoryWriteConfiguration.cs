@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Catalog.Infrastructure.Configurations;
 
-internal sealed class CategoryReadConfiguration : IEntityTypeConfiguration<CategoryEntity>
+internal sealed class CategoryWriteConfiguration : IEntityTypeConfiguration<CategoryEntity>
 {
     public void Configure(EntityTypeBuilder<CategoryEntity> builder)
     {

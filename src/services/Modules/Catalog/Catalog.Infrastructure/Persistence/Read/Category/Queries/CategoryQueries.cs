@@ -19,5 +19,17 @@ internal sealed class CategoryQueries(CatalogReadDbContext db, CategoryReadFacto
             .ConfigureAwait(false);
         return rows.Select(readFactory.ToResponse).ToList();
     }
+
+    public async Task<IReadOnlyList<CategoryMenuSourceRow>> GetAllActiveCategoriesAsync(
+        CancellationToken cancellationToken = default)
+    {
+        var rows = await db.Set<CategoryEntity>()
+            .Where(c => c.DeletedOn == null)
+            .OrderBy(c => c.Name)
+            .Select(c => new CategoryMenuSourceRow(c.Id, c.Name, c.Slug, c.ParentId))
+            .ToListAsync(cancellationToken)
+            .ConfigureAwait(false);
+        return rows;
+    }
 }
 

@@ -1,4 +1,5 @@
 using Catalog.Application.Category.Queries.GetCategories;
+using Catalog.Application.Category.Queries.GetCategoryMenu;
 using Catalog.Application.Category.Responses;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
@@ -15,6 +16,14 @@ public sealed class CatalogController(IMediator mediator) : ControllerBase
     public async Task<IActionResult> GetCategories(CancellationToken cancellationToken)
     {
         var result = await mediator.Send(new GetCategoriesQuery(), cancellationToken).ConfigureAwait(false);
+        return result.ToActionResult();
+    }
+
+    [HttpGet("categories/menu")]
+    [ProducesResponseType(typeof(IReadOnlyList<CategoryMenuNodeResponse>), StatusCodes.Status200OK)]
+    public async Task<IActionResult> GetCategoryMenu(CancellationToken cancellationToken)
+    {
+        var result = await mediator.Send(new GetCategoryMenuQuery(), cancellationToken).ConfigureAwait(false);
         return result.ToActionResult();
     }
 }
