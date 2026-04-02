@@ -28,3 +28,41 @@
 # OS files
 .DS_Store
 Thumbs.db
+
+# Frontend — Node / npm / Angular (any path, e.g. src/clients/angular)
+node_modules/
+dist/
+out-tsc/
+tmp/
+temp/
+
+# Angular CLI / build cache
+.angular/
+
+# TypeScript / tooling caches
+*.tsbuildinfo
+.eslintcache
+.sass-cache/
+
+# Test / coverage output
+coverage/
+lib-cov/
+.nyc_output/
+
+# npm / yarn / pnpm logs & local store hints
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# Nx (if reintroduced)
+nx-cloud.env
+.nx/
+
+# E2E artifacts (if you add Playwright / Cypress later)
+/test-results/
+/playwright-report/
+/blob-report/
+/cypress/videos/
+/cypress/screenshots/
