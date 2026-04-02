@@ -1,18 +1,76 @@
 <section class="product-list">
-  <h1>Catalog</h1>
-  <p class="muted">Products and filters will go here. Categories below come from the API.</p>
-
-  @if (loading$ | async) {
-    <p>Loading categories…</p>
-  } @else if (error$ | async; as err) {
-    <p role="alert">{{ err }}</p>
-  } @else {
-    <ul class="product-list__categories">
-      @for (c of (categories$ | async) ?? []; track c.id) {
-        <li>
-          <a [routerLink]="['/catalog', 'category', c.slug]">{{ c.name }}</a>
-        </li>
+  <header class="shop-hero">
+    <div class="shop-hero__media" aria-hidden="true"></div>
+    <div class="shop-hero__content">
+      <h1 class="shop-hero__title">Welcome to our store</h1>
+      <p class="shop-hero__subtitle">
+        Browse categories, explore products, and enjoy a clean storefront experience.
+      </p>
+      <a
+        mat-raised-button
+        routerLink="/catalog"
+        fragment="shop-categories"
+        class="shop-cta shop-hero__cta"
+      >
+        Shop now
+        <mat-icon iconPositionEnd aria-hidden="true">arrow_forward</mat-icon>
+      </a>
+    </div>
+    <div class="shop-hero__dots" aria-hidden="true">
+      @for (d of heroDots; track d) {
+        <span class="shop-hero__dot" [class.shop-hero__dot--active]="d === 0"></span>
       }
-    </ul>
-  }
+    </div>
+  </header>
+
+  <div class="product-list__inner">
+    @if (loading$ | async) {
+      <div class="product-list__state" role="status" aria-live="polite">
+        <mat-progress-spinner mode="indeterminate" diameter="44" />
+        <p class="product-list__state-text">Loading categories...</p>
+      </div>
+    } @else if (error$ | async; as err) {
+      <mat-card class="product-list__error" appearance="outlined">
+        <mat-card-content>
+          <div class="product-list__error-row">
+            <mat-icon color="warn" aria-hidden="true">error_outline</mat-icon>
+            <p role="alert">{{ err }}</p>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    } @else {
+      @let cats = (categories$ | async) ?? [];
+      @if (cats.length === 0) {
+        <mat-card appearance="outlined" class="product-list__empty">
+          <mat-card-content>
+            <mat-icon class="product-list__empty-icon" aria-hidden="true">inventory_2</mat-icon>
+            <p>No categories returned from the server.</p>
+          </mat-card-content>
+        </mat-card>
+      } @else {
+        <h2 id="shop-categories" class="product-list__section-title">Shop by category</h2>
+        <div class="product-list__grid">
+          @for (c of cats; track c.id) {
+            <a
+              class="product-list__card-link"
+              matRipple
+              [routerLink]="['/catalog', 'category', c.slug]"
+            >
+              <mat-card appearance="outlined" class="product-list__card">
+                <mat-card-content>
+                  <div class="product-list__card-body">
+                    <span class="product-list__card-icon-wrap" aria-hidden="true">
+                      <mat-icon>folder</mat-icon>
+                    </span>
+                    <span class="product-list__card-title">{{ c.name }}</span>
+                    <mat-icon class="product-list__card-chevron" aria-hidden="true">chevron_right</mat-icon>
+                  </div>
+                </mat-card-content>
+              </mat-card>
+            </a>
+          }
+        </div>
+      }
+    }
+  </div>
 </section>

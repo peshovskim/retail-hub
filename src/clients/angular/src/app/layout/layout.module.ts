@@ -2,7 +2,9 @@ import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
 import { MatBadgeModule } from '@angular/material/badge';
 import { MatButtonModule } from '@angular/material/button';
+import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
+import { MatInputModule } from '@angular/material/input';
 import { MatToolbarModule } from '@angular/material/toolbar';
 
 import { CatalogMenuModule } from '../features/catalog/catalog-menu.module';
@@ -24,6 +26,8 @@ import { MainLayoutPage } from './pages/main-layout.page';
     MatButtonModule,
     MatIconModule,
     MatBadgeModule,
+    MatFormFieldModule,
+    MatInputModule,
   ],
 })
 export class LayoutModule {}

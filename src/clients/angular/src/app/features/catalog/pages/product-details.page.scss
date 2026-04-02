@@ -1,3 +1,14 @@
-.muted {
-  color: #666;
+.product-details {
+  max-width: 42rem;
+  margin: 0 auto;
+}
+
+.product-details__card {
+  border-radius: var(--mat-sys-corner-medium, 12px);
+}
+
+.product-details__muted {
+  margin: 0;
+  color: var(--mat-sys-on-surface-variant);
+  font-size: 0.95rem;
 }

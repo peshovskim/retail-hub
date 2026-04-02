@@ -1,17 +1,21 @@
 <mat-menu
   #panel="matMenu"
   [overlapTrigger]="false"
-  [class]="panelClass || ''"
+  [class]="panelClass || 'category-menu-panel'"
 >
   @for (n of nodes; track n.id) {
     @if (n.children.length) {
-      <button type="button" mat-menu-item [matMenuTriggerFor]="sub.menu">
-        <span>{{ n.name }}</span>
-        <mat-icon iconPositionEnd>chevron_right</mat-icon>
+      <button type="button" mat-menu-item [matMenuTriggerFor]="sub.menu" class="category-nested-menu__item">
+        <mat-icon class="category-nested-menu__icon-start" aria-hidden="true">folder_open</mat-icon>
+        <span class="category-nested-menu__label">{{ n.name }}</span>
+        <mat-icon iconPositionEnd aria-hidden="true">chevron_right</mat-icon>
       </button>
       <app-category-nested-menu #sub [nodes]="n.children" [panelClass]="panelClass" />
     } @else {
-      <a mat-menu-item [routerLink]="['/catalog', 'category', n.slug]">{{ n.name }}</a>
+      <a mat-menu-item [routerLink]="['/catalog', 'category', n.slug]" class="category-nested-menu__item">
+        <mat-icon class="category-nested-menu__icon-start" aria-hidden="true">label</mat-icon>
+        <span class="category-nested-menu__label">{{ n.name }}</span>
+      </a>
     }
   }
 </mat-menu>

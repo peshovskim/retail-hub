@@ -14,6 +14,9 @@ import {
   standalone: false,
 })
 export class ProductListPage {
+  /** Decorative carousel dots (static; styling reference only). */
+  protected readonly heroDots = [0, 1, 2, 3, 4];
+
   protected categories$;
   protected loading$;
   protected error$;

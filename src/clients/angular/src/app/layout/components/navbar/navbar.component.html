@@ -1,27 +1,36 @@
-<mat-toolbar color="primary" class="app-toolbar">
-  <a mat-button routerLink="/catalog" class="app-toolbar__brand">Retail Hub</a>
+<mat-toolbar class="app-toolbar app-toolbar--shop">
+  <div class="app-toolbar__inner">
+    <a routerLink="/catalog" class="app-toolbar__logo" aria-label="Retail Hub home">
+      <span class="app-toolbar__logo-mark">
+        <mat-icon aria-hidden="true">storefront</mat-icon>
+      </span>
+      <span class="app-toolbar__brand">Retail Hub</span>
+    </a>
 
-  <nav class="app-toolbar__nav" aria-label="Primary">
-    <a mat-button routerLink="/catalog" class="app-toolbar__link">All products</a>
-    <app-category-menu />
-  </nav>
+    <nav class="app-toolbar__nav" aria-label="Primary">
+      <a mat-button routerLink="/catalog" class="app-toolbar__link">All products</a>
+      <app-category-menu />
+    </nav>
 
-  <span class="app-toolbar__fill"></span>
+    <span class="app-toolbar__fill"></span>
 
-  <div class="app-toolbar__search" role="search">
-    <mat-icon class="app-toolbar__search-icon" aria-hidden="true">search</mat-icon>
-    <input
-      type="search"
-      class="app-toolbar__search-input"
-      placeholder="Search"
-      disabled
-      aria-label="Search (coming soon)"
-    />
-  </div>
-
-  <button mat-icon-button type="button" aria-label="Shopping cart (coming soon)" disabled>
-    <mat-icon matBadge="0" matBadgeSize="small" matBadgeColor="accent" aria-hidden="true"
-      >shopping_cart</mat-icon
+    <mat-form-field
+      appearance="outline"
+      class="app-toolbar__search-field"
+      subscriptSizing="dynamic"
     >
-  </button>
+      <mat-icon matPrefix class="app-toolbar__search-prefix" aria-hidden="true">search</mat-icon>
+      <input
+        matInput
+        type="search"
+        placeholder="Search..."
+        disabled
+        aria-label="Search (coming soon)"
+      />
+    </mat-form-field>
+
+    <button mat-icon-button type="button" class="app-toolbar__cart" aria-label="Shopping cart (coming soon)" disabled>
+      <mat-icon matBadge="0" matBadgeSize="small" matBadgeColor="warn" aria-hidden="true">shopping_cart</mat-icon>
+    </button>
+  </div>
 </mat-toolbar>
