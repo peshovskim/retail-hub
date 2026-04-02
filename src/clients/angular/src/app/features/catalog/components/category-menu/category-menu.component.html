@@ -4,7 +4,7 @@
   } @else if (error$ | async; as err) {
     <span class="category-menu__hint" role="alert">{{ err }}</span>
   } @else {
-    @for (c of (categories$ | async) ?? []; track c.id) {
+    @for (c of (menu$ | async) ?? []; track c.id) {
       <a [routerLink]="['/catalog', 'category', c.slug]" class="category-menu__link">{{ c.name }}</a>
     }
   }

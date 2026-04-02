@@ -1,6 +1,6 @@
 import { createFeature, createReducer, on } from '@ngrx/store';
 
-import type { Category } from '../models/category.model';
+import type { Category, CategoryMenuNode } from '../models/category.model';
 import { catalogActions } from './catalog.actions';
 
 export const CATALOG_FEATURE_KEY = 'catalog' as const;
@@ -9,12 +9,18 @@ export interface CatalogState {
   categories: Category[];
   loading: boolean;
   error: string | null;
+  menu: CategoryMenuNode[];
+  menuLoading: boolean;
+  menuError: string | null;
 }
 
 const initialState: CatalogState = {
   categories: [],
   loading: false,
   error: null,
+  menu: [],
+  menuLoading: false,
+  menuError: null,
 };
 
 export const catalogReducer = createReducer(
@@ -33,6 +39,21 @@ export const catalogReducer = createReducer(
     ...state,
     loading: false,
     error,
+  })),
+  on(catalogActions.loadCategoryMenu, (state) => ({
+    ...state,
+    menuLoading: true,
+    menuError: null,
+  })),
+  on(catalogActions.loadCategoryMenuSuccess, (state, { menu }) => ({
+    ...state,
+    menu,
+    menuLoading: false,
+  })),
+  on(catalogActions.loadCategoryMenuFailure, (state, { error }) => ({
+    ...state,
+    menuLoading: false,
+    menuError: error,
   })),
 );
 

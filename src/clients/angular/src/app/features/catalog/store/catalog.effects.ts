@@ -29,4 +29,22 @@ export class CatalogEffects {
       ),
     ),
   );
+
+  loadCategoryMenu$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(catalogActions.loadCategoryMenu),
+      switchMap(() =>
+        this.api.getCategoryMenu().pipe(
+          map((menu) => catalogActions.loadCategoryMenuSuccess({ menu })),
+          catchError((err: unknown) =>
+            of(
+              catalogActions.loadCategoryMenuFailure({
+                error: err instanceof Error ? err.message : 'Unknown error',
+              }),
+            ),
+          ),
+        ),
+      ),
+    ),
+  );
 }

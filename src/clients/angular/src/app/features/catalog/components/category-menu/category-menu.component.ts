@@ -3,9 +3,9 @@ import { Store } from '@ngrx/store';
 
 import { catalogActions } from '../../store/catalog.actions';
 import {
-  selectCatalogCategories,
-  selectCatalogError,
-  selectCatalogLoading,
+  selectCategoryMenu,
+  selectCategoryMenuError,
+  selectCategoryMenuLoading,
 } from '../../store/catalog.selectors';
 
 @Component({
@@ -15,17 +15,17 @@ import {
   standalone: false,
 })
 export class CategoryMenuComponent implements OnInit {
-  protected categories$;
+  protected menu$;
   protected loading$;
   protected error$;
 
   constructor(private readonly store: Store) {
-    this.categories$ = this.store.select(selectCatalogCategories);
-    this.loading$ = this.store.select(selectCatalogLoading);
-    this.error$ = this.store.select(selectCatalogError);
+    this.menu$ = this.store.select(selectCategoryMenu);
+    this.loading$ = this.store.select(selectCategoryMenuLoading);
+    this.error$ = this.store.select(selectCategoryMenuError);
   }
 
   ngOnInit(): void {
-    this.store.dispatch(catalogActions.loadCategories());
+    this.store.dispatch(catalogActions.loadCategoryMenu());
   }
 }

@@ -1,6 +1,6 @@
 import { createActionGroup, emptyProps, props } from '@ngrx/store';
 
-import type { Category } from '../models/category.model';
+import type { Category, CategoryMenuNode } from '../models/category.model';
 
 export const catalogActions = createActionGroup({
   source: 'Catalog',
@@ -8,5 +8,9 @@ export const catalogActions = createActionGroup({
     loadCategories: emptyProps(),
     loadCategoriesSuccess: props<{ categories: Category[] }>(),
     loadCategoriesFailure: props<{ error: string }>(),
+
+    loadCategoryMenu: emptyProps(),
+    loadCategoryMenuSuccess: props<{ menu: CategoryMenuNode[] }>(),
+    loadCategoryMenuFailure: props<{ error: string }>(),
   },
 });
