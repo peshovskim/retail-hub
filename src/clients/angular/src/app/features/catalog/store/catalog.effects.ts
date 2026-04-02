@@ -1,16 +1,19 @@
-import { Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import { Actions, createEffect, ofType } from '@ngrx/effects';
 import { catchError, map, of, switchMap } from 'rxjs';
 
 import { CatalogApiService } from '../services/catalog-api.service';
 import { catalogActions } from './catalog.actions';
 
+/**
+ * `inject()` fields must run before `createEffect` fields: class field initializers run
+ * top-to-bottom before the constructor, so `createEffect(() => this.actions$.pipe(...))`
+ * would otherwise see `actions$` as undefined.
+ */
 @Injectable()
 export class CatalogEffects {
-  constructor(
-    private readonly actions$: Actions,
-    private readonly api: CatalogApiService,
-  ) {}
+  private readonly actions$ = inject(Actions);
+  private readonly api = inject(CatalogApiService);
 
   loadCategories$ = createEffect(() =>
     this.actions$.pipe(

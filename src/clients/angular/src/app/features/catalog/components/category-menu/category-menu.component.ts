@@ -1,4 +1,5 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, DestroyRef, inject, OnInit } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Store } from '@ngrx/store';
 
 import { catalogActions } from '../../store/catalog.actions';
@@ -15,6 +16,9 @@ import {
   standalone: false,
 })
 export class CategoryMenuComponent implements OnInit {
+  private readonly cdr = inject(ChangeDetectorRef);
+  private readonly destroyRef = inject(DestroyRef);
+
   protected menu$;
   protected loading$;
   protected error$;
@@ -27,5 +31,12 @@ export class CategoryMenuComponent implements OnInit {
 
   ngOnInit(): void {
     this.store.dispatch(catalogActions.loadCategoryMenu());
+    this.loading$
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((loading) => {
+        if (!loading) {
+          queueMicrotask(() => this.cdr.detectChanges());
+        }
+      });
   }
 }

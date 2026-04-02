@@ -4,20 +4,21 @@
   } @else if (error$ | async; as err) {
     <span class="category-menu__hint" role="alert">{{ err }}</span>
   } @else {
-    <button
-      type="button"
-      mat-button
-      [matMenuTriggerFor]="rootMenu.menu"
-      class="category-menu__trigger"
-    >
-      <span>Категории</span>
-      <span class="category-menu__sep" aria-hidden="true">/</span>
-      <span>Categories</span>
-    </button>
+    <!-- Nested menu first: `menu` is a ViewChild inside the child; the trigger must not bind until it exists. -->
     <app-category-nested-menu
       #rootMenu
       [nodes]="(menu$ | async) ?? []"
       panelClass="category-menu-panel"
     />
+    @if (rootMenu.menu) {
+      <button
+        type="button"
+        mat-button
+        [matMenuTriggerFor]="rootMenu.menu"
+        class="category-menu__trigger"
+      >
+        <span>Categories</span>
+      </button>
+    }
   }
 </div>

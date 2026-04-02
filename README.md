@@ -90,6 +90,7 @@ An Angular client lives under **`src/clients/angular`**. Running it is separate 
 |--------|----------------|
 | Publish fails with a **version / target platform** error | The server must be **SQL Server 2025** (or another engine that matches **`Sql170`**). Older instances (for example SQL Server 2019) will not match the project target. |
 | **`Cannot connect to localhost`** | Confirm the **SQL Server (MSSQLSERVER)** service exists and is **Running** in **`services.msc`**. If you only have a **named** instance, update the connection string (see above). |
+| **`dotnet run` / build fails** with **MSB3027** or **“file is locked by RetailHub.Api”** | Another API instance is still running (terminal, **dotnet run**, or Visual Studio debug). Stop it first: end **`RetailHub.Api`** in Task Manager, or press **Shift+F5** in Visual Studio, or close the terminal that is hosting the API. Then build or run again. |
 | API returns **empty** category lists | Confirm you published to the **same** server and database as **`RetailHubDatabase`**, and that seed scripts ran. In SSMS, query **`catalog.Category`** on database **`RetailHub`**. |
 | **Database diagrams** in SSMS fail on SQL 2025 | Update SSMS to the latest version, or manage schema through the **RetailHub.Database** project instead of the diagram designer. |
 
