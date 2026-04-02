@@ -1,0 +1,18 @@
+<section class="product-list">
+  <h1>Catalog</h1>
+  <p class="muted">Products and filters will go here. Categories below come from the API.</p>
+
+  @if (loading$ | async) {
+    <p>Loading categories…</p>
+  } @else if (error$ | async; as err) {
+    <p role="alert">{{ err }}</p>
+  } @else {
+    <ul class="product-list__categories">
+      @for (c of (categories$ | async) ?? []; track c.id) {
+        <li>
+          <a [routerLink]="['/catalog', 'category', c.slug]">{{ c.name }}</a>
+        </li>
+      }
+    </ul>
+  }
+</section>
