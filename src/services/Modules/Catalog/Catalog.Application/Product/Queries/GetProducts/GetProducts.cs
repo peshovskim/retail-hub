@@ -6,7 +6,15 @@ using RetailHub.SharedKernel.Application.Common.Results;
 
 namespace Catalog.Application.Product.Queries.GetProducts;
 
-public sealed record GetProductsQuery : IQuery<IReadOnlyList<ProductResponse>>;
+/// <summary>List criteria for products: optional search, category and price filters, sort, and optional paging.</summary>
+public sealed record GetProductsQuery(
+    string? Search = null,
+    IReadOnlyList<Guid>? CategoryIds = null,
+    decimal? PriceMin = null,
+    decimal? PriceMax = null,
+    ProductListSort Sort = ProductListSort.NameAsc,
+    int? Page = null,
+    int? PageSize = null) : IQuery<IReadOnlyList<ProductResponse>>;
 
 public sealed class GetProductsQueryHandler : IRequestHandler<GetProductsQuery, Result<IReadOnlyList<ProductResponse>>>
 {
