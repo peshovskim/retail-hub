@@ -9,13 +9,20 @@ namespace RetailHub.Api.Controllers;
 
 [ApiController]
 [Route("api/catalog")]
-public sealed class CatalogController(IMediator mediator) : ControllerBase
+public sealed class CatalogController : ControllerBase
 {
+    private readonly IMediator _mediator;
+
+    public CatalogController(IMediator mediator)
+    {
+        _mediator = mediator;
+    }
+
     [HttpGet("categories")]
     [ProducesResponseType(typeof(IReadOnlyList<CategoryResponse>), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetCategories(CancellationToken cancellationToken)
     {
-        var result = await mediator.Send(new GetCategoriesQuery(), cancellationToken).ConfigureAwait(false);
+        var result = await _mediator.Send(new GetCategoriesQuery(), cancellationToken).ConfigureAwait(false);
         return result.ToActionResult();
     }
 
@@ -23,8 +30,7 @@ public sealed class CatalogController(IMediator mediator) : ControllerBase
     [ProducesResponseType(typeof(IReadOnlyList<CategoryMenuNodeResponse>), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetCategoryMenu(CancellationToken cancellationToken)
     {
-        var result = await mediator.Send(new GetCategoryMenuQuery(), cancellationToken).ConfigureAwait(false);
+        var result = await _mediator.Send(new GetCategoryMenuQuery(), cancellationToken).ConfigureAwait(false);
         return result.ToActionResult();
     }
 }
-

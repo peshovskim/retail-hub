@@ -10,9 +10,16 @@ namespace RetailHub.SharedKernel.Infrastructure.Persistence.Interceptors;
 /// <summary>
 /// After successful SaveChanges, dispatches domain events on tracked <see cref="AggregateRoot"/> instances.
 /// </summary>
-public sealed class DomainEventDispatchInterceptor<TDbContext>(IServiceProvider serviceProvider) : SaveChangesInterceptor
+public sealed class DomainEventDispatchInterceptor<TDbContext> : SaveChangesInterceptor
     where TDbContext : DbContext
 {
+    private readonly IServiceProvider _serviceProvider;
+
+    public DomainEventDispatchInterceptor(IServiceProvider serviceProvider)
+    {
+        _serviceProvider = serviceProvider;
+    }
+
     public override async ValueTask<int> SavedChangesAsync(
         SaveChangesCompletedEventData eventData,
         int result,
@@ -35,7 +42,7 @@ public sealed class DomainEventDispatchInterceptor<TDbContext>(IServiceProvider 
             return result;
         }
 
-        await using var scope = serviceProvider.CreateAsyncScope();
+        await using var scope = _serviceProvider.CreateAsyncScope();
         var dispatcher = scope.ServiceProvider.GetRequiredService<IDomainEventDispatcher>();
         foreach (var aggregate in aggregates)
         {

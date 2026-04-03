@@ -4,10 +4,17 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Catalog.Infrastructure.Persistence.Write.Category.Repositories;
 
-internal sealed class CategoryRepository(CatalogWriteDbContext db) : ICategoryRepository
+internal sealed class CategoryRepository : ICategoryRepository
 {
+    private readonly CatalogWriteDbContext _db;
+
+    public CategoryRepository(CatalogWriteDbContext db)
+    {
+        _db = db;
+    }
+
     public async Task AddAsync(CategoryEntity category, CancellationToken cancellationToken = default)
     {
-        await db.Set<CategoryEntity>().AddAsync(category, cancellationToken).ConfigureAwait(false);
+        await _db.Set<CategoryEntity>().AddAsync(category, cancellationToken).ConfigureAwait(false);
     }
 }
