@@ -148,8 +148,8 @@ export class ProductListPage {
     return this.selectedCategoryIds().size > 0 || this.priceMax() != null;
   }
 
-  protected setSort(value: string): void {
-    const v = value as ShopSortOption;
+  protected setSort(value: unknown): void {
+    const v = String(value) as ShopSortOption;
     if (v === 'name-asc' || v === 'name-desc' || v === 'price-asc' || v === 'price-desc') {
       this.sortOption.set(v);
     }

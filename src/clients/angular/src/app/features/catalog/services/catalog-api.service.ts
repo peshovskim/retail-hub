@@ -22,4 +22,8 @@ export class CatalogApiService {
   getProducts(): Observable<Product[]> {
     return this.http.get<Product[]>(`${this.apiBaseUrl}/api/catalog/products`);
   }
+
+  getProduct(id: string): Observable<Product> {
+    return this.http.get<Product>(`${this.apiBaseUrl}/api/catalog/products/${id}`);
+  }
 }

@@ -1,11 +1,114 @@
-<section class="product-details">
-  <mat-card appearance="outlined" class="product-details__card">
-    <mat-card-header>
-      <mat-card-title>Product</mat-card-title>
-      <mat-card-subtitle>Details view placeholder</mat-card-subtitle>
-    </mat-card-header>
-    <mat-card-content>
-      <p class="product-details__muted">Product information will appear here.</p>
-    </mat-card-content>
-  </mat-card>
+<section class="product-detail" aria-label="Product details">
+  @if (vm(); as state) {
+    @if (state.kind === 'loading') {
+      <div class="product-detail__state" role="status" aria-live="polite">
+        <mat-progress-spinner mode="indeterminate" diameter="48" />
+        <p>Loading product…</p>
+      </div>
+    } @else if (state.kind === 'bad-route') {
+      <mat-card appearance="outlined" class="product-detail__notice">
+        <mat-card-content>
+          <p>Invalid product link.</p>
+          <a mat-button color="primary" routerLink="/catalog">Back to products</a>
+        </mat-card-content>
+      </mat-card>
+    } @else if (state.kind === 'not-found') {
+      <mat-card appearance="outlined" class="product-detail__notice">
+        <mat-card-content>
+          <p>We could not find that product.</p>
+          <a mat-button color="primary" routerLink="/catalog">Back to products</a>
+        </mat-card-content>
+      </mat-card>
+    } @else if (state.kind === 'error') {
+      <mat-card appearance="outlined" class="product-detail__notice product-detail__notice--error">
+        <mat-card-content>
+          <p role="alert">{{ state.message }}</p>
+          <a mat-button color="primary" routerLink="/catalog">Back to products</a>
+        </mat-card-content>
+      </mat-card>
+    } @else if (state.kind === 'ready') {
+      @let p = state.product;
+      <div class="product-detail__grid">
+        <div class="product-detail__media">
+          <div class="product-detail__image-frame">
+            <div class="product-detail__image-placeholder" aria-hidden="true">
+              <mat-icon>inventory_2</mat-icon>
+            </div>
+          </div>
+        </div>
+
+        <div class="product-detail__info">
+          <h1 class="product-detail__title">{{ p.name }}</h1>
+          <p class="product-detail__price">{{ p.price | appCurrency }}</p>
+
+          <dl class="product-detail__meta">
+            <div class="product-detail__meta-row">
+              <dt>Category</dt>
+              <dd>{{ p.categoryName ?? '—' }}</dd>
+            </div>
+            <div class="product-detail__meta-row">
+              <dt>Availability</dt>
+              <dd><span class="product-detail__stock">In stock</span></dd>
+            </div>
+            <div class="product-detail__meta-row">
+              <dt>Item no.</dt>
+              <dd>{{ p.sku }}</dd>
+            </div>
+          </dl>
+
+          <div class="product-detail__buy">
+            <div class="product-detail__qty" aria-label="Quantity">
+              <button
+                mat-icon-button
+                type="button"
+                class="product-detail__qty-btn"
+                (click)="decrementQty()"
+                [disabled]="quantity() <= 1"
+                aria-label="Decrease quantity"
+              >
+                <mat-icon>remove</mat-icon>
+              </button>
+              <input
+                class="product-detail__qty-input"
+                type="number"
+                min="1"
+                max="99"
+                [value]="quantity()"
+                (input)="onQtyInput($event)"
+                aria-label="Quantity"
+              />
+              <button
+                mat-icon-button
+                type="button"
+                class="product-detail__qty-btn"
+                (click)="incrementQty()"
+                [disabled]="quantity() >= 99"
+                aria-label="Increase quantity"
+              >
+                <mat-icon>add</mat-icon>
+              </button>
+            </div>
+
+            <button
+              mat-flat-button
+              type="button"
+              class="product-detail__add-cart"
+              disabled
+              aria-describedby="add-cart-hint"
+            >
+              Add to cart
+            </button>
+            <p id="add-cart-hint" class="product-detail__add-cart-hint">Shopping cart is coming soon.</p>
+          </div>
+
+          <mat-divider class="product-detail__divider" />
+
+          <section class="product-detail__description" aria-labelledby="product-desc-heading">
+            <h2 id="product-desc-heading" class="product-detail__desc-heading">Description</h2>
+            <p class="product-detail__desc-body">{{ descriptionText(p) }}</p>
+          </section>
+        </div>
+      </div>
+    }
+  }
 </section>

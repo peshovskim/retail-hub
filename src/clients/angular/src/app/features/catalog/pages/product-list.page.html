@@ -97,7 +97,10 @@
             class="shop-catalog__sort"
           >
             <mat-label>Sort by</mat-label>
-            <mat-select [value]="sortOption()" (valueChange)="setSort($event)">
+            <mat-select
+              [value]="sortOption()"
+              (selectionChange)="setSort($event.value)"
+            >
               <mat-option value="name-asc">Name A–Z</mat-option>
               <mat-option value="name-desc">Name Z–A</mat-option>
               <mat-option value="price-asc">Price: low to high</mat-option>

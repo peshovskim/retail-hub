@@ -1,4 +1,4 @@
-/** Product row from `GET /api/catalog/products` (camelCase JSON). */
+/** Product from catalog API (camelCase JSON). */
 export interface Product {
   id: string;
   categoryId: string;
@@ -6,4 +6,7 @@ export interface Product {
   slug: string;
   sku: string;
   price: number;
+  shortDescription: string;
+  description: string;
+  categoryName: string | null;
 }
