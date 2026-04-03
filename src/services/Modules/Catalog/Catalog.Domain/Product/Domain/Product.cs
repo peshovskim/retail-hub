@@ -6,6 +6,9 @@ public sealed partial class Product : AggregateRoot
 {
     public Guid CategoryId { get; set; }
 
+    /// <summary>EF / read-model navigation. Not required for <see cref="Create"/>.</summary>
+    public global::Catalog.Domain.Category.Domain.Category? Category { get; set; }
+
     public string Name { get; private set; } = null!;
 
     public string Slug { get; private set; } = null!;

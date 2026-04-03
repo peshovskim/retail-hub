@@ -1,4 +1,3 @@
-using CategoryEntity = Catalog.Domain.Category.Domain.Category;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using ProductEntity = Catalog.Domain.Product.Domain.Product;
@@ -33,8 +32,8 @@ internal sealed class ProductWriteConfiguration : IEntityTypeConfiguration<Produ
 
         builder.Property(p => p.Description).HasMaxLength(2000).IsRequired(false);
 
-        builder.HasOne<CategoryEntity>()
-            .WithMany()
+        builder.HasOne(p => p.Category)
+            .WithMany(c => c.Products)
             .HasForeignKey(p => p.CategoryId)
             .OnDelete(DeleteBehavior.Restrict);
     }

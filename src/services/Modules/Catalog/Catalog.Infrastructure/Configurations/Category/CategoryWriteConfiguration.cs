@@ -24,8 +24,8 @@ internal sealed class CategoryWriteConfiguration : IEntityTypeConfiguration<Cate
 
         builder.Property(c => c.ParentId);
 
-        builder.HasOne<CategoryEntity>()
-            .WithMany()
+        builder.HasOne(c => c.Parent)
+            .WithMany(c => c.Children)
             .HasForeignKey(c => c.ParentId)
             .OnDelete(DeleteBehavior.Restrict);
     }
