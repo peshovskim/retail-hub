@@ -8,7 +8,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\BuildingBlocks\Infrastructure\SharedKernel.Infrastructure\SharedKernel.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\..\SharedKernel\Infrastructure\SharedKernel.Infrastructure\SharedKernel.Infrastructure.csproj" />
     <ProjectReference Include="..\Catalog.Application\Catalog.Application.csproj" />
     <ProjectReference Include="..\Catalog.Domain\Catalog.Domain.csproj" />
   </ItemGroup>

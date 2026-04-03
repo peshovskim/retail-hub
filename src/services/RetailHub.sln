@@ -11,15 +11,15 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SharedKernel", "SharedKerne
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Domain", "Domain", "{40989E0B-D64C-46ED-21F8-707E8BBF6E02}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SharedKernel.Domain", "BuildingBlocks\Domain\SharedKernel.Domain\SharedKernel.Domain.csproj", "{32D614A2-9E34-4F86-AF61-7ECE918A29F0}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SharedKernel.Domain", "SharedKernel\Domain\SharedKernel.Domain\SharedKernel.Domain.csproj", "{32D614A2-9E34-4F86-AF61-7ECE918A29F0}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Application", "Application", "{328D8444-6DE6-A52E-F3CF-45F39437F3B2}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SharedKernel.Application", "BuildingBlocks\Application\SharedKernel.Application\SharedKernel.Application.csproj", "{EF4E9E92-0881-447D-BDD5-EF6871E8A421}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SharedKernel.Application", "SharedKernel\Application\SharedKernel.Application\SharedKernel.Application.csproj", "{EF4E9E92-0881-447D-BDD5-EF6871E8A421}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Infrastructure", "Infrastructure", "{F8F4539D-0082-74A4-1D92-510706789366}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SharedKernel.Infrastructure", "BuildingBlocks\Infrastructure\SharedKernel.Infrastructure\SharedKernel.Infrastructure.csproj", "{25E607EC-9F47-40E4-BB62-5D56DB156D02}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SharedKernel.Infrastructure", "SharedKernel\Infrastructure\SharedKernel.Infrastructure\SharedKernel.Infrastructure.csproj", "{25E607EC-9F47-40E4-BB62-5D56DB156D02}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Modules", "Modules", "{CA253913-39DE-BFD0-C9A3-4B7EC6FBDF17}"
 EndProject
