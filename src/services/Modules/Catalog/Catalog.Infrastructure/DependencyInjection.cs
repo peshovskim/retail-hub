@@ -1,7 +1,11 @@
 using Catalog.Application.Category.Interfaces;
+using Catalog.Application.Product.Interfaces;
 using Catalog.Infrastructure.Persistence.Read.Category.Factories;
 using Catalog.Infrastructure.Persistence.Read.Category.Queries;
-using Catalog.Infrastructure.Persistence.Write.Category.Repositories;
+using Catalog.Infrastructure.Persistence.Read.Product.Factories;
+using Catalog.Infrastructure.Persistence.Read.Product.Queries;
+using Catalog.Infrastructure.Persistence.Write.Category.Repository;
+using Catalog.Infrastructure.Persistence.Write.Product.Repository;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using RetailHub.SharedKernel.Infrastructure;
@@ -27,6 +31,11 @@ public static class DependencyInjection
         services.AddScoped<CategoryReadFactory>();
         services.AddScoped<ICategoryReadRepository, CategoryQueries>();
         services.AddScoped<ICategoryRepository, CategoryRepository>();
+
+        services.AddScoped<ProductReadFactory>();
+        services.AddScoped<IProductReadRepository, ProductQueries>();
+        services.AddScoped<IProductRepository, ProductRepository>();
+
         return services;
     }
 }

@@ -1,6 +1,8 @@
 using Catalog.Application.Category.Queries.GetCategories;
 using Catalog.Application.Category.Queries.GetCategoryMenu;
 using Catalog.Application.Category.Responses;
+using Catalog.Application.Product.Queries.GetProducts;
+using Catalog.Application.Product.Responses;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using RetailHub.Api.Common.Http;
@@ -31,6 +33,14 @@ public sealed class CatalogController : ControllerBase
     public async Task<IActionResult> GetCategoryMenu(CancellationToken cancellationToken)
     {
         var result = await _mediator.Send(new GetCategoryMenuQuery(), cancellationToken).ConfigureAwait(false);
+        return result.ToActionResult();
+    }
+
+    [HttpGet("products")]
+    [ProducesResponseType(typeof(IReadOnlyList<ProductResponse>), StatusCodes.Status200OK)]
+    public async Task<IActionResult> GetProducts(CancellationToken cancellationToken)
+    {
+        var result = await _mediator.Send(new GetProductsQuery(), cancellationToken).ConfigureAwait(false);
         return result.ToActionResult();
     }
 }

@@ -2,9 +2,9 @@ using CategoryEntity = Catalog.Domain.Category.Domain.Category;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace Catalog.Infrastructure.Configurations;
+namespace Catalog.Infrastructure.Configurations.Category;
 
-internal sealed class CategoryWriteConfiguration : IEntityTypeConfiguration<CategoryEntity>
+internal sealed class CategoryReadConfiguration : IEntityTypeConfiguration<CategoryEntity>
 {
     public void Configure(EntityTypeBuilder<CategoryEntity> builder)
     {

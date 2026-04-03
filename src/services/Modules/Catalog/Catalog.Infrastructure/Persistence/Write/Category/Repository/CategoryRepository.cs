@@ -2,7 +2,7 @@ using Catalog.Application.Category.Interfaces;
 using CategoryEntity = Catalog.Domain.Category.Domain.Category;
 using Microsoft.EntityFrameworkCore;
 
-namespace Catalog.Infrastructure.Persistence.Write.Category.Repositories;
+namespace Catalog.Infrastructure.Persistence.Write.Category.Repository;
 
 internal sealed class CategoryRepository : ICategoryRepository
 {
