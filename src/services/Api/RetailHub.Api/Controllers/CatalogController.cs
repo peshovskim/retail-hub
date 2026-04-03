@@ -1,6 +1,7 @@
 using Catalog.Application.Category.Queries.GetCategories;
 using Catalog.Application.Category.Queries.GetCategoryMenu;
 using Catalog.Application.Category.Responses;
+using Catalog.Application.Product.Queries.GetProductById;
 using Catalog.Application.Product.Queries.GetProducts;
 using Catalog.Application.Product.Responses;
 using MediatR;
@@ -41,6 +42,15 @@ public sealed class CatalogController : ControllerBase
     public async Task<IActionResult> GetProducts(CancellationToken cancellationToken)
     {
         var result = await _mediator.Send(new GetProductsQuery(), cancellationToken).ConfigureAwait(false);
+        return result.ToActionResult();
+    }
+
+    [HttpGet("products/{id:guid}")]
+    [ProducesResponseType(typeof(ProductResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> GetProduct(Guid id, CancellationToken cancellationToken)
+    {
+        var result = await _mediator.Send(new GetProductByIdQuery(id), cancellationToken).ConfigureAwait(false);
         return result.ToActionResult();
     }
 }

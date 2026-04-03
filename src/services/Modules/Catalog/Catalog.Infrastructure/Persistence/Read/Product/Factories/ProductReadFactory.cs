@@ -5,6 +5,15 @@ namespace Catalog.Infrastructure.Persistence.Read.Product.Factories;
 
 public sealed class ProductReadFactory
 {
-    public ProductResponse ToResponse(ProductEntity product) =>
-        new(product.Id, product.CategoryId, product.Name, product.Slug, product.Sku, product.Price);
+    public ProductResponse ToResponse(ProductEntity product, string? categoryName = null) =>
+        new(
+            product.Id,
+            product.CategoryId,
+            product.Name,
+            product.Slug,
+            product.Sku,
+            product.Price,
+            product.ShortDescription,
+            product.Description,
+            categoryName);
 }

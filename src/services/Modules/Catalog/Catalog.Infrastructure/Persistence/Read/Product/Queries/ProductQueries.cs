@@ -2,6 +2,7 @@ using Catalog.Application.Product.Interfaces;
 using Catalog.Application.Product.Responses;
 using Catalog.Infrastructure.Persistence.Read.Product.Factories;
 using Microsoft.EntityFrameworkCore;
+using CategoryEntity = Catalog.Domain.Category.Domain.Category;
 using ProductEntity = Catalog.Domain.Product.Domain.Product;
 
 namespace Catalog.Infrastructure.Persistence.Read.Product.Queries;
@@ -25,6 +26,21 @@ internal sealed class ProductQueries : IProductReadRepository
             .OrderBy(p => p.Name)
             .ToListAsync(cancellationToken)
             .ConfigureAwait(false);
-        return rows.Select(_readFactory.ToResponse).ToList();
+        return rows.Select(p => _readFactory.ToResponse(p)).ToList();
+    }
+
+    public async Task<ProductResponse?> GetActiveProductByIdAsync(
+        Guid id,
+        CancellationToken cancellationToken = default)
+    {
+        var row = await (
+                from p in _db.Set<ProductEntity>()
+                join c in _db.Set<CategoryEntity>() on p.CategoryId equals c.Id
+                where p.Id == id && p.DeletedOn == null && c.DeletedOn == null
+                select new { Product = p, c.Name })
+            .FirstOrDefaultAsync(cancellationToken)
+            .ConfigureAwait(false);
+
+        return row is null ? null : _readFactory.ToResponse(row.Product, row.Name);
     }
 }
