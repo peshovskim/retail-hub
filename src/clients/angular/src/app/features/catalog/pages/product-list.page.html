@@ -39,24 +39,59 @@
           }
         </mat-expansion-panel>
 
-        <mat-expansion-panel class="shop-filters__panel">
+        <mat-expansion-panel class="shop-filters__panel" [expanded]="true">
           <mat-expansion-panel-header>
             <mat-panel-title>Price</mat-panel-title>
           </mat-expansion-panel-header>
           <div class="shop-filters__price">
-            <mat-form-field appearance="outline" subscriptSizing="dynamic" class="shop-filters__price-field">
-              <mat-label>Max price</mat-label>
-              <input
-                matInput
-                type="number"
-                min="0"
-                step="0.01"
-                [value]="priceMax() ?? ''"
-                (change)="onPriceMaxChange($event)"
-                placeholder="No limit"
-              />
-            </mat-form-field>
-            <p class="shop-filters__hint">Show products up to this price. Updates when you leave the field.</p>
+            <div class="shop-filters__price-row">
+              <label class="shop-filters__price-box">
+                <span class="shop-filters__price-box-label">Min</span>
+                <input
+                  class="shop-filters__price-box-input"
+                  type="number"
+                  min="0"
+                  step="0.01"
+                  inputmode="decimal"
+                  placeholder="—"
+                  [value]="priceMin() ?? ''"
+                  (change)="onPriceMinChange($event)"
+                  aria-label="Minimum price"
+                />
+              </label>
+              <span class="shop-filters__price-dash" aria-hidden="true">—</span>
+              <label class="shop-filters__price-box">
+                <span class="shop-filters__price-box-label">Max</span>
+                <input
+                  class="shop-filters__price-box-input"
+                  type="number"
+                  min="0"
+                  step="0.01"
+                  inputmode="decimal"
+                  placeholder="—"
+                  [value]="priceMax() ?? ''"
+                  (change)="onPriceMaxChange($event)"
+                  aria-label="Maximum price"
+                />
+              </label>
+            </div>
+            <mat-slider
+              class="shop-filters__range-slider"
+              [min]="0"
+              [max]="priceSliderCeiling"
+              [step]="5"
+            >
+              <input matSliderStartThumb [(ngModel)]="sliderStart" (change)="onPriceSliderChange()" />
+              <input matSliderEndThumb [(ngModel)]="sliderEnd" (change)="onPriceSliderChange()" />
+            </mat-slider>
+            <button
+              type="button"
+              class="shop-filters__clear-price"
+              (click)="clearPriceFilter()"
+              [disabled]="!hasPriceFilter()"
+            >
+              Clear price
+            </button>
           </div>
         </mat-expansion-panel>
       </mat-accordion>
@@ -87,21 +122,6 @@
           <mat-form-field
             appearance="outline"
             subscriptSizing="dynamic"
-            class="shop-catalog__search"
-          >
-            <mat-label>Search</mat-label>
-            <input
-              matInput
-              type="search"
-              [value]="searchText()"
-              (input)="onSearchInput($event)"
-              placeholder="Name or SKU"
-              autocomplete="off"
-            />
-          </mat-form-field>
-          <mat-form-field
-            appearance="outline"
-            subscriptSizing="dynamic"
             class="shop-catalog__sort"
           >
             <mat-label>Sort by</mat-label>
@@ -121,7 +141,7 @@
           <mat-card appearance="outlined" class="shop-catalog__empty">
             <mat-card-content>
               @if (hasActiveFilters()) {
-                <p>No products match the current filters or search.</p>
+                <p>No products match the current filters.</p>
                 <button mat-button type="button" color="primary" (click)="clearFilters()">Clear filters</button>
               } @else {
                 <mat-icon class="shop-catalog__empty-icon" aria-hidden="true">inventory_2</mat-icon>

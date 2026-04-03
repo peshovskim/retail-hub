@@ -6,6 +6,7 @@ import { debounceTime, distinctUntilChanged, skip } from 'rxjs';
 import type { CategoryMenuNode } from '../models/category.model';
 import type { ProductListParams, ProductListSort } from '../models/product-list.model';
 import type { CatalogProductsView } from '../store/catalog.selectors';
+import { CatalogToolbarSearchService } from '../services/catalog-toolbar-search.service';
 import { CatalogFacade } from '../store/catalog.facade';
 
 export type ShopSortOption = 'name-asc' | 'name-desc' | 'price-asc' | 'price-desc';
@@ -63,6 +64,14 @@ function shopSortToApi(sort: ShopSortOption): ProductListSort {
 })
 export class ProductListPage {
   private readonly catalog = inject(CatalogFacade);
+  private readonly toolbarSearch = inject(CatalogToolbarSearchService);
+
+  /** Upper bound for the price range slider; values at the max mean “no max filter”. */
+  protected readonly priceSliderCeiling = 5000;
+
+  /** Mat range slider model (always numeric; maps to nullable filters at API boundaries). */
+  sliderStart = 0;
+  sliderEnd = this.priceSliderCeiling;
 
   constructor() {
     this.catalog.loadCategoryMenu();
@@ -79,7 +88,7 @@ export class ProductListPage {
       }
     });
 
-    toObservable(this.searchText)
+    toObservable(this.toolbarSearch.text)
       .pipe(
         debounceTime(350),
         distinctUntilChanged(),
@@ -102,8 +111,8 @@ export class ProductListPage {
 
   protected readonly sortOption = signal<ShopSortOption>('name-asc');
   protected readonly selectedCategoryIds = signal(new Set<string>());
+  protected readonly priceMin = signal<number | null>(null);
   protected readonly priceMax = signal<number | null>(null);
-  protected readonly searchText = signal('');
   protected readonly currentPage = signal(1);
   protected readonly pageSize = signal(DEFAULT_CATALOG_PAGE_SIZE);
 
@@ -129,33 +138,76 @@ export class ProductListPage {
       next.delete(id);
     }
     this.selectedCategoryIds.set(next);
-    this.reloadProducts();
+    this.goToFirstPageAndReload();
   }
 
   protected clearFilters(): void {
     this.selectedCategoryIds.set(new Set());
+    this.clearPriceFilter(false);
+    this.toolbarSearch.clear();
+    this.goToFirstPageAndReload();
+  }
+
+  /** Clears only min/max price (and slider). @param reload when false, caller reloads (e.g. clear all). */
+  protected clearPriceFilter(reload = true): void {
+    this.priceMin.set(null);
     this.priceMax.set(null);
-    this.searchText.set('');
-    this.reloadProducts();
+    this.sliderStart = 0;
+    this.sliderEnd = this.priceSliderCeiling;
+    if (reload) {
+      this.goToFirstPageAndReload();
+    }
+  }
+
+  protected onPriceMinChange(event: Event): void {
+    const raw = (event.target as HTMLInputElement).value;
+    if (raw === '') {
+      this.priceMin.set(null);
+      this.sliderStart = 0;
+    } else {
+      const n = Number(raw);
+      if (Number.isFinite(n) && n >= 0) {
+        this.priceMin.set(n);
+        this.sliderStart = Math.min(n, this.sliderEnd);
+      }
+    }
+    this.goToFirstPageAndReload();
   }
 
   protected onPriceMaxChange(event: Event): void {
     const raw = (event.target as HTMLInputElement).value;
     if (raw === '') {
       this.priceMax.set(null);
+      this.sliderEnd = this.priceSliderCeiling;
     } else {
       const n = Number(raw);
-      this.priceMax.set(Number.isFinite(n) ? n : null);
+      if (Number.isFinite(n) && n >= 0) {
+        this.priceMax.set(n);
+        this.sliderEnd = Math.max(Math.min(n, this.priceSliderCeiling), this.sliderStart);
+      }
     }
+    this.goToFirstPageAndReload();
+  }
+
+  protected onPriceSliderChange(): void {
+    const low = this.sliderStart;
+    const high = this.sliderEnd;
+    this.priceMin.set(low <= 0 ? null : low);
+    this.priceMax.set(high >= this.priceSliderCeiling ? null : high);
     this.goToFirstPageAndReload();
   }
 
   protected hasActiveFilters(): boolean {
     return (
       this.selectedCategoryIds().size > 0 ||
+      this.priceMin() != null ||
       this.priceMax() != null ||
-      this.searchText().trim().length > 0
+      this.toolbarSearch.text().trim().length > 0
     );
+  }
+
+  protected hasPriceFilter(): boolean {
+    return this.priceMin() != null || this.priceMax() != null;
   }
 
   protected setSort(value: unknown): void {
@@ -192,18 +244,18 @@ export class ProductListPage {
     this.reloadProducts();
   }
 
-  protected onSearchInput(event: Event): void {
-    this.searchText.set((event.target as HTMLInputElement).value);
-  }
-
   private buildParams(): ProductListParams {
     const sort = shopSortToApi(this.sortOption());
     const categoryIds = [...this.selectedCategoryIds()];
+    const priceMin = this.priceMin();
     const priceMax = this.priceMax();
-    const search = this.searchText().trim();
+    const search = this.toolbarSearch.text().trim();
     const params: ProductListParams = { sort };
     if (categoryIds.length > 0) {
       params.categoryIds = categoryIds;
+    }
+    if (priceMin != null && !Number.isNaN(priceMin) && priceMin >= 0) {
+      params.priceMin = priceMin;
     }
     if (priceMax != null && !Number.isNaN(priceMax) && priceMax >= 0) {
       params.priceMax = priceMax;

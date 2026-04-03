@@ -14,23 +14,24 @@
 
     <span class="app-toolbar__fill"></span>
 
-    <mat-form-field
-      appearance="outline"
-      class="app-toolbar__search-field"
-      subscriptSizing="dynamic"
-    >
-      <mat-icon matPrefix class="app-toolbar__search-prefix" aria-hidden="true">search</mat-icon>
-      <input
-        matInput
-        type="search"
-        placeholder="Search..."
-        disabled
-        aria-label="Search (coming soon)"
-      />
-    </mat-form-field>
+    <div class="app-toolbar__search-cart">
+      <div class="app-toolbar__search-box">
+        <mat-icon class="app-toolbar__search-icon" aria-hidden="true">search</mat-icon>
+        <input
+          type="search"
+          class="app-toolbar__search-input"
+          placeholder="Search..."
+          autocomplete="off"
+          enterkeyhint="search"
+          aria-label="Search products by name or SKU"
+          [ngModel]="catalogSearch.text()"
+          (ngModelChange)="catalogSearch.text.set($event)"
+        />
+      </div>
 
-    <button mat-icon-button type="button" class="app-toolbar__cart" aria-label="Shopping cart (coming soon)" disabled>
-      <mat-icon matBadge="0" matBadgeSize="small" matBadgeColor="warn" aria-hidden="true">shopping_cart</mat-icon>
-    </button>
+      <button mat-icon-button type="button" class="app-toolbar__cart" aria-label="Shopping cart (coming soon)" disabled>
+        <mat-icon matBadge="0" matBadgeSize="small" matBadgeColor="warn" aria-hidden="true">shopping_cart</mat-icon>
+      </button>
+    </div>
   </div>
 </mat-toolbar>

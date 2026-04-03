@@ -68,40 +68,66 @@
   min-width: 0;
 }
 
-.app-toolbar__search-field {
-  flex: 0 1 12rem;
-  min-width: 8rem;
-  margin: 0 !important;
+.app-toolbar__search-cart {
+  display: flex;
+  align-items: center;
+  gap: 0.15rem;
+  flex-shrink: 0;
+}
 
-  --mat-form-field-outlined-outline-color: var(--shop-header-border);
-  --mat-form-field-outlined-hover-outline-color: var(--shop-outline-strong);
-  --mat-form-field-outlined-focus-outline-color: var(--shop-outline-strong);
+.app-toolbar__search-box {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  flex: 0 1 16rem;
+  min-width: 11rem;
+  max-width: 18rem;
+  height: 2.5rem;
+  padding: 0 0.65rem 0 0.55rem;
+  box-sizing: border-box;
+  border: 1px solid var(--shop-header-border);
+  border-radius: 8px;
+  background: var(--shop-header-bg);
+  transition:
+    border-color 0.15s ease,
+    box-shadow 0.15s ease;
 
-  .mat-mdc-text-field-wrapper {
-    background: var(--shop-header-bg);
-  }
-
-  .mat-mdc-form-field-subscript-wrapper {
-    display: none;
-  }
-
-  .mat-mdc-form-field-infix {
-    min-height: 40px;
-    padding-top: 0.5rem !important;
-    padding-bottom: 0.5rem !important;
-  }
-
-  .mat-mdc-text-field-wrapper .mat-mdc-form-field-flex .mat-mdc-floating-label {
-    top: 1.25rem;
+  &:focus-within {
+    border-color: var(--shop-outline-strong);
+    box-shadow: 0 0 0 2px color-mix(in srgb, var(--shop-cta) 18%, transparent);
   }
 }
 
-.app-toolbar__search-prefix {
-  margin-right: 0.25rem;
+.app-toolbar__search-icon {
+  flex-shrink: 0;
   color: var(--shop-muted);
-  font-size: 1.125rem;
-  width: 1.125rem;
-  height: 1.125rem;
+  font-size: 1.25rem;
+  width: 1.25rem;
+  height: 1.25rem;
+}
+
+.app-toolbar__search-input {
+  flex: 1 1 auto;
+  min-width: 0;
+  border: none;
+  margin: 0;
+  padding: 0;
+  font: inherit;
+  font-size: 0.875rem;
+  color: var(--shop-on-header);
+  background: transparent;
+
+  &:focus {
+    outline: none;
+  }
+
+  &::placeholder {
+    color: rgb(0 0 0 / 38%);
+  }
+
+  &::-webkit-search-cancel-button {
+    cursor: pointer;
+  }
 }
 
 .app-toolbar__cart {

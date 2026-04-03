@@ -1,4 +1,6 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
+
+import { CatalogToolbarSearchService } from '../../../features/catalog/services/catalog-toolbar-search.service';
 
 @Component({
   selector: 'app-navbar',
@@ -6,4 +8,6 @@ import { Component } from '@angular/core';
   styleUrl: './navbar.component.scss',
   standalone: false,
 })
-export class NavbarComponent {}
+export class NavbarComponent {
+  protected readonly catalogSearch = inject(CatalogToolbarSearchService);
+}

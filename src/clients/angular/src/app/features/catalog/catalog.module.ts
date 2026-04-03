@@ -1,5 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
+import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatCheckboxModule } from '@angular/material/checkbox';
@@ -12,6 +13,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatPaginatorModule } from '@angular/material/paginator';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSelectModule } from '@angular/material/select';
+import { MatSliderModule } from '@angular/material/slider';
 
 import { CatalogRoutingModule } from './catalog-routing.module';
 import { ProductCardComponent } from './components/product-card/product-card.component';
@@ -23,6 +25,7 @@ import { SharedModule } from '../../shared/shared.module';
   declarations: [ProductListPage, ProductDetailsPage, ProductCardComponent],
   imports: [
     CommonModule,
+    FormsModule,
     SharedModule,
     CatalogRoutingModule,
     MatButtonModule,
@@ -37,6 +40,7 @@ import { SharedModule } from '../../shared/shared.module';
     MatProgressSpinnerModule,
     MatRippleModule,
     MatSelectModule,
+    MatSliderModule,
   ],
 })
 export class CatalogModule {}
