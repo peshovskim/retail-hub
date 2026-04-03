@@ -4,5 +4,6 @@
 
 :r .\Tables\User\Seed\User.Test.Seed.sql
 :r .\Tables\Category\Seed\Category.Test.Seed.sql
+:r .\Tables\Product\Seed\Product.Test.Seed.sql
 :r .\Tables\Cart\Seed\Cart.Test.Seed.sql
 :r .\Tables\Order\Seed\Order.Test.Seed.sql
