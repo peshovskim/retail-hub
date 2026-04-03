@@ -7,19 +7,19 @@ namespace Catalog.Infrastructure.Persistence.Read.Category.Queries;
 
 internal sealed class CategoryQueries : ICategoryReadRepository
 {
-    private readonly CatalogReadDbContext _db;
+    private readonly CatalogReadDbContext _dbContext;
     private readonly CategoryReadFactory _readFactory;
 
-    public CategoryQueries(CatalogReadDbContext db, CategoryReadFactory readFactory)
+    public CategoryQueries(CatalogReadDbContext dbContext, CategoryReadFactory readFactory)
     {
-        _db = db;
+        _dbContext = dbContext;
         _readFactory = readFactory;
     }
 
     public async Task<IReadOnlyList<CategoryResponse>> GetRootCategoriesAsync(
         CancellationToken cancellationToken = default)
     {
-        var rows = await _db.Categories
+        var rows = await _dbContext.Categories
             .Where(c => c.ParentId == null && c.DeletedOn == null)
             .OrderBy(c => c.Name)
             .ToListAsync(cancellationToken)
@@ -30,7 +30,7 @@ internal sealed class CategoryQueries : ICategoryReadRepository
     public async Task<IReadOnlyList<CategoryMenuSourceRow>> GetAllActiveCategoriesAsync(
         CancellationToken cancellationToken = default)
     {
-        var rows = await _db.Categories
+        var rows = await _dbContext.Categories
             .Where(c => c.DeletedOn == null)
             .OrderBy(c => c.Name)
             .Select(c => new CategoryMenuSourceRow(c.Id, c.Name, c.Slug, c.ParentId))

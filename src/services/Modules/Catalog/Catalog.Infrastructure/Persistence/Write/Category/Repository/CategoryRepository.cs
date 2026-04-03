@@ -6,15 +6,15 @@ namespace Catalog.Infrastructure.Persistence.Write.Category.Repository;
 
 internal sealed class CategoryRepository : ICategoryRepository
 {
-    private readonly CatalogWriteDbContext _db;
+    private readonly CatalogWriteDbContext _dbContext;
 
-    public CategoryRepository(CatalogWriteDbContext db)
+    public CategoryRepository(CatalogWriteDbContext dbContext)
     {
-        _db = db;
+        _dbContext = dbContext;
     }
 
     public async Task AddAsync(CategoryEntity category, CancellationToken cancellationToken = default)
     {
-        await _db.Categories.AddAsync(category, cancellationToken).ConfigureAwait(false);
+        await _dbContext.Categories.AddAsync(category, cancellationToken).ConfigureAwait(false);
     }
 }

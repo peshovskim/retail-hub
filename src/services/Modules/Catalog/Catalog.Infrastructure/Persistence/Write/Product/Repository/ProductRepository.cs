@@ -6,15 +6,15 @@ namespace Catalog.Infrastructure.Persistence.Write.Product.Repository;
 
 internal sealed class ProductRepository : IProductRepository
 {
-    private readonly CatalogWriteDbContext _db;
+    private readonly CatalogWriteDbContext _dbContext;
 
-    public ProductRepository(CatalogWriteDbContext db)
+    public ProductRepository(CatalogWriteDbContext dbContext)
     {
-        _db = db;
+        _dbContext = dbContext;
     }
 
     public async Task AddAsync(ProductEntity product, CancellationToken cancellationToken = default)
     {
-        await _db.Products.AddAsync(product, cancellationToken).ConfigureAwait(false);
+        await _dbContext.Products.AddAsync(product, cancellationToken).ConfigureAwait(false);
     }
 }

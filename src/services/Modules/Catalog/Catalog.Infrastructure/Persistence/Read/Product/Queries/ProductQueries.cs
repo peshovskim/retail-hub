@@ -7,19 +7,19 @@ namespace Catalog.Infrastructure.Persistence.Read.Product.Queries;
 
 internal sealed class ProductQueries : IProductReadRepository
 {
-    private readonly CatalogReadDbContext _db;
+    private readonly CatalogReadDbContext _dbContext;
     private readonly ProductReadFactory _readFactory;
 
-    public ProductQueries(CatalogReadDbContext db, ProductReadFactory readFactory)
+    public ProductQueries(CatalogReadDbContext dbContext, ProductReadFactory readFactory)
     {
-        _db = db;
+        _dbContext = dbContext;
         _readFactory = readFactory;
     }
 
     public async Task<IReadOnlyList<ProductResponse>> GetAllActiveProductsAsync(
         CancellationToken cancellationToken = default)
     {
-        var rows = await _db.Products
+        var rows = await _dbContext.Products
             .Where(p => p.DeletedOn == null)
             .OrderBy(p => p.Name)
             .ToListAsync(cancellationToken)
@@ -32,8 +32,8 @@ internal sealed class ProductQueries : IProductReadRepository
         CancellationToken cancellationToken = default)
     {
         var row = await (
-                from p in _db.Products
-                join c in _db.Categories on p.CategoryId equals c.Id
+                from p in _dbContext.Products
+                join c in _dbContext.Categories on p.CategoryId equals c.Id
                 where p.Id == id && p.DeletedOn == null && c.DeletedOn == null
                 select new { Product = p, c.Name })
             .FirstOrDefaultAsync(cancellationToken)
