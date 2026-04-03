@@ -50,4 +50,22 @@ export class CatalogEffects {
       ),
     ),
   );
+
+  loadProducts$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(catalogActions.loadProducts),
+      switchMap(() =>
+        this.api.getProducts().pipe(
+          map((products) => catalogActions.loadProductsSuccess({ products })),
+          catchError((err: unknown) =>
+            of(
+              catalogActions.loadProductsFailure({
+                error: err instanceof Error ? err.message : 'Unable to load products.',
+              }),
+            ),
+          ),
+        ),
+      ),
+    ),
+  );
 }
