@@ -159,6 +159,24 @@
               </a>
             }
           </div>
+
+          @if (showPagination(pv.totalCount)) {
+            <div class="shop-catalog__pagination">
+              <p class="shop-catalog__range" aria-live="polite">
+                Showing {{ pageRange(pv.totalCount).start }}–{{ pageRange(pv.totalCount).end }} of
+                {{ pv.totalCount }}
+              </p>
+              <mat-paginator
+                class="shop-catalog__paginator"
+                [length]="pv.totalCount"
+                [pageSize]="pageSize()"
+                [pageIndex]="currentPage() - 1"
+                [pageSizeOptions]="pageSizeOptions"
+                [showFirstLastButtons]="true"
+                (page)="onPageChange($event)"
+              />
+            </div>
+          }
         }
         }
       }

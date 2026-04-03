@@ -1,5 +1,6 @@
-import { Component, computed, inject, signal } from '@angular/core';
+import { Component, computed, effect, inject, signal } from '@angular/core';
 import { takeUntilDestroyed, toObservable, toSignal } from '@angular/core/rxjs-interop';
+import { PageEvent } from '@angular/material/paginator';
 import { debounceTime, distinctUntilChanged, skip } from 'rxjs';
 
 import type { CategoryMenuNode } from '../models/category.model';
@@ -37,6 +38,9 @@ function buildCategoryNameMap(nodes: CategoryMenuNode[]): Map<string, string> {
   return map;
 }
 
+/** Default page size for catalog API requests (must stay ≤ API max, currently 100). */
+const DEFAULT_CATALOG_PAGE_SIZE = 24;
+
 function shopSortToApi(sort: ShopSortOption): ProductListSort {
   switch (sort) {
     case 'name-desc':
@@ -64,6 +68,17 @@ export class ProductListPage {
     this.catalog.loadCategoryMenu();
     this.reloadProducts();
 
+    effect(() => {
+      const pv = this.productsView();
+      if (pv.kind !== 'ok' || pv.totalCount === 0) {
+        return;
+      }
+      if (pv.items.length === 0 && this.currentPage() > 1) {
+        this.currentPage.set(1);
+        this.reloadProducts();
+      }
+    });
+
     toObservable(this.searchText)
       .pipe(
         debounceTime(350),
@@ -71,7 +86,10 @@ export class ProductListPage {
         skip(1),
         takeUntilDestroyed(),
       )
-      .subscribe(() => this.reloadProducts());
+      .subscribe(() => {
+        this.currentPage.set(1);
+        this.reloadProducts();
+      });
   }
 
   protected readonly productsView = toSignal(this.catalog.productsView$, {
@@ -86,6 +104,10 @@ export class ProductListPage {
   protected readonly selectedCategoryIds = signal(new Set<string>());
   protected readonly priceMax = signal<number | null>(null);
   protected readonly searchText = signal('');
+  protected readonly currentPage = signal(1);
+  protected readonly pageSize = signal(DEFAULT_CATALOG_PAGE_SIZE);
+
+  protected readonly pageSizeOptions = [12, 24, 48] as const;
 
   protected readonly flatCategories = computed(() => flattenCategoryNodes(this.menu()));
 
@@ -125,7 +147,7 @@ export class ProductListPage {
       const n = Number(raw);
       this.priceMax.set(Number.isFinite(n) ? n : null);
     }
-    this.reloadProducts();
+    this.goToFirstPageAndReload();
   }
 
   protected hasActiveFilters(): boolean {
@@ -140,8 +162,34 @@ export class ProductListPage {
     const v = String(value) as ShopSortOption;
     if (v === 'name-asc' || v === 'name-desc' || v === 'price-asc' || v === 'price-desc') {
       this.sortOption.set(v);
-      this.reloadProducts();
+      this.goToFirstPageAndReload();
     }
+  }
+
+  protected onPageChange(event: PageEvent): void {
+    this.currentPage.set(event.pageIndex + 1);
+    this.pageSize.set(event.pageSize);
+    this.reloadProducts();
+  }
+
+  protected showPagination(totalCount: number): boolean {
+    return totalCount > this.pageSize();
+  }
+
+  protected pageRange(totalCount: number): { start: number; end: number } {
+    if (totalCount === 0) {
+      return { start: 0, end: 0 };
+    }
+    const size = this.pageSize();
+    const page = this.currentPage();
+    const start = (page - 1) * size + 1;
+    const end = Math.min(page * size, totalCount);
+    return { start, end };
+  }
+
+  private goToFirstPageAndReload(): void {
+    this.currentPage.set(1);
+    this.reloadProducts();
   }
 
   protected onSearchInput(event: Event): void {
@@ -163,6 +211,8 @@ export class ProductListPage {
     if (search.length > 0) {
       params.search = search;
     }
+    params.page = this.currentPage();
+    params.pageSize = this.pageSize();
     return params;
   }
 
