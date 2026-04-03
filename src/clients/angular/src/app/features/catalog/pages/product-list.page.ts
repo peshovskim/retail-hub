@@ -1,8 +1,9 @@
 import { Component, computed, inject, signal } from '@angular/core';
-import { toSignal } from '@angular/core/rxjs-interop';
+import { takeUntilDestroyed, toObservable, toSignal } from '@angular/core/rxjs-interop';
+import { debounceTime, distinctUntilChanged, skip } from 'rxjs';
 
 import type { CategoryMenuNode } from '../models/category.model';
-import type { Product } from '../models/product.model';
+import type { ProductListParams, ProductListSort } from '../models/product-list.model';
 import type { CatalogProductsView } from '../store/catalog.selectors';
 import { CatalogFacade } from '../store/catalog.facade';
 
@@ -36,35 +37,18 @@ function buildCategoryNameMap(nodes: CategoryMenuNode[]): Map<string, string> {
   return map;
 }
 
-function applyFiltersAndSort(
-  items: Product[],
-  opts: {
-    selectedCategoryIds: Set<string>;
-    priceMax: number | null;
-    sort: ShopSortOption;
-  },
-): Product[] {
-  let list = [...items];
-  if (opts.selectedCategoryIds.size > 0) {
-    list = list.filter((p) => opts.selectedCategoryIds.has(p.categoryId));
+function shopSortToApi(sort: ShopSortOption): ProductListSort {
+  switch (sort) {
+    case 'name-desc':
+      return 'nameDesc';
+    case 'price-asc':
+      return 'priceAsc';
+    case 'price-desc':
+      return 'priceDesc';
+    case 'name-asc':
+    default:
+      return 'nameAsc';
   }
-  if (opts.priceMax != null && !Number.isNaN(opts.priceMax) && opts.priceMax > 0) {
-    list = list.filter((p) => p.price <= opts.priceMax!);
-  }
-  list.sort((a, b) => {
-    switch (opts.sort) {
-      case 'name-desc':
-        return b.name.localeCompare(a.name, undefined, { sensitivity: 'base' });
-      case 'price-asc':
-        return a.price - b.price;
-      case 'price-desc':
-        return b.price - a.price;
-      case 'name-asc':
-      default:
-        return a.name.localeCompare(b.name, undefined, { sensitivity: 'base' });
-    }
-  });
-  return list;
 }
 
 @Component({
@@ -77,8 +61,17 @@ export class ProductListPage {
   private readonly catalog = inject(CatalogFacade);
 
   constructor() {
-    this.catalog.loadProducts();
     this.catalog.loadCategoryMenu();
+    this.reloadProducts();
+
+    toObservable(this.searchText)
+      .pipe(
+        debounceTime(350),
+        distinctUntilChanged(),
+        skip(1),
+        takeUntilDestroyed(),
+      )
+      .subscribe(() => this.reloadProducts());
   }
 
   protected readonly productsView = toSignal(this.catalog.productsView$, {
@@ -92,24 +85,11 @@ export class ProductListPage {
   protected readonly sortOption = signal<ShopSortOption>('name-asc');
   protected readonly selectedCategoryIds = signal(new Set<string>());
   protected readonly priceMax = signal<number | null>(null);
+  protected readonly searchText = signal('');
 
   protected readonly flatCategories = computed(() => flattenCategoryNodes(this.menu()));
 
   protected readonly categoryNameMap = computed(() => buildCategoryNameMap(this.menu()));
-
-  protected readonly displayedProducts = computed(() => {
-    const pv = this.productsView();
-    if (pv.kind !== 'ok') {
-      return [];
-    }
-    return applyFiltersAndSort(pv.items, {
-      selectedCategoryIds: this.selectedCategoryIds(),
-      priceMax: this.priceMax(),
-      sort: this.sortOption(),
-    });
-  });
-
-  protected readonly displayedCount = computed(() => this.displayedProducts().length);
 
   protected categoryLabel(categoryId: string): string {
     return this.categoryNameMap().get(categoryId) ?? 'General';
@@ -127,31 +107,66 @@ export class ProductListPage {
       next.delete(id);
     }
     this.selectedCategoryIds.set(next);
+    this.reloadProducts();
   }
 
   protected clearFilters(): void {
     this.selectedCategoryIds.set(new Set());
     this.priceMax.set(null);
+    this.searchText.set('');
+    this.reloadProducts();
   }
 
-  protected onPriceMaxInput(event: Event): void {
+  protected onPriceMaxChange(event: Event): void {
     const raw = (event.target as HTMLInputElement).value;
     if (raw === '') {
       this.priceMax.set(null);
-      return;
+    } else {
+      const n = Number(raw);
+      this.priceMax.set(Number.isFinite(n) ? n : null);
     }
-    const n = Number(raw);
-    this.priceMax.set(Number.isFinite(n) ? n : null);
+    this.reloadProducts();
   }
 
   protected hasActiveFilters(): boolean {
-    return this.selectedCategoryIds().size > 0 || this.priceMax() != null;
+    return (
+      this.selectedCategoryIds().size > 0 ||
+      this.priceMax() != null ||
+      this.searchText().trim().length > 0
+    );
   }
 
   protected setSort(value: unknown): void {
     const v = String(value) as ShopSortOption;
     if (v === 'name-asc' || v === 'name-desc' || v === 'price-asc' || v === 'price-desc') {
       this.sortOption.set(v);
+      this.reloadProducts();
     }
+  }
+
+  protected onSearchInput(event: Event): void {
+    this.searchText.set((event.target as HTMLInputElement).value);
+  }
+
+  private buildParams(): ProductListParams {
+    const sort = shopSortToApi(this.sortOption());
+    const categoryIds = [...this.selectedCategoryIds()];
+    const priceMax = this.priceMax();
+    const search = this.searchText().trim();
+    const params: ProductListParams = { sort };
+    if (categoryIds.length > 0) {
+      params.categoryIds = categoryIds;
+    }
+    if (priceMax != null && !Number.isNaN(priceMax) && priceMax >= 0) {
+      params.priceMax = priceMax;
+    }
+    if (search.length > 0) {
+      params.search = search;
+    }
+    return params;
+  }
+
+  private reloadProducts(): void {
+    this.catalog.loadProducts(this.buildParams());
   }
 }

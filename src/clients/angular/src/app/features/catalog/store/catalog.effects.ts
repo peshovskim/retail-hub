@@ -54,9 +54,11 @@ export class CatalogEffects {
   loadProducts$ = createEffect(() =>
     this.actions$.pipe(
       ofType(catalogActions.loadProducts),
-      switchMap(() =>
-        this.api.getProducts().pipe(
-          map((res) => catalogActions.loadProductsSuccess({ products: res.items })),
+      switchMap(({ params }) =>
+        this.api.getProducts(params).pipe(
+          map((res) =>
+            catalogActions.loadProductsSuccess({ products: res.items, totalCount: res.totalCount }),
+          ),
           catchError((err: unknown) =>
             of(
               catalogActions.loadProductsFailure({

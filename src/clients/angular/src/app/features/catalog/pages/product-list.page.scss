@@ -164,6 +164,12 @@
   color: var(--shop-muted);
 }
 
+.shop-catalog__search {
+  flex: 1 1 12rem;
+  min-width: min(100%, 10rem);
+  max-width: 22rem;
+}
+
 .shop-catalog__sort {
   width: min(100%, 13rem);
 }

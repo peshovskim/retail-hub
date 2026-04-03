@@ -15,6 +15,8 @@ export const selectCategoryMenuError = catalogFeature.selectMenuError;
 export const selectCatalogProducts = catalogFeature.selectProducts;
 export const selectCatalogProductsLoading = catalogFeature.selectProductsLoading;
 export const selectCatalogProductsError = catalogFeature.selectProductsError;
+export const selectProductListParams = catalogFeature.selectProductListParams;
+export const selectProductListTotalCount = catalogFeature.selectProductListTotalCount;
 
 /**
  * Zalary-style grouped selectors (`inboxEntriesQuery`) for one import surface.
@@ -29,24 +31,27 @@ export const catalogQuery = {
   getProducts: catalogFeature.selectProducts,
   getProductsLoading: catalogFeature.selectProductsLoading,
   getProductsError: catalogFeature.selectProductsError,
+  getProductListParams: catalogFeature.selectProductListParams,
+  getProductListTotalCount: catalogFeature.selectProductListTotalCount,
 };
 
 export type CatalogProductsView =
   | { kind: 'loading' }
   | { kind: 'error'; message: string }
-  | { kind: 'ok'; items: Product[] };
+  | { kind: 'ok'; items: Product[]; totalCount: number };
 
 export const selectCatalogProductsView = createSelector(
   catalogFeature.selectProductsLoading,
   catalogFeature.selectProductsError,
   catalogFeature.selectProducts,
-  (loading, error, items): CatalogProductsView => {
+  catalogFeature.selectProductListTotalCount,
+  (loading, error, items, totalCount): CatalogProductsView => {
     if (loading) {
       return { kind: 'loading' };
     }
     if (error) {
       return { kind: 'error', message: error };
     }
-    return { kind: 'ok', items };
+    return { kind: 'ok', items, totalCount };
   },
 );

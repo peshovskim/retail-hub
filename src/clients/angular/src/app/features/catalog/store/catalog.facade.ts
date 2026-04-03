@@ -1,6 +1,7 @@
 import { inject, Injectable } from '@angular/core';
 import { Store } from '@ngrx/store';
 
+import type { ProductListParams } from '../models/product-list.model';
 import { catalogActions } from './catalog.actions';
 import { catalogQuery, selectCatalogProductsView } from './catalog.selectors';
 
@@ -23,6 +24,8 @@ export class CatalogFacade {
   readonly productsLoading$ = this.store.select(catalogQuery.getProductsLoading);
   readonly productsError$ = this.store.select(catalogQuery.getProductsError);
   readonly productsView$ = this.store.select(selectCatalogProductsView);
+  readonly productListParams$ = this.store.select(catalogQuery.getProductListParams);
+  readonly productListTotalCount$ = this.store.select(catalogQuery.getProductListTotalCount);
 
   loadCategories(): void {
     this.store.dispatch(catalogActions.loadCategories());
@@ -32,7 +35,7 @@ export class CatalogFacade {
     this.store.dispatch(catalogActions.loadCategoryMenu());
   }
 
-  loadProducts(): void {
-    this.store.dispatch(catalogActions.loadProducts());
+  loadProducts(params: ProductListParams = {}): void {
+    this.store.dispatch(catalogActions.loadProducts({ params }));
   }
 }

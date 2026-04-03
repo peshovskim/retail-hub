@@ -1,6 +1,7 @@
 import { createFeature, createReducer, on } from '@ngrx/store';
 
 import type { Category, CategoryMenuNode } from '../models/category.model';
+import type { ProductListParams } from '../models/product-list.model';
 import type { Product } from '../models/product.model';
 import { catalogActions } from './catalog.actions';
 
@@ -16,6 +17,8 @@ export interface CatalogState {
   products: Product[];
   productsLoading: boolean;
   productsError: string | null;
+  productListParams: ProductListParams;
+  productListTotalCount: number;
 }
 
 const initialState: CatalogState = {
@@ -28,6 +31,8 @@ const initialState: CatalogState = {
   products: [],
   productsLoading: false,
   productsError: null,
+  productListParams: {},
+  productListTotalCount: 0,
 };
 
 export const catalogReducer = createReducer(
@@ -62,14 +67,16 @@ export const catalogReducer = createReducer(
     menuLoading: false,
     menuError: error,
   })),
-  on(catalogActions.loadProducts, (state) => ({
+  on(catalogActions.loadProducts, (state, { params }) => ({
     ...state,
     productsLoading: true,
     productsError: null,
+    productListParams: params,
   })),
-  on(catalogActions.loadProductsSuccess, (state, { products }) => ({
+  on(catalogActions.loadProductsSuccess, (state, { products, totalCount }) => ({
     ...state,
     products,
+    productListTotalCount: totalCount,
     productsLoading: false,
   })),
   on(catalogActions.loadProductsFailure, (state, { error }) => ({
