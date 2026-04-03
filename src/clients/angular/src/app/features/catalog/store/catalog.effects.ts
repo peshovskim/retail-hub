@@ -56,7 +56,7 @@ export class CatalogEffects {
       ofType(catalogActions.loadProducts),
       switchMap(() =>
         this.api.getProducts().pipe(
-          map((products) => catalogActions.loadProductsSuccess({ products })),
+          map((res) => catalogActions.loadProductsSuccess({ products: res.items })),
           catchError((err: unknown) =>
             of(
               catalogActions.loadProductsFailure({
