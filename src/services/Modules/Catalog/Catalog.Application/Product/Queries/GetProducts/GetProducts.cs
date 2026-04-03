@@ -9,14 +9,14 @@ namespace Catalog.Application.Product.Queries.GetProducts;
 /// <summary>List criteria for products: optional search, category and price filters, sort, and optional paging.</summary>
 public sealed record GetProductsQuery(
     string? Search = null,
-    IReadOnlyList<Guid>? CategoryIds = null,
+    List<Guid>? CategoryIds = null,
     decimal? PriceMin = null,
     decimal? PriceMax = null,
     ProductListSort Sort = ProductListSort.NameAsc,
     int? Page = null,
-    int? PageSize = null) : IQuery<IReadOnlyList<ProductResponse>>;
+    int? PageSize = null) : IQuery<ProductListResult>;
 
-public sealed class GetProductsQueryHandler : IRequestHandler<GetProductsQuery, Result<IReadOnlyList<ProductResponse>>>
+public sealed class GetProductsQueryHandler : IRequestHandler<GetProductsQuery, Result<ProductListResult>>
 {
     private readonly IProductReadRepository _repository;
 
@@ -25,11 +25,11 @@ public sealed class GetProductsQueryHandler : IRequestHandler<GetProductsQuery, 
         _repository = repository;
     }
 
-    public async Task<Result<IReadOnlyList<ProductResponse>>> Handle(
+    public async Task<Result<ProductListResult>> Handle(
         GetProductsQuery request,
         CancellationToken cancellationToken)
     {
-        var responses = await _repository.GetAllActiveProductsAsync(cancellationToken).ConfigureAwait(false);
-        return Result<IReadOnlyList<ProductResponse>>.Success(responses);
+        var list = await _repository.ListActiveProductsAsync(request, cancellationToken).ConfigureAwait(false);
+        return Result<ProductListResult>.Success(list);
     }
 }

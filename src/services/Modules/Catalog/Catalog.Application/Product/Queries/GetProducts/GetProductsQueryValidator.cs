@@ -9,6 +9,8 @@ public sealed class GetProductsQueryValidator : AbstractValidator<GetProductsQue
 
     public GetProductsQueryValidator()
     {
+        RuleFor(x => x.Sort).IsInEnum();
+
         RuleFor(x => x.Search)
             .Must(static s => string.IsNullOrWhiteSpace(s) || s.Trim().Length <= MaxSearchLength)
             .WithMessage($"Search must be at most {MaxSearchLength} characters after trimming.");
