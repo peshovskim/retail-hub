@@ -1,16 +1,4 @@
 .product-card {
   display: block;
   height: 100%;
-  border-radius: var(--mat-sys-corner-medium, 12px);
-  transition:
-    box-shadow 180ms ease,
-    border-color 180ms ease;
-
-  &:hover {
-    box-shadow: var(--mat-sys-level2, 0 2px 8px rgb(0 0 0 / 12%));
-  }
-}
-
-.product-card__content {
-  padding: 1rem 1.25rem !important;
 }

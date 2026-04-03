@@ -1,50 +1,151 @@
-<section class="product-list">
-  <div class="product-list__inner">
-    <section class="product-list__products-section" aria-labelledby="shop-products">
-      <h2 id="shop-products" class="product-list__section-title">Products</h2>
-      @if (productsView$ | async; as pv) {
-        @if (pv.kind === 'loading') {
-          <div class="product-list__state" role="status" aria-live="polite">
-            <mat-progress-spinner mode="indeterminate" diameter="44" />
-            <p class="product-list__state-text">Loading products...</p>
+<section class="shop-catalog" aria-label="Product catalog">
+  <div class="shop-catalog__inner">
+    <aside class="shop-filters" aria-label="Filters">
+      <div class="shop-filters__header">
+        <h2 class="shop-filters__title">Filters</h2>
+        <button
+          type="button"
+          class="shop-filters__clear"
+          (click)="clearFilters()"
+          [disabled]="!hasActiveFilters()"
+        >
+          Clear all
+        </button>
+      </div>
+
+      <mat-accordion class="shop-filters__accordion" multi>
+        <mat-expansion-panel class="shop-filters__panel" [expanded]="true">
+          <mat-expansion-panel-header>
+            <mat-panel-title>Categories</mat-panel-title>
+          </mat-expansion-panel-header>
+          @if (menuLoading()) {
+            <p class="shop-filters__hint">Loading categories…</p>
+          } @else if (flatCategories().length === 0) {
+            <p class="shop-filters__hint">No categories available yet.</p>
+          } @else {
+            <ul class="shop-filters__checkbox-list">
+              @for (c of flatCategories(); track c.id) {
+                <li>
+                  <mat-checkbox
+                    color="primary"
+                    [checked]="isCategorySelected(c.id)"
+                    (change)="toggleCategory(c.id, $event.checked)"
+                  >
+                    {{ c.name }}
+                  </mat-checkbox>
+                </li>
+              }
+            </ul>
+          }
+        </mat-expansion-panel>
+
+        <mat-expansion-panel class="shop-filters__panel">
+          <mat-expansion-panel-header>
+            <mat-panel-title>Price</mat-panel-title>
+          </mat-expansion-panel-header>
+          <div class="shop-filters__price">
+            <mat-form-field appearance="outline" subscriptSizing="dynamic" class="shop-filters__price-field">
+              <mat-label>Max price</mat-label>
+              <input
+                matInput
+                type="number"
+                min="0"
+                step="0.01"
+                [value]="priceMax() ?? ''"
+                (input)="onPriceMaxInput($event)"
+                placeholder="No limit"
+              />
+            </mat-form-field>
+            <p class="shop-filters__hint">Show products up to this price.</p>
           </div>
+        </mat-expansion-panel>
+      </mat-accordion>
+    </aside>
+
+    <div class="shop-catalog__main">
+      @if (productsView(); as pv) {
+        @if (pv.kind === 'loading') {
+        <div class="shop-catalog__state" role="status" aria-live="polite">
+          <mat-progress-spinner mode="indeterminate" diameter="44" />
+          <p class="shop-catalog__state-text">Loading products…</p>
+        </div>
         } @else if (pv.kind === 'error') {
-          <mat-card class="product-list__error" appearance="outlined">
+        <mat-card class="shop-catalog__error" appearance="outlined">
+          <mat-card-content>
+            <div class="shop-catalog__error-row">
+              <mat-icon color="warn" aria-hidden="true">error_outline</mat-icon>
+              <p role="alert">{{ pv.message }}</p>
+            </div>
+          </mat-card-content>
+        </mat-card>
+        } @else if (pv.kind === 'ok' && pv.items.length === 0) {
+        <mat-card appearance="outlined" class="shop-catalog__empty">
+          <mat-card-content>
+            <mat-icon class="shop-catalog__empty-icon" aria-hidden="true">inventory_2</mat-icon>
+            <p>No products returned from the server.</p>
+          </mat-card-content>
+        </mat-card>
+        } @else {
+        <header class="shop-catalog__toolbar">
+          <div class="shop-catalog__toolbar-left">
+            <h1 class="shop-catalog__heading" id="shop-products">Products</h1>
+            <span class="shop-catalog__count">{{ displayedCount() }} products</span>
+          </div>
+          <mat-form-field
+            appearance="outline"
+            subscriptSizing="dynamic"
+            class="shop-catalog__sort"
+          >
+            <mat-label>Sort by</mat-label>
+            <mat-select [value]="sortOption()" (valueChange)="setSort($event)">
+              <mat-option value="name-asc">Name A–Z</mat-option>
+              <mat-option value="name-desc">Name Z–A</mat-option>
+              <mat-option value="price-asc">Price: low to high</mat-option>
+              <mat-option value="price-desc">Price: high to low</mat-option>
+            </mat-select>
+          </mat-form-field>
+        </header>
+
+        @if (displayedCount() === 0) {
+          <mat-card appearance="outlined" class="shop-catalog__empty">
             <mat-card-content>
-              <div class="product-list__error-row">
-                <mat-icon color="warn" aria-hidden="true">error_outline</mat-icon>
-                <p role="alert">{{ pv.message }}</p>
-              </div>
-            </mat-card-content>
-          </mat-card>
-        } @else if (pv.items.length === 0) {
-          <mat-card appearance="outlined" class="product-list__empty">
-            <mat-card-content>
-              <mat-icon class="product-list__empty-icon" aria-hidden="true">inventory_2</mat-icon>
-              <p>No products returned from the server.</p>
+              <p>No products match the current filters.</p>
+              <button mat-button type="button" color="primary" (click)="clearFilters()">Clear filters</button>
             </mat-card-content>
           </mat-card>
         } @else {
-          <div class="product-list__grid product-list__grid--products">
-            @for (p of pv.items; track p.id) {
+          <div class="shop-grid">
+            @for (p of displayedProducts(); track p.id) {
               <a
-                class="product-list__card-link"
+                class="shop-grid__link"
                 matRipple
                 [routerLink]="['/catalog', 'product', p.id]"
               >
                 <app-product-card>
-                  <div class="product-list__product-body">
-                    <span class="product-list__product-name">{{ p.name }}</span>
-                    <span class="product-list__product-meta"
-                      >{{ p.sku }} · {{ p.price | appCurrency }}</span
-                    >
+                  <div class="shop-grid__card-inner">
+                    <div class="shop-grid__media">
+                      <div class="shop-grid__media-placeholder" aria-hidden="true">
+                        <mat-icon>image</mat-icon>
+                      </div>
+                      <div class="shop-grid__media-hover">
+                        <span>View details</span>
+                        <mat-icon>arrow_forward</mat-icon>
+                      </div>
+                    </div>
+                    <div class="shop-grid__body">
+                      <h2 class="shop-grid__title">{{ p.name }}</h2>
+                      <p class="shop-grid__subtitle">SKU {{ p.sku }}</p>
+                      <span class="shop-grid__badge">{{ categoryLabel(p.categoryId) }}</span>
+                      <p class="shop-grid__price">{{ p.price | appCurrency }}</p>
+                    </div>
                   </div>
                 </app-product-card>
               </a>
             }
           </div>
         }
+        }
       }
-    </section>
+    </div>
   </div>
 </section>
