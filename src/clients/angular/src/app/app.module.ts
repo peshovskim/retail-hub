@@ -8,8 +8,10 @@ import { StoreDevtoolsModule } from '@ngrx/store-devtools';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { CoreModule } from './core/core.module';
+import { API_BASE_URL } from './core/tokens';
 import { CatalogEffects } from './features/catalog/store/catalog.effects';
 import { CATALOG_FEATURE_KEY, catalogReducer } from './features/catalog/store/catalog.reducer';
+import { environment } from './environments/environment';
 
 @NgModule({
   declarations: [AppComponent],
@@ -18,7 +20,15 @@ import { CATALOG_FEATURE_KEY, catalogReducer } from './features/catalog/store/ca
     BrowserAnimationsModule,
     AppRoutingModule,
     CoreModule,
-    StoreModule.forRoot({}),
+    StoreModule.forRoot(
+      {},
+      {
+        runtimeChecks: {
+          strictStateImmutability: true,
+          strictActionImmutability: true,
+        },
+      },
+    ),
     EffectsModule.forRoot([]),
     StoreModule.forFeature(CATALOG_FEATURE_KEY, catalogReducer),
     EffectsModule.forFeature([CatalogEffects]),
@@ -26,6 +36,12 @@ import { CATALOG_FEATURE_KEY, catalogReducer } from './features/catalog/store/ca
       maxAge: 25,
       logOnly: !isDevMode(),
     }),
+  ],
+  providers: [
+    {
+      provide: API_BASE_URL,
+      useFactory: (): string => environment.apiBaseUrl.replace(/\/$/, ''),
+    },
   ],
   bootstrap: [AppComponent],
 })

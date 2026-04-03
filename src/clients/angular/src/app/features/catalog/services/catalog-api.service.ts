@@ -1,27 +1,25 @@
 import { HttpClient } from '@angular/common/http';
-import { Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 
-import { environment } from '../../../environments/environment';
+import { API_BASE_URL } from '../../../core/tokens';
 import type { Category, CategoryMenuNode } from '../models/category.model';
 import type { Product } from '../models/product.model';
 
 @Injectable({ providedIn: 'root' })
 export class CatalogApiService {
-  constructor(private readonly http: HttpClient) {}
+  private readonly http = inject(HttpClient);
+  private readonly apiBaseUrl = inject(API_BASE_URL);
 
   getCategories(): Observable<Category[]> {
-    const base = environment.apiBaseUrl.replace(/\/$/, '');
-    return this.http.get<Category[]>(`${base}/api/catalog/categories`);
+    return this.http.get<Category[]>(`${this.apiBaseUrl}/api/catalog/categories`);
   }
 
   getCategoryMenu(): Observable<CategoryMenuNode[]> {
-    const base = environment.apiBaseUrl.replace(/\/$/, '');
-    return this.http.get<CategoryMenuNode[]>(`${base}/api/catalog/categories/menu`);
+    return this.http.get<CategoryMenuNode[]>(`${this.apiBaseUrl}/api/catalog/categories/menu`);
   }
 
   getProducts(): Observable<Product[]> {
-    const base = environment.apiBaseUrl.replace(/\/$/, '');
-    return this.http.get<Product[]>(`${base}/api/catalog/products`);
+    return this.http.get<Product[]>(`${this.apiBaseUrl}/api/catalog/products`);
   }
 }
