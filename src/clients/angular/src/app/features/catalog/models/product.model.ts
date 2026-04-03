@@ -1,6 +1,9 @@
-/** Placeholder until product API exists. */
+/** Product row from `GET /api/catalog/products` (camelCase JSON). */
 export interface Product {
   id: string;
+  categoryId: string;
   name: string;
-  slug?: string;
+  slug: string;
+  sku: string;
+  price: number;
 }

@@ -1,11 +1,8 @@
-import { Component } from '@angular/core';
-import { Store } from '@ngrx/store';
+import { Component, inject } from '@angular/core';
+import { Observable } from 'rxjs';
 
-import {
-  selectCatalogCategories,
-  selectCatalogError,
-  selectCatalogLoading,
-} from '../store/catalog.selectors';
+import type { CatalogProductsView } from '../store/catalog.selectors';
+import { CatalogFacade } from '../store/catalog.facade';
 
 @Component({
   selector: 'app-product-list-page',
@@ -14,16 +11,12 @@ import {
   standalone: false,
 })
 export class ProductListPage {
-  /** Decorative carousel dots (static; styling reference only). */
-  protected readonly heroDots = [0, 1, 2, 3, 4];
+  private readonly catalog = inject(CatalogFacade);
 
-  protected categories$;
-  protected loading$;
-  protected error$;
-
-  constructor(private readonly store: Store) {
-    this.categories$ = this.store.select(selectCatalogCategories);
-    this.loading$ = this.store.select(selectCatalogLoading);
-    this.error$ = this.store.select(selectCatalogError);
+  constructor() {
+    this.catalog.loadProducts();
   }
+
+  /** All active products from the store (loaded via `CatalogEffects`). */
+  protected readonly productsView$: Observable<CatalogProductsView> = this.catalog.productsView$;
 }

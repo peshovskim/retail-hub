@@ -4,6 +4,7 @@ import { Observable } from 'rxjs';
 
 import { environment } from '../../../environments/environment';
 import type { Category, CategoryMenuNode } from '../models/category.model';
+import type { Product } from '../models/product.model';
 
 @Injectable({ providedIn: 'root' })
 export class CatalogApiService {
@@ -17,5 +18,10 @@ export class CatalogApiService {
   getCategoryMenu(): Observable<CategoryMenuNode[]> {
     const base = environment.apiBaseUrl.replace(/\/$/, '');
     return this.http.get<CategoryMenuNode[]>(`${base}/api/catalog/categories/menu`);
+  }
+
+  getProducts(): Observable<Product[]> {
+    const base = environment.apiBaseUrl.replace(/\/$/, '');
+    return this.http.get<Product[]>(`${base}/api/catalog/products`);
   }
 }
