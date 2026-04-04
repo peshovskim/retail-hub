@@ -92,13 +92,14 @@
             <button
               mat-flat-button
               type="button"
+              color="primary"
               class="product-detail__add-cart"
-              disabled
-              aria-describedby="add-cart-hint"
+              (click)="addToCart(p)"
+              aria-describedby="add_cart_hint"
             >
               Add to cart
             </button>
-            <p id="add-cart-hint" class="product-detail__add-cart-hint">Shopping cart is coming soon.</p>
+            <p id="add_cart_hint" class="product-detail__add-cart-hint">Uses the price shown above for this line.</p>
           </div>
 
           <mat-divider class="product-detail__divider" />

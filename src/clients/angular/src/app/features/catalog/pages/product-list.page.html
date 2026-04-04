@@ -175,6 +175,15 @@
                       <p class="shop-grid__subtitle">SKU {{ p.sku }}</p>
                       <span class="shop-grid__badge">{{ categoryLabel(p.categoryId) }}</span>
                       <p class="shop-grid__price">{{ p.price | appCurrency }}</p>
+                      <button
+                        mat-stroked-button
+                        type="button"
+                        color="primary"
+                        class="shop-grid__add"
+                        (click)="addOneToCart($event, p.id)"
+                      >
+                        Add to cart
+                      </button>
                     </div>
                   </div>
                 </app-product-card>

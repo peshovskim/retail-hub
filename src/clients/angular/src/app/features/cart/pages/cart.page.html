@@ -1,0 +1,87 @@
+<section class="cart-page" aria-label="Shopping cart">
+  <header class="cart-page__header">
+    <h1 class="cart-page__title">Your cart</h1>
+    <button mat-button type="button" color="primary" (click)="continueShopping()">Continue shopping</button>
+  </header>
+
+  @if (error(); as err) {
+    <mat-card appearance="outlined" class="cart-page__notice cart-page__notice--error">
+      <mat-card-content>
+        <p role="alert">{{ err }}</p>
+        <button mat-button type="button" color="primary" (click)="facade.refreshCart()">Try again</button>
+      </mat-card-content>
+    </mat-card>
+  }
+
+  @if (loading() && !cart()) {
+    <div class="cart-page__state" role="status">
+      <mat-progress-spinner mode="indeterminate" diameter="44" />
+      <p>Loading cart…</p>
+    </div>
+  } @else if (cart(); as c) {
+    @if (c.lines.length === 0) {
+      <mat-card appearance="outlined" class="cart-page__empty">
+        <mat-card-content>
+          <mat-icon aria-hidden="true">shopping_cart</mat-icon>
+          <p>Your cart is empty.</p>
+          <button mat-flat-button color="primary" type="button" (click)="continueShopping()">
+            Browse products
+          </button>
+        </mat-card-content>
+      </mat-card>
+    } @else {
+      <div class="cart-page__table" [class.opacityBusy]="mutationBusy()">
+        <table class="cart-table">
+          <thead>
+            <tr>
+              <th scope="col">Product</th>
+              <th scope="col">SKU</th>
+              <th scope="col">Price</th>
+              <th scope="col">Qty</th>
+              <th scope="col">Line total</th>
+              <th scope="col"><span class="visually-hidden">Remove</span></th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (line of c.lines; track line.productId) {
+              <tr>
+                <td>{{ line.name }}</td>
+                <td>{{ line.sku }}</td>
+                <td>{{ line.unitPrice | appCurrency }}</td>
+                <td>
+                  <input
+                    class="cart-table__qty"
+                    type="number"
+                    min="0"
+                    max="99"
+                    [value]="line.quantity"
+                    (change)="changeQty(line.productId, $event)"
+                    [disabled]="mutationBusy()"
+                    [attr.aria-label]="'Quantity for ' + line.name"
+                  />
+                </td>
+                <td>{{ line.lineTotal | appCurrency }}</td>
+                <td>
+                  <button
+                    mat-icon-button
+                    type="button"
+                    (click)="remove(line.productId)"
+                    [disabled]="mutationBusy()"
+                    aria-label="Remove from cart"
+                  >
+                    <mat-icon>delete_outline</mat-icon>
+                  </button>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+
+        <div class="cart-page__footer">
+          <span class="cart-page__subtotal-label">Subtotal</span>
+          <span class="cart-page__subtotal">{{ c.subtotal | appCurrency }}</span>
+        </div>
+      </div>
+    }
+  }
+</section>

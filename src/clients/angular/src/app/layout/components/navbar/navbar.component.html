@@ -46,9 +46,23 @@
         </button>
       </div>
 
-      <button mat-icon-button type="button" class="app-toolbar__cart" aria-label="Shopping cart (coming soon)" disabled>
-        <mat-icon matBadge="0" matBadgeSize="small" matBadgeColor="primary" aria-hidden="true">shopping_cart</mat-icon>
-      </button>
+      <a
+        mat-icon-button
+        type="button"
+        class="app-toolbar__cart"
+        routerLink="/cart"
+        [attr.aria-label]="'Shopping cart, ' + cartItemCount() + ' items'"
+      >
+        <mat-icon
+          [matBadge]="cartItemCount()"
+          [matBadgeHidden]="cartItemCount() === 0"
+          matBadgeSize="small"
+          matBadgeColor="primary"
+          aria-hidden="true"
+        >
+          shopping_cart
+        </mat-icon>
+      </a>
     </div>
   </div>
 </mat-toolbar>

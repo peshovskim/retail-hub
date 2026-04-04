@@ -11,6 +11,8 @@ import { AppComponent } from './app.component';
 import { CoreModule } from './core/core.module';
 import { CatalogRouteReuseStrategy } from './core/routing/catalog-route-reuse.strategy';
 import { API_BASE_URL } from './core/tokens';
+import { CartEffects } from './features/cart/store/cart.effects';
+import { CART_FEATURE_KEY, cartReducer } from './features/cart/store/cart.reducer';
 import { CatalogEffects } from './features/catalog/store/catalog.effects';
 import { CATALOG_FEATURE_KEY, catalogReducer } from './features/catalog/store/catalog.reducer';
 import { environment } from './environments/environment';
@@ -33,7 +35,8 @@ import { environment } from './environments/environment';
     ),
     EffectsModule.forRoot([]),
     StoreModule.forFeature(CATALOG_FEATURE_KEY, catalogReducer),
-    EffectsModule.forFeature([CatalogEffects]),
+    StoreModule.forFeature(CART_FEATURE_KEY, cartReducer),
+    EffectsModule.forFeature([CatalogEffects, CartEffects]),
     StoreDevtoolsModule.instrument({
       maxAge: 25,
       logOnly: !isDevMode(),

@@ -7,6 +7,7 @@ import { distinctUntilChanged, map, skip } from 'rxjs';
 import type { CategoryMenuNode } from '../models/category.model';
 import type { ProductListParams, ProductListSort } from '../models/product-list.model';
 import type { CatalogProductsView } from '../store/catalog.selectors';
+import { CartFacade } from '../../cart/store/cart.facade';
 import { CatalogToolbarSearchService } from '../services/catalog-toolbar-search.service';
 import { CatalogFacade } from '../store/catalog.facade';
 
@@ -156,6 +157,7 @@ function shopSortToApi(sort: ShopSortOption): ProductListSort {
 })
 export class ProductListPage {
   private readonly catalog = inject(CatalogFacade);
+  private readonly cart = inject(CartFacade);
   private readonly toolbarSearch = inject(CatalogToolbarSearchService);
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
@@ -515,5 +517,11 @@ export class ProductListPage {
     if (!options?.skipUrlSync) {
       this.syncQueryStringFromState();
     }
+  }
+
+  protected addOneToCart(event: Event, productId: string): void {
+    event.preventDefault();
+    event.stopPropagation();
+    this.cart.addToCart(productId, 1);
   }
 }

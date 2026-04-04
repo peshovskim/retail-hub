@@ -16,11 +16,28 @@ namespace RetailHub.Api.Controllers;
 [Route("api/cart")]
 public sealed class CartController : ControllerBase
 {
+    public const string CartSessionHeaderName = "X-Cart-Session";
+
     private readonly IMediator _mediator;
 
     public CartController(IMediator mediator)
     {
         _mediator = mediator;
+    }
+
+    /// <summary>Creates a new anonymous cart or returns an existing one for the given session key.</summary>
+    /// <param name="clientAnonymousKey">Optional client-generated key; omit to start a new session.</param>
+    [HttpPost("session")]
+    [ProducesResponseType(typeof(CartSessionResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    public async Task<IActionResult> CreateOrGetSession(
+        [FromHeader(Name = CartSessionHeaderName)] string? clientAnonymousKey,
+        CancellationToken cancellationToken)
+    {
+        Result<CartSessionResponse> result =
+            await _mediator.Send(new CreateOrGetCartSessionCommand(clientAnonymousKey), cancellationToken)
+                .ConfigureAwait(false);
+        return result.ToActionResult();
     }
 
     [HttpGet("{cartId:guid}")]
@@ -41,7 +58,6 @@ public sealed class CartController : ControllerBase
         Result<CartResponse> result = await _mediator
             .Send(new AddCartItemCommand(request), cancellationToken)
             .ConfigureAwait(false);
-
         return result.ToActionResult();
     }
 
@@ -64,9 +80,9 @@ public sealed class CartController : ControllerBase
     [ProducesResponseType(typeof(CartResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> RemoveItem(
-    Guid productId,
-    [FromQuery] RemoveCartItemRequest request,
-    CancellationToken cancellationToken)
+        Guid productId,
+        [FromQuery] RemoveCartItemRequest request,
+        CancellationToken cancellationToken)
     {
         Result<CartResponse> result = await _mediator
             .Send(new RemoveCartItemCommand(request, productId), cancellationToken)

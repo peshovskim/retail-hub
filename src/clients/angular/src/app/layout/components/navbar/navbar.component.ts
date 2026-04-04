@@ -1,6 +1,8 @@
 import { Component, inject } from '@angular/core';
+import { toSignal } from '@angular/core/rxjs-interop';
 import { Router } from '@angular/router';
 
+import { CartFacade } from '../../../features/cart/store/cart.facade';
 import { CatalogToolbarSearchService } from '../../../features/catalog/services/catalog-toolbar-search.service';
 
 @Component({
@@ -12,6 +14,13 @@ import { CatalogToolbarSearchService } from '../../../features/catalog/services/
 export class NavbarComponent {
   protected readonly catalogSearch = inject(CatalogToolbarSearchService);
   private readonly router = inject(Router);
+  private readonly cartFacade = inject(CartFacade);
+
+  protected readonly cartItemCount = toSignal(this.cartFacade.itemCount$, { initialValue: 0 });
+
+  constructor() {
+    this.cartFacade.bootstrap();
+  }
 
   protected onSearchSubmit(event?: Event): void {
     event?.preventDefault();
