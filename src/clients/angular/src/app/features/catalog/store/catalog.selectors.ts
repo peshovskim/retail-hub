@@ -46,7 +46,8 @@ export const selectCatalogProductsView = createSelector(
   catalogFeature.selectProducts,
   catalogFeature.selectProductListTotalCount,
   (loading, error, items, totalCount): CatalogProductsView => {
-    if (loading) {
+    // Avoid full-page spinner on every refetch: keep showing previous results while loading.
+    if (loading && items.length === 0) {
       return { kind: 'loading' };
     }
     if (error) {

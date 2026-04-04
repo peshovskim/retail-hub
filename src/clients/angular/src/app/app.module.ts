@@ -2,12 +2,14 @@ import { isDevMode, NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { EffectsModule } from '@ngrx/effects';
+import { RouteReuseStrategy } from '@angular/router';
 import { StoreModule } from '@ngrx/store';
 import { StoreDevtoolsModule } from '@ngrx/store-devtools';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { CoreModule } from './core/core.module';
+import { CatalogRouteReuseStrategy } from './core/routing/catalog-route-reuse.strategy';
 import { API_BASE_URL } from './core/tokens';
 import { CatalogEffects } from './features/catalog/store/catalog.effects';
 import { CATALOG_FEATURE_KEY, catalogReducer } from './features/catalog/store/catalog.reducer';
@@ -42,6 +44,7 @@ import { environment } from './environments/environment';
       provide: API_BASE_URL,
       useFactory: (): string => environment.apiBaseUrl.replace(/\/$/, ''),
     },
+    { provide: RouteReuseStrategy, useClass: CatalogRouteReuseStrategy },
   ],
   bootstrap: [AppComponent],
 })
