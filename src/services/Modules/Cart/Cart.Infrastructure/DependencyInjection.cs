@@ -1,4 +1,6 @@
 using Cart.Application.Cart.Interfaces;
+using Cart.Infrastructure.Persistence.Read.Cart.Factories;
+using Cart.Infrastructure.Persistence.Read.Cart.Queries;
 using Cart.Infrastructure.Persistence.Write.Cart.Repository;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -23,6 +25,9 @@ public static class DependencyInjection
             options.UseSqlServer(connectionString)
                 .UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking);
         });
+
+        services.AddScoped<CartReadFactory>();
+        services.AddScoped<ICartReadRepository, CartQueries>();
 
         services.AddScoped<ICartRepository, CartRepository>();
 
