@@ -20,20 +20,20 @@ public sealed record UpdateCartItemQuantityCommand(Guid CartId, Guid ProductId, 
 
 public sealed class UpdateCartItemQuantityCommandHandler : IRequestHandler<UpdateCartItemQuantityCommand, Result<CartResponse>>
 {
-    private readonly ICartRepository _carts;
-    private readonly IProductReadRepository _products;
+    private readonly ICartRepository _cartRepository;
+    private readonly IProductReadRepository _productReadRepository;
 
-    public UpdateCartItemQuantityCommandHandler(ICartRepository carts, IProductReadRepository products)
+    public UpdateCartItemQuantityCommandHandler(ICartRepository cartRepository, IProductReadRepository productReadRepository)
     {
-        _carts = carts;
-        _products = products;
+        _cartRepository = cartRepository;
+        _productReadRepository = productReadRepository;
     }
 
     public async Task<Result<CartResponse>> Handle(
         UpdateCartItemQuantityCommand request,
         CancellationToken cancellationToken)
     {
-        var cart = await _carts.GetByIdWithItemsAsync(request.CartId, cancellationToken).ConfigureAwait(false);
+        var cart = await _cartRepository.GetByIdWithItemsAsync(request.CartId, cancellationToken).ConfigureAwait(false);
 
         if (cart is null)
         {
@@ -46,7 +46,7 @@ public sealed class UpdateCartItemQuantityCommandHandler : IRequestHandler<Updat
         }
         else
         {
-            var product = await _products
+            var product = await _productReadRepository
                 .GetActiveProductByIdAsync(request.ProductId, cancellationToken)
                 .ConfigureAwait(false);
 
@@ -67,9 +67,9 @@ public sealed class UpdateCartItemQuantityCommandHandler : IRequestHandler<Updat
             }
         }
 
-        await _carts.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+        await _cartRepository.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
 
-        CartResponse dto = await CartResponseFactory.CreateAsync(cart, _products, cancellationToken).ConfigureAwait(false);
+        CartResponse dto = await CartResponseFactory.CreateAsync(cart, _productReadRepository, cancellationToken).ConfigureAwait(false);
 
         return Result<CartResponse>.Success(dto);
     }

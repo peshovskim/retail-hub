@@ -10,18 +10,18 @@ public sealed record GetCategoriesQuery : IQuery<IReadOnlyList<CategoryResponse>
 
 public sealed class GetCategoriesQueryHandler : IRequestHandler<GetCategoriesQuery, Result<IReadOnlyList<CategoryResponse>>>
 {
-    private readonly ICategoryReadRepository _repository;
+    private readonly ICategoryReadRepository _categoryReadRepository;
 
-    public GetCategoriesQueryHandler(ICategoryReadRepository repository)
+    public GetCategoriesQueryHandler(ICategoryReadRepository categoryReadRepository)
     {
-        _repository = repository;
+        _categoryReadRepository = categoryReadRepository;
     }
 
     public async Task<Result<IReadOnlyList<CategoryResponse>>> Handle(
         GetCategoriesQuery request,
         CancellationToken cancellationToken)
     {
-        var responses = await _repository.GetRootCategoriesAsync(cancellationToken).ConfigureAwait(false);
+        var responses = await _categoryReadRepository.GetRootCategoriesAsync(cancellationToken).ConfigureAwait(false);
         return Result<IReadOnlyList<CategoryResponse>>.Success(responses);
     }
 }

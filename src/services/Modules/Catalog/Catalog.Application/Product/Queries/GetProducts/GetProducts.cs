@@ -18,18 +18,18 @@ public sealed record GetProductsQuery(
 
 public sealed class GetProductsQueryHandler : IRequestHandler<GetProductsQuery, Result<ProductListResult>>
 {
-    private readonly IProductReadRepository _repository;
+    private readonly IProductReadRepository _productReadRepository;
 
-    public GetProductsQueryHandler(IProductReadRepository repository)
+    public GetProductsQueryHandler(IProductReadRepository productReadRepository)
     {
-        _repository = repository;
+        _productReadRepository = productReadRepository;
     }
 
     public async Task<Result<ProductListResult>> Handle(
         GetProductsQuery request,
         CancellationToken cancellationToken)
     {
-        var list = await _repository.ListActiveProductsAsync(request, cancellationToken).ConfigureAwait(false);
+        var list = await _productReadRepository.ListActiveProductsAsync(request, cancellationToken).ConfigureAwait(false);
         return Result<ProductListResult>.Success(list);
     }
 }

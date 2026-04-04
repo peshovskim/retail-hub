@@ -37,6 +37,7 @@ public sealed class CartController : ControllerBase
         Result<CartSessionResponse> result =
             await _mediator.Send(new CreateOrGetCartSessionCommand(clientAnonymousKey), cancellationToken)
                 .ConfigureAwait(false);
+
         return result.ToActionResult();
     }
 
@@ -46,6 +47,7 @@ public sealed class CartController : ControllerBase
     public async Task<IActionResult> GetCart(Guid cartId, CancellationToken cancellationToken)
     {
         Result<CartResponse> result = await _mediator.Send(new GetCartQuery(cartId), cancellationToken).ConfigureAwait(false);
+
         return result.ToActionResult();
     }
 
@@ -58,6 +60,7 @@ public sealed class CartController : ControllerBase
         Result<CartResponse> result = await _mediator
             .Send(new AddCartItemCommand(request), cancellationToken)
             .ConfigureAwait(false);
+
         return result.ToActionResult();
     }
 
@@ -73,6 +76,7 @@ public sealed class CartController : ControllerBase
         Result<CartResponse> result = await _mediator
             .Send(new UpdateCartItemQuantityCommand(request, productId), cancellationToken)
             .ConfigureAwait(false);
+
         return result.ToActionResult();
     }
 
@@ -87,6 +91,7 @@ public sealed class CartController : ControllerBase
         Result<CartResponse> result = await _mediator
             .Send(new RemoveCartItemCommand(request, productId), cancellationToken)
             .ConfigureAwait(false);
+
         return result.ToActionResult();
     }
 }

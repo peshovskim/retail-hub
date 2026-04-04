@@ -10,18 +10,18 @@ public sealed record GetProductByIdQuery(Guid Id) : IQuery<ProductResponse>;
 
 public sealed class GetProductByIdQueryHandler : IRequestHandler<GetProductByIdQuery, Result<ProductResponse>>
 {
-    private readonly IProductReadRepository _repository;
+    private readonly IProductReadRepository _productReadRepository;
 
-    public GetProductByIdQueryHandler(IProductReadRepository repository)
+    public GetProductByIdQueryHandler(IProductReadRepository productReadRepository)
     {
-        _repository = repository;
+        _productReadRepository = productReadRepository;
     }
 
     public async Task<Result<ProductResponse>> Handle(
         GetProductByIdQuery request,
         CancellationToken cancellationToken)
     {
-        var product = await _repository
+        var product = await _productReadRepository
             .GetActiveProductByIdAsync(request.Id, cancellationToken)
             .ConfigureAwait(false);
 

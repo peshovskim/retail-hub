@@ -11,13 +11,13 @@ public sealed record GetCartQuery(Guid CartId) : IQuery<CartResponse>;
 
 public sealed class GetCartQueryHandler : IRequestHandler<GetCartQuery, Result<CartResponse>>
 {
-    private readonly ICartReadRepository _carts;
-    private readonly IProductReadRepository _products;
+    private readonly ICartReadRepository _cartReadRepository;
+    private readonly IProductReadRepository _productReadRepository;
 
-    public GetCartQueryHandler(ICartReadRepository carts, IProductReadRepository products)
+    public GetCartQueryHandler(ICartReadRepository cartReadRepository, IProductReadRepository productReadRepository)
     {
-        _carts = carts;
-        _products = products;
+        _cartReadRepository = cartReadRepository;
+        _productReadRepository = productReadRepository;
     }
 
     public async Task<Result<CartResponse>> Handle(GetCartQuery request, CancellationToken cancellationToken)
@@ -32,8 +32,9 @@ public sealed class GetCartQueryHandler : IRequestHandler<GetCartQuery, Result<C
         }
 
         var dto = await CartResponseFactory
-            .CreateAsync(cart, _products, cancellationToken)
+            .CreateAsync(cart, _productReadRepository, cancellationToken)
             .ConfigureAwait(false);
+
         return Result<CartResponse>.Success(dto);
     }
 }

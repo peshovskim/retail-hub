@@ -19,25 +19,25 @@ public sealed record AddCartItemCommand(Guid CartId, Guid ProductId, int Quantit
 
 public sealed class AddCartItemCommandHandler : IRequestHandler<AddCartItemCommand, Result<CartResponse>>
 {
-    private readonly ICartRepository _carts;
-    private readonly IProductReadRepository _products;
+    private readonly ICartRepository _cartRepository;
+    private readonly IProductReadRepository _productReadRepository;
 
-    public AddCartItemCommandHandler(ICartRepository carts, IProductReadRepository products)
+    public AddCartItemCommandHandler(ICartRepository cartRepository, IProductReadRepository productReadRepository)
     {
-        _carts = carts;
-        _products = products;
+        _cartRepository = cartRepository;
+        _productReadRepository = productReadRepository;
     }
 
     public async Task<Result<CartResponse>> Handle(AddCartItemCommand request, CancellationToken cancellationToken)
     {
-        var cart = await _carts.GetByIdWithItemsAsync(request.CartId, cancellationToken).ConfigureAwait(false);
+        var cart = await _cartRepository.GetByIdWithItemsAsync(request.CartId, cancellationToken).ConfigureAwait(false);
 
         if (cart is null)
         {
             return Result<CartResponse>.Failure(Error.NotFound("Cart not found."));
         }
 
-        var product = await _products
+        var product = await _productReadRepository
             .GetActiveProductByIdAsync(request.ProductId, cancellationToken)
             .ConfigureAwait(false);
 
@@ -58,9 +58,9 @@ public sealed class AddCartItemCommandHandler : IRequestHandler<AddCartItemComma
             return Result<CartResponse>.Failure(DomainResultAdapter.ToApplicationError(addResult.Error!));
         }
 
-        await _carts.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+        await _cartRepository.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
 
-        CartResponse dto = await CartResponseFactory.CreateAsync(cart, _products, cancellationToken).ConfigureAwait(false);
+        CartResponse dto = await CartResponseFactory.CreateAsync(cart, _productReadRepository, cancellationToken).ConfigureAwait(false);
 
         return Result<CartResponse>.Success(dto);
     }

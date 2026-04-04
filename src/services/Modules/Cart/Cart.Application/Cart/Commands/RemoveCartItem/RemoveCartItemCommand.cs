@@ -18,18 +18,18 @@ public sealed record RemoveCartItemCommand(Guid CartId, Guid ProductId) : IComma
 
 public sealed class RemoveCartItemCommandHandler : IRequestHandler<RemoveCartItemCommand, Result<CartResponse>>
 {
-    private readonly ICartRepository _carts;
-    private readonly IProductReadRepository _products;
+    private readonly ICartRepository _cartRepository;
+    private readonly IProductReadRepository _productReadRepository;
 
-    public RemoveCartItemCommandHandler(ICartRepository carts, IProductReadRepository products)
+    public RemoveCartItemCommandHandler(ICartRepository cartRepository, IProductReadRepository productReadRepository)
     {
-        _carts = carts;
-        _products = products;
+        _cartRepository = cartRepository;
+        _productReadRepository = productReadRepository;
     }
 
     public async Task<Result<CartResponse>> Handle(RemoveCartItemCommand request, CancellationToken cancellationToken)
     {
-        var cart = await _carts.GetByIdWithItemsAsync(request.CartId, cancellationToken).ConfigureAwait(false);
+        var cart = await _cartRepository.GetByIdWithItemsAsync(request.CartId, cancellationToken).ConfigureAwait(false);
 
         if (cart is null)
         {
@@ -38,9 +38,9 @@ public sealed class RemoveCartItemCommandHandler : IRequestHandler<RemoveCartIte
 
         cart.RemoveItem(request.ProductId, DateTime.UtcNow);
 
-        await _carts.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+        await _cartRepository.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
 
-        CartResponse dto = await CartResponseFactory.CreateAsync(cart, _products, cancellationToken).ConfigureAwait(false);
+        CartResponse dto = await CartResponseFactory.CreateAsync(cart, _productReadRepository, cancellationToken).ConfigureAwait(false);
 
         return Result<CartResponse>.Success(dto);
     }

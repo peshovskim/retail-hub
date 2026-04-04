@@ -10,18 +10,18 @@ public sealed record GetCategoryMenuQuery : IQuery<IReadOnlyList<CategoryMenuNod
 
 public sealed class GetCategoryMenuQueryHandler : IRequestHandler<GetCategoryMenuQuery, Result<IReadOnlyList<CategoryMenuNodeResponse>>>
 {
-    private readonly ICategoryReadRepository _repository;
+    private readonly ICategoryReadRepository _categoryReadRepository;
 
-    public GetCategoryMenuQueryHandler(ICategoryReadRepository repository)
+    public GetCategoryMenuQueryHandler(ICategoryReadRepository categoryReadRepository)
     {
-        _repository = repository;
+        _categoryReadRepository = categoryReadRepository;
     }
 
     public async Task<Result<IReadOnlyList<CategoryMenuNodeResponse>>> Handle(
         GetCategoryMenuQuery request,
         CancellationToken cancellationToken)
     {
-        var rows = await _repository.GetAllActiveCategoriesAsync(cancellationToken).ConfigureAwait(false);
+        var rows = await _categoryReadRepository.GetAllActiveCategoriesAsync(cancellationToken).ConfigureAwait(false);
 
         var orderedRows = rows.OrderBy(r => r.Name).ToList();
         var byParent = orderedRows.ToLookup(r => r.ParentId);
