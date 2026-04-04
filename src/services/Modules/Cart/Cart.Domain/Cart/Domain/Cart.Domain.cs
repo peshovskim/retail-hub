@@ -74,5 +74,13 @@ public sealed partial class Cart
         }
     }
 
+    public void ClearAllActiveItems(DateTime utcNow)
+    {
+        foreach (var item in Items.Where(i => i.IsActive).ToList())
+        {
+            item.SoftDelete(utcNow);
+        }
+    }
+
     private int ActiveItemCount => Items.Count(i => i.IsActive);
 }
