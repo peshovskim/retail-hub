@@ -1,7 +1,8 @@
 import { Component, computed, effect, inject, signal } from '@angular/core';
 import { takeUntilDestroyed, toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { PageEvent } from '@angular/material/paginator';
-import { distinctUntilChanged, skip } from 'rxjs';
+import { ActivatedRoute } from '@angular/router';
+import { distinctUntilChanged, map, skip } from 'rxjs';
 
 import type { CategoryMenuNode } from '../models/category.model';
 import type { ProductListParams, ProductListSort } from '../models/product-list.model';
@@ -39,6 +40,39 @@ function buildCategoryNameMap(nodes: CategoryMenuNode[]): Map<string, string> {
   return map;
 }
 
+function findCategoryNodeBySlug(nodes: CategoryMenuNode[], slug: string): CategoryMenuNode | null {
+  for (const n of nodes) {
+    if (n.slug === slug) {
+      return n;
+    }
+    const child = findCategoryNodeBySlug(n.children ?? [], slug);
+    if (child) {
+      return child;
+    }
+  }
+  return null;
+}
+
+/** All product category IDs under this node (leaf = self; parent = all descendant leaves). */
+function categoryIdsForMenuNode(node: CategoryMenuNode): string[] {
+  if (!node.children?.length) {
+    return [node.id];
+  }
+  return node.children.flatMap(categoryIdsForMenuNode);
+}
+
+function setsEqualString(a: Set<string>, b: Set<string>): boolean {
+  if (a.size !== b.size) {
+    return false;
+  }
+  for (const x of a) {
+    if (!b.has(x)) {
+      return false;
+    }
+  }
+  return true;
+}
+
 /** Default page size for catalog API requests (must stay ≤ API max, currently 100). */
 const DEFAULT_CATALOG_PAGE_SIZE = 24;
 
@@ -65,6 +99,16 @@ function shopSortToApi(sort: ShopSortOption): ProductListSort {
 export class ProductListPage {
   private readonly catalog = inject(CatalogFacade);
   private readonly toolbarSearch = inject(CatalogToolbarSearchService);
+  private readonly route = inject(ActivatedRoute);
+
+  /** `category/:slug` from the router (header Categories menu navigates here). */
+  private readonly routeCategorySlug = toSignal(
+    this.route.paramMap.pipe(map((pm) => pm.get('slug'))),
+    { initialValue: this.route.snapshot.paramMap.get('slug') },
+  );
+
+  /** True while URL is `/catalog/category/:slug` so leaving that route clears the filter. */
+  private readonly routeCategoryFilterActive = signal(false);
 
   /** Upper bound for the price range slider; values at the max mean “no max filter”. */
   protected readonly priceSliderCeiling = 5000;
@@ -94,6 +138,42 @@ export class ProductListPage {
         this.currentPage.set(1);
         this.reloadProducts();
       });
+
+    effect(() => {
+      const slug = this.routeCategorySlug();
+      const nodes = this.menu();
+
+      if (slug) {
+        if (nodes.length === 0) {
+          return;
+        }
+        const node = findCategoryNodeBySlug(nodes, slug);
+        if (!node) {
+          return;
+        }
+        const ids = categoryIdsForMenuNode(node);
+        if (ids.length === 0) {
+          return;
+        }
+        const next = new Set(ids);
+        if (setsEqualString(this.selectedCategoryIds(), next)) {
+          this.routeCategoryFilterActive.set(true);
+          return;
+        }
+        this.selectedCategoryIds.set(next);
+        this.routeCategoryFilterActive.set(true);
+        this.currentPage.set(1);
+        this.reloadProducts();
+        return;
+      }
+
+      if (this.routeCategoryFilterActive()) {
+        this.routeCategoryFilterActive.set(false);
+        this.selectedCategoryIds.set(new Set());
+        this.currentPage.set(1);
+        this.reloadProducts();
+      }
+    });
   }
 
   protected readonly productsView = toSignal(this.catalog.productsView$, {
