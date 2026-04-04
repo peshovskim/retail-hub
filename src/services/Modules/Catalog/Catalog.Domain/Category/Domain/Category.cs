@@ -1,7 +1,7 @@
 using RetailHub.SharedKernel.Domain;
+using ProductAggregate = Catalog.Domain.Product.Domain.Product;
 
 namespace Catalog.Domain.Category.Domain;
-
 public sealed partial class Category : AggregateRoot
 {
     public string Name { get; private set; } = null!;
@@ -17,6 +17,5 @@ public sealed partial class Category : AggregateRoot
     public ICollection<Category> Children { get; set; } = new List<Category>();
 
     /// <summary>Products in this category (EF navigation).</summary>
-    public ICollection<global::Catalog.Domain.Product.Domain.Product> Products { get; set; } =
-        new List<global::Catalog.Domain.Product.Domain.Product>();
+    public ICollection<ProductAggregate> Products { get; set; } = new List<ProductAggregate>();
 }
