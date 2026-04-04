@@ -1,0 +1,54 @@
+<mat-menu #panel="matMenu" [overlapTrigger]="false" panelClass="category-mega-menu-panel">
+  <div
+    class="category-mega"
+    role="region"
+    aria-label="Shop by category"
+    [style.--category-cols]="nodes.length > 0 ? nodes.length : 1"
+  >
+    <div class="category-mega__roots">
+      @for (col of nodes; track col.id) {
+        <a
+          class="category-mega__heading"
+          [routerLink]="['/catalog', 'category', col.slug]"
+          routerLinkActive="category-mega__heading--active"
+          [routerLinkActiveOptions]="{ exact: true }"
+        >
+          {{ col.name }}
+        </a>
+      }
+    </div>
+
+    <div class="category-mega__divider" aria-hidden="true"></div>
+
+    <div class="category-mega__subs">
+      @for (col of nodes; track col.id) {
+        <div class="category-mega__column-body">
+          @if (col.children.length) {
+            <ul class="category-mega__list">
+              @for (c of col.children; track c.id) {
+                <li class="category-mega__item">
+                  @if (c.children.length) {
+                    <a class="category-mega__link category-mega__link--subhead" [routerLink]="['/catalog', 'category', c.slug]">{{
+                      c.name
+                    }}</a>
+                    <ul class="category-mega__sublist">
+                      @for (g of c.children; track g.id) {
+                        <li>
+                          <a class="category-mega__link category-mega__link--nested" [routerLink]="['/catalog', 'category', g.slug]">{{
+                            g.name
+                          }}</a>
+                        </li>
+                      }
+                    </ul>
+                  } @else {
+                    <a class="category-mega__link" [routerLink]="['/catalog', 'category', c.slug]">{{ c.name }}</a>
+                  }
+                </li>
+              }
+            </ul>
+          }
+        </div>
+      }
+    </div>
+  </div>
+</mat-menu>

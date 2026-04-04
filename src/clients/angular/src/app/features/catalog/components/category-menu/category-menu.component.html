@@ -4,11 +4,7 @@
   } @else if (error$ | async; as err) {
     <span class="category-menu__hint" role="alert">{{ err }}</span>
   } @else {
-    <app-category-nested-menu
-      #rootMenu
-      [nodes]="(menu$ | async) ?? []"
-      panelClass="category-menu-panel"
-    />
+    <app-category-mega-menu #rootMenu [nodes]="(menuForToolbar$ | async) ?? []" />
     @if (rootMenu.menu) {
       <button
         type="button"

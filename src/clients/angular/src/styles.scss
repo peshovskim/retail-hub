@@ -57,6 +57,14 @@ body {
   --shop-catalog-shadow-hover: 0 8px 24px rgb(255 122 0 / 10%), 0 2px 8px rgb(0 0 0 / 5%);
   --shop-badge-bg: #fff0e3;
   --shop-hero-overlay: rgb(0 0 0 / 48%);
+  /* Header category mega-menu (light retail bar — matches reference layout) */
+  --shop-mega-bg: #f3f3f3;
+  --shop-mega-border: #dedede;
+  --shop-mega-heading: #1a1a1a;
+  --shop-mega-link: #5a5a5a;
+  --shop-mega-link-hover: var(--shop-cta);
+  --shop-mega-divider: #d8d8d8;
+  --shop-mega-menu-width: min(94vw, 88rem);
 }
 
 .app-toolbar--shop {
@@ -152,6 +160,42 @@ body {
   a.mat-mdc-menu-item {
     text-decoration: none;
     color: inherit;
+  }
+}
+
+/*
+ * Mega-menu: override Material max-width 280px. panelClass on <mat-menu>.
+ * Wide pane + :has(.category-mega) fallback if panelClass fails.
+ */
+.cdk-overlay-pane:has(.category-mega) {
+  display: block !important;
+  width: var(--shop-mega-menu-width) !important;
+  max-width: var(--shop-mega-menu-width) !important;
+  box-sizing: border-box;
+}
+
+.mat-mdc-menu-panel.category-mega-menu-panel,
+.mat-mdc-menu-panel:has(.category-mega) {
+  width: var(--shop-mega-menu-width) !important;
+  min-width: var(--shop-mega-menu-width) !important;
+  max-width: var(--shop-mega-menu-width) !important;
+  max-height: min(82vh, 44rem);
+  flex: 0 0 auto !important;
+  overflow-x: hidden;
+  overflow-y: auto;
+  box-sizing: border-box;
+  border-radius: 12px;
+  border: 1px solid var(--shop-mega-border);
+  box-shadow:
+    0 4px 24px rgb(0 0 0 / 8%),
+    0 2px 12px rgb(255 122 0 / 12%);
+  background: var(--shop-mega-bg) !important;
+
+  .mat-mdc-menu-content {
+    padding: 0;
+    max-width: 100%;
+    width: 100%;
+    box-sizing: border-box;
   }
 }
 

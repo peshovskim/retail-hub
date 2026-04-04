@@ -4,15 +4,21 @@
 }
 
 .category-menu__trigger {
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  font-size: 0.75rem;
+  text-transform: none;
+  letter-spacing: 0.02em;
+  font-size: 0.8125rem;
   font-weight: 600;
   min-width: 0;
-  padding-inline: 0.5rem;
+  padding-inline: 0.65rem;
+  border-radius: 999px;
+  transition: background-color 0.15s ease;
+
+  &:hover {
+    background-color: color-mix(in srgb, var(--shop-muted, #6e6e6e) 12%, transparent);
+  }
 
   .mat-mdc-button-persistent-ripple {
-    border-radius: 4px;
+    border-radius: 999px;
   }
 }
 

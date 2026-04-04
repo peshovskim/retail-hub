@@ -5,8 +5,8 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatMenuModule } from '@angular/material/menu';
 import { RouterModule } from '@angular/router';
 
+import { CategoryMegaMenuComponent } from './components/category-mega-menu/category-mega-menu.component';
 import { CategoryMenuComponent } from './components/category-menu/category-menu.component';
-import { CategoryNestedMenuComponent } from './components/category-nested-menu/category-nested-menu.component';
 
 /** Eager slice so the navbar can show categories while `CatalogModule` stays lazy for routes. */
 @NgModule({
@@ -17,7 +17,7 @@ import { CategoryNestedMenuComponent } from './components/category-nested-menu/c
     MatButtonModule,
     MatIconModule,
     MatMenuModule,
-    CategoryNestedMenuComponent,
+    CategoryMegaMenuComponent,
   ],
   exports: [CategoryMenuComponent],
 })
