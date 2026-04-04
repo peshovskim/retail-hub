@@ -59,6 +59,7 @@
     <Build Include="Tables\Category\Table\Category.sql" />
     <Build Include="Tables\Product\Table\Product.sql" />
     <Build Include="Tables\Order\Table\Order.sql" />
+    <Build Include="Tables\Order\Table\OrderLine.sql" />
     <Build Include="Tables\User\Table\User.sql" />
     <None Include="Tables\Cart\Seed\Cart.Test.Seed.sql" />
     <None Include="Tables\Cart\Seed\CartItem.Test.Seed.sql" />
