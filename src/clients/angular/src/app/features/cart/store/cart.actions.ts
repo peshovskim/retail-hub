@@ -1,6 +1,7 @@
 import { createActionGroup, emptyProps, props } from '@ngrx/store';
 
 import type { Cart } from '../models/cart.model';
+import type { Order } from '../models/order.model';
 
 export const cartActions = createActionGroup({
   source: 'Cart',
@@ -23,5 +24,9 @@ export const cartActions = createActionGroup({
 
     /** Merges server cart into state (used after mutations). */
     applyCartFromServer: props<{ cart: Cart }>(),
+
+    placeOrder: emptyProps(),
+    placeOrderCompleted: props<{ order: Order; cart: Cart }>(),
+    placeOrderFailure: props<{ error: string }>(),
   },
 });

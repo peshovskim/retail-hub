@@ -1,13 +1,25 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
+import { Router } from '@angular/router';
 import { Actions, createEffect, ofType } from '@ngrx/effects';
 import { Store } from '@ngrx/store';
 import { catchError, map, mergeMap, of, switchMap, take, tap, withLatestFrom } from 'rxjs';
 
+import type { Cart } from '../models/cart.model';
 import { CartApiService } from '../services/cart-api.service';
+import { OrdersApiService } from '../services/orders-api.service';
 import { CartSessionStorage } from '../services/cart-session.storage';
 import { cartActions } from './cart.actions';
 import { selectCart } from './cart.selectors';
+
+function clearedCartSnapshot(cart: Cart): Cart {
+  return {
+    ...cart,
+    lines: [],
+    subtotal: 0,
+    itemCount: 0,
+  };
+}
 
 function extractErrorMessage(err: unknown, fallback: string): string {
   if (err instanceof HttpErrorResponse && err.error && typeof err.error === 'object' && 'message' in err.error) {
@@ -23,6 +35,8 @@ function extractErrorMessage(err: unknown, fallback: string): string {
 export class CartEffects {
   private readonly actions$ = inject(Actions);
   private readonly api = inject(CartApiService);
+  private readonly ordersApi = inject(OrdersApiService);
+  private readonly router = inject(Router);
   private readonly storage = inject(CartSessionStorage);
   private readonly store = inject(Store);
 
@@ -136,5 +150,44 @@ export class CartEffects {
         );
       }),
     ),
+  );
+
+  placeOrder$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(cartActions.placeOrder),
+      withLatestFrom(this.store.select(selectCart)),
+      switchMap(([, cart]) => {
+        if (!cart?.id) {
+          return of(cartActions.placeOrderFailure({ error: 'No cart loaded.' }));
+        }
+        return this.ordersApi.placeOrder({ cartId: cart.id }).pipe(
+          switchMap((order) =>
+            this.api.getCart(cart.id).pipe(
+              map((c) => cartActions.placeOrderCompleted({ order, cart: c })),
+              catchError(() =>
+                of(
+                  cartActions.placeOrderCompleted({
+                    order,
+                    cart: clearedCartSnapshot(cart),
+                  }),
+                ),
+              ),
+            ),
+          ),
+          catchError((err: unknown) =>
+            of(cartActions.placeOrderFailure({ error: extractErrorMessage(err, 'Could not place order.') })),
+          ),
+        );
+      }),
+    ),
+  );
+
+  placeOrderCompletedNavigate$ = createEffect(
+    () =>
+      this.actions$.pipe(
+        ofType(cartActions.placeOrderCompleted),
+        tap(({ order }) => void this.router.navigate(['/cart', 'confirmation', order.id])),
+      ),
+    { dispatch: false },
   );
 }

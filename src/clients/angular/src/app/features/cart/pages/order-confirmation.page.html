@@ -1,0 +1,74 @@
+<section class="confirmation-page" aria-label="Order confirmation">
+  <header class="confirmation-page__header">
+    <h1 class="confirmation-page__title">Thank you</h1>
+  </header>
+
+  @if (state(); as s) {
+    @if (s.status === 'loading') {
+      <div class="confirmation-page__state" role="status">
+        <mat-progress-spinner mode="indeterminate" diameter="44" />
+        <p>Loading your order…</p>
+      </div>
+    }
+    @if (s.status === 'error') {
+      <mat-card appearance="outlined" class="confirmation-page__notice confirmation-page__notice--error">
+        <mat-card-content>
+          <p role="alert">{{ s.message }}</p>
+          <button mat-button type="button" color="primary" (click)="viewCart()">Back to cart</button>
+        </mat-card-content>
+      </mat-card>
+    }
+    @if (s.status === 'ready') {
+      <mat-card appearance="outlined" class="confirmation-page__card">
+        <mat-card-content>
+          <p class="confirmation-page__lead">Your order has been placed.</p>
+          <dl class="confirmation-page__meta">
+            <div>
+              <dt>Order ID</dt>
+              <dd>{{ s.order.id }}</dd>
+            </div>
+            <div>
+              <dt>Status</dt>
+              <dd>{{ s.order.status }}</dd>
+            </div>
+            <div>
+              <dt>Total</dt>
+              <dd>{{ s.order.totalAmount | appCurrency }}</dd>
+            </div>
+          </dl>
+
+          @if (s.order.lines.length > 0) {
+            <h2 class="confirmation-page__subheading">Items</h2>
+            <table class="confirmation-table">
+              <thead>
+                <tr>
+                  <th scope="col">Product ID</th>
+                  <th scope="col">Qty</th>
+                  <th scope="col">Unit price</th>
+                  <th scope="col">Line total</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (line of s.order.lines; track line.productId) {
+                  <tr>
+                    <td>{{ line.productId }}</td>
+                    <td>{{ line.quantity }}</td>
+                    <td>{{ line.unitPrice | appCurrency }}</td>
+                    <td>{{ line.lineTotal | appCurrency }}</td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          }
+
+          <div class="confirmation-page__actions">
+            <button mat-flat-button color="primary" type="button" (click)="continueShopping()">
+              Continue shopping
+            </button>
+            <button mat-button type="button" (click)="viewCart()">View cart</button>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    }
+  }
+</section>

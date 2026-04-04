@@ -34,4 +34,8 @@ export class CartFacade {
   removeLine(productId: string): void {
     this.store.dispatch(cartActions.removeLine({ productId }));
   }
+
+  placeOrder(): void {
+    this.store.dispatch(cartActions.placeOrder());
+  }
 }

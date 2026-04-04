@@ -81,6 +81,10 @@
           <span class="cart-page__subtotal-label">Subtotal</span>
           <span class="cart-page__subtotal">{{ c.subtotal | appCurrency }}</span>
         </div>
+
+        <div class="cart-page__checkout">
+          <a mat-flat-button color="primary" routerLink="/cart/checkout">Proceed to checkout</a>
+        </div>
       </div>
     }
   }

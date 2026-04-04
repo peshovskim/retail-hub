@@ -98,6 +98,22 @@ export const cartReducer = createReducer(
     mutationBusy: false,
     error,
   })),
+  on(cartActions.placeOrder, (state) => ({
+    ...state,
+    mutationBusy: true,
+    error: null,
+  })),
+  on(cartActions.placeOrderCompleted, (state, { cart }) => ({
+    ...state,
+    cart,
+    mutationBusy: false,
+    error: null,
+  })),
+  on(cartActions.placeOrderFailure, (state, { error }) => ({
+    ...state,
+    mutationBusy: false,
+    error,
+  })),
 );
 
 export const cartFeature = createFeature({

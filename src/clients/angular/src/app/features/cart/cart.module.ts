@@ -8,9 +8,11 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { SharedModule } from '../../shared/shared.module';
 import { CartRoutingModule } from './cart-routing.module';
 import { CartPage } from './pages/cart.page';
+import { CheckoutPage } from './pages/checkout.page';
+import { OrderConfirmationPage } from './pages/order-confirmation.page';
 
 @NgModule({
-  declarations: [CartPage],
+  declarations: [CartPage, CheckoutPage, OrderConfirmationPage],
   imports: [
     CommonModule,
     SharedModule,
