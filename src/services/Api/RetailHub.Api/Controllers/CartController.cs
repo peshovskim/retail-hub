@@ -59,4 +59,18 @@ public sealed class CartController : ControllerBase
             .ConfigureAwait(false);
         return result.ToActionResult();
     }
+
+    [HttpDelete("items/{productId:guid}")]
+    [ProducesResponseType(typeof(CartResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> RemoveItem(
+    Guid productId,
+    [FromQuery] RemoveCartItemRequest request,
+    CancellationToken cancellationToken)
+    {
+        Result<CartResponse> result = await _mediator
+            .Send(new RemoveCartItemCommand(request, productId), cancellationToken)
+            .ConfigureAwait(false);
+        return result.ToActionResult();
+    }
 }
