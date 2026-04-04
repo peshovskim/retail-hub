@@ -13,6 +13,7 @@ public static class ResultExtensions
         }
 
         var error = result.Error!;
+
         return error.Code switch
         {
             ErrorCodes.Validation => new BadRequestObjectResult(new { code = error.Code, message = error.Message }),

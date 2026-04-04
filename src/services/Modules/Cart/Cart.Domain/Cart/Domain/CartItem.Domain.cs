@@ -1,3 +1,5 @@
+using RetailHub.SharedKernel.Domain;
+
 namespace Cart.Domain.Cart.Domain;
 
 public sealed partial class CartItem
@@ -7,29 +9,49 @@ public sealed partial class CartItem
         DeletedOn = utcNow;
     }
 
-    internal void MergeQuantity(int quantityToAdd, decimal unitPrice, DateTime utcNow)
+    internal Result MergeQuantity(int quantityToAdd, decimal unitPrice, DateTime utcNow)
     {
-        ArgumentOutOfRangeException.ThrowIfLessThanOrEqual(quantityToAdd, 0);
+        if (quantityToAdd <= 0)
+        {
+            return Result.Invalid(
+                ResultCodes.Validation,
+                "Quantity must be greater than zero.");
+        }
+
         if (!IsActive)
         {
-            throw new InvalidOperationException("Cannot modify a removed cart line.");
+            return Result.Invalid(
+                ResultCodes.Validation,
+                "Cannot modify a removed cart line.");
         }
 
         Quantity += quantityToAdd;
         UnitPrice = unitPrice;
         UpdatedOn = utcNow;
+
+        return Result.Success();
     }
 
-    internal void SetQuantity(int quantity, decimal unitPrice, DateTime utcNow)
+    internal Result SetQuantity(int quantity, decimal unitPrice, DateTime utcNow)
     {
-        ArgumentOutOfRangeException.ThrowIfLessThanOrEqual(quantity, 0);
+        if (quantity <= 0)
+        {
+            return Result.Invalid(
+                ResultCodes.Validation,
+                "Quantity must be greater than zero.");
+        }
+
         if (!IsActive)
         {
-            throw new InvalidOperationException("Cannot modify a removed cart line.");
+            return Result.Invalid(
+                ResultCodes.Validation,
+                "Cannot modify a removed cart line.");
         }
 
         Quantity = quantity;
         UnitPrice = unitPrice;
         UpdatedOn = utcNow;
+
+        return Result.Success();
     }
 }

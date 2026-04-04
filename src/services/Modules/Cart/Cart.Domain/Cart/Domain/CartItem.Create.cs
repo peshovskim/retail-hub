@@ -1,3 +1,5 @@
+using RetailHub.SharedKernel.Domain;
+
 namespace Cart.Domain.Cart.Domain;
 
 public sealed partial class CartItem
@@ -6,7 +8,7 @@ public sealed partial class CartItem
     {
     }
 
-    internal static CartItem Create(
+    internal static Result<CartItem> Create(
         Guid id,
         Guid cartId,
         Guid productId,
@@ -14,18 +16,24 @@ public sealed partial class CartItem
         decimal unitPrice,
         DateTime createdOn)
     {
-        ArgumentOutOfRangeException.ThrowIfLessThanOrEqual(quantity, 0);
-
-        return new CartItem
+        if (quantity <= 0)
         {
-            Id = id,
-            CartId = cartId,
-            ProductId = productId,
-            Quantity = quantity,
-            UnitPrice = unitPrice,
-            CreatedOn = createdOn,
-            DeletedOn = null,
-            UpdatedOn = null,
-        };
+            return Result<CartItem>.Invalid(
+                ResultCodes.Validation,
+                "Quantity must be greater than zero.");
+        }
+
+        return Result<CartItem>.Success(
+            new CartItem
+            {
+                Id = id,
+                CartId = cartId,
+                ProductId = productId,
+                Quantity = quantity,
+                UnitPrice = unitPrice,
+                CreatedOn = createdOn,
+                DeletedOn = null,
+                UpdatedOn = null,
+            });
     }
 }

@@ -1,4 +1,9 @@
+using Cart.Application.Cart.Commands.AddCartItem;
+using Cart.Application.Cart.Commands.CreateOrGetCartSession;
+using Cart.Application.Cart.Commands.RemoveCartItem;
+using Cart.Application.Cart.Commands.UpdateCartItemQuantity;
 using Cart.Application.Cart.Queries.GetCart;
+using Cart.Application.Cart.Requests;
 using Cart.Application.Cart.Responses;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
@@ -24,6 +29,19 @@ public sealed class CartController : ControllerBase
     public async Task<IActionResult> GetCart(Guid cartId, CancellationToken cancellationToken)
     {
         Result<CartResponse> result = await _mediator.Send(new GetCartQuery(cartId), cancellationToken).ConfigureAwait(false);
+        return result.ToActionResult();
+    }
+
+    [HttpPost("items")]
+    [ProducesResponseType(typeof(CartResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> AddItem([FromBody] AddCartItemRequest request, CancellationToken cancellationToken)
+    {
+        Result<CartResponse> result = await _mediator
+            .Send(new AddCartItemCommand(request), cancellationToken)
+            .ConfigureAwait(false);
+
         return result.ToActionResult();
     }
 }
