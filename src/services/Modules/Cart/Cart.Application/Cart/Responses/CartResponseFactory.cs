@@ -19,6 +19,7 @@ internal static class CartResponseFactory
             var product = await productReadRepository
                 .GetActiveProductByIdAsync(item.ProductId, cancellationToken)
                 .ConfigureAwait(false);
+
             var name = product?.Name ?? "Unavailable";
             var sku = product?.Sku ?? string.Empty;
             var lineTotal = item.UnitPrice * item.Quantity;

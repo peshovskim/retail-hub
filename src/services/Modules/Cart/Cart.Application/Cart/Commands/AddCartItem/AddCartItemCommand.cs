@@ -30,7 +30,9 @@ public sealed class AddCartItemCommandHandler : IRequestHandler<AddCartItemComma
 
     public async Task<Result<CartResponse>> Handle(AddCartItemCommand request, CancellationToken cancellationToken)
     {
-        var cart = await _cartRepository.GetByIdWithItemsAsync(request.CartId, cancellationToken).ConfigureAwait(false);
+        var cart = await _cartRepository
+            .GetByIdWithItemsAsync(request.CartId, cancellationToken)
+            .ConfigureAwait(false);
 
         if (cart is null)
         {
@@ -60,7 +62,9 @@ public sealed class AddCartItemCommandHandler : IRequestHandler<AddCartItemComma
 
         await _cartRepository.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
 
-        CartResponse dto = await CartResponseFactory.CreateAsync(cart, _productReadRepository, cancellationToken).ConfigureAwait(false);
+        CartResponse dto = await CartResponseFactory
+            .CreateAsync(cart, _productReadRepository, cancellationToken)
+            .ConfigureAwait(false);
 
         return Result<CartResponse>.Success(dto);
     }

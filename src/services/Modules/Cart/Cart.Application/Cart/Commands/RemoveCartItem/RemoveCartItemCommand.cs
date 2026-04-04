@@ -29,7 +29,9 @@ public sealed class RemoveCartItemCommandHandler : IRequestHandler<RemoveCartIte
 
     public async Task<Result<CartResponse>> Handle(RemoveCartItemCommand request, CancellationToken cancellationToken)
     {
-        var cart = await _cartRepository.GetByIdWithItemsAsync(request.CartId, cancellationToken).ConfigureAwait(false);
+        var cart = await _cartRepository
+            .GetByIdWithItemsAsync(request.CartId, cancellationToken)
+            .ConfigureAwait(false);
 
         if (cart is null)
         {
@@ -40,7 +42,9 @@ public sealed class RemoveCartItemCommandHandler : IRequestHandler<RemoveCartIte
 
         await _cartRepository.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
 
-        CartResponse dto = await CartResponseFactory.CreateAsync(cart, _productReadRepository, cancellationToken).ConfigureAwait(false);
+        CartResponse dto = await CartResponseFactory
+            .CreateAsync(cart, _productReadRepository, cancellationToken)
+            .ConfigureAwait(false);
 
         return Result<CartResponse>.Success(dto);
     }

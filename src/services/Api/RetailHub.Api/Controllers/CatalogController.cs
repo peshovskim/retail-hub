@@ -26,7 +26,10 @@ public sealed class CatalogController : ControllerBase
     [ProducesResponseType(typeof(IReadOnlyList<CategoryResponse>), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetCategories(CancellationToken cancellationToken)
     {
-        Result<IReadOnlyList<CategoryResponse>> result = await _mediator.Send(new GetCategoriesQuery(), cancellationToken).ConfigureAwait(false);
+        Result<IReadOnlyList<CategoryResponse>> result = await _mediator
+            .Send(new GetCategoriesQuery(), cancellationToken)
+            .ConfigureAwait(false);
+
         return result.ToActionResult();
     }
 
@@ -34,7 +37,10 @@ public sealed class CatalogController : ControllerBase
     [ProducesResponseType(typeof(IReadOnlyList<CategoryMenuNodeResponse>), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetCategoryMenu(CancellationToken cancellationToken)
     {
-        Result<IReadOnlyList<CategoryMenuNodeResponse>> result = await _mediator.Send(new GetCategoryMenuQuery(), cancellationToken).ConfigureAwait(false);
+        Result<IReadOnlyList<CategoryMenuNodeResponse>> result = await _mediator
+            .Send(new GetCategoryMenuQuery(), cancellationToken)
+            .ConfigureAwait(false);
+
         return result.ToActionResult();
     }
 
@@ -43,7 +49,10 @@ public sealed class CatalogController : ControllerBase
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> GetProducts([FromQuery] GetProductsQuery query, CancellationToken cancellationToken)
     {
-        Result<ProductListResult> result = await _mediator.Send(query, cancellationToken).ConfigureAwait(false);
+        Result<ProductListResult> result = await _mediator
+            .Send(query, cancellationToken)
+            .ConfigureAwait(false);
+
         return result.ToActionResult();
     }
 
@@ -52,7 +61,10 @@ public sealed class CatalogController : ControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> GetProduct(Guid id, CancellationToken cancellationToken)
     {
-        Result<ProductResponse> result = await _mediator.Send(new GetProductByIdQuery(id), cancellationToken).ConfigureAwait(false);
+        Result<ProductResponse> result = await _mediator
+            .Send(new GetProductByIdQuery(id), cancellationToken)
+            .ConfigureAwait(false);
+
         return result.ToActionResult();
     }
 }

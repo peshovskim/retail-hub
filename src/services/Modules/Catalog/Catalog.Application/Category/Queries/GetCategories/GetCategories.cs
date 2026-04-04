@@ -21,7 +21,10 @@ public sealed class GetCategoriesQueryHandler : IRequestHandler<GetCategoriesQue
         GetCategoriesQuery request,
         CancellationToken cancellationToken)
     {
-        var responses = await _categoryReadRepository.GetRootCategoriesAsync(cancellationToken).ConfigureAwait(false);
+        var responses = await _categoryReadRepository
+            .GetRootCategoriesAsync(cancellationToken)
+            .ConfigureAwait(false);
+
         return Result<IReadOnlyList<CategoryResponse>>.Success(responses);
     }
 }

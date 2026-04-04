@@ -46,7 +46,9 @@ public sealed class CartController : ControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> GetCart(Guid cartId, CancellationToken cancellationToken)
     {
-        Result<CartResponse> result = await _mediator.Send(new GetCartQuery(cartId), cancellationToken).ConfigureAwait(false);
+        Result<CartResponse> result = await _mediator
+            .Send(new GetCartQuery(cartId), cancellationToken)
+            .ConfigureAwait(false);
 
         return result.ToActionResult();
     }

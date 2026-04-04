@@ -22,7 +22,7 @@ public sealed class GetCartQueryHandler : IRequestHandler<GetCartQuery, Result<C
 
     public async Task<Result<CartResponse>> Handle(GetCartQuery request, CancellationToken cancellationToken)
     {
-        var cart = await _carts
+        var cart = await _cartReadRepository
             .GetByIdWithItemsAsync(request.CartId, cancellationToken)
             .ConfigureAwait(false);
 
@@ -31,7 +31,7 @@ public sealed class GetCartQueryHandler : IRequestHandler<GetCartQuery, Result<C
             return Result<CartResponse>.Failure(Error.NotFound("Cart not found."));
         }
 
-        var dto = await CartResponseFactory
+        CartResponse dto = await CartResponseFactory
             .CreateAsync(cart, _productReadRepository, cancellationToken)
             .ConfigureAwait(false);
 
