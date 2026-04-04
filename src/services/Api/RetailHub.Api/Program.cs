@@ -1,12 +1,12 @@
 using System.Diagnostics;
+using Cart.Application;
+using Cart.Application.Cart.Queries.GetCart;
 using Catalog.Application;
 using Catalog.Application.Category.Queries.GetCategories;
+using Cart.Infrastructure;
 using Catalog.Infrastructure;
-using MediatR;
 using Microsoft.AspNetCore.Hosting.Server;
 using Microsoft.AspNetCore.Hosting.Server.Features;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
 using RetailHub.SharedKernel.Application.Common.Abstractions.DomainEvents;
 using RetailHub.SharedKernel.Application.Common.Behaviors;
 using RetailHub.SharedKernel.Application.Common.DomainEvents;
@@ -18,11 +18,13 @@ ArgumentException.ThrowIfNullOrEmpty(connectionString);
 
 builder.Services.AddScoped<IDomainEventDispatcher, MediatRDomainEventDispatcher>();
 builder.Services.AddCatalogApplication();
+builder.Services.AddCartApplication();
 builder.Services.AddCatalogInfrastructure(connectionString);
+builder.Services.AddCartInfrastructure(connectionString);
 
 builder.Services.AddMediatR(cfg =>
 {
-    cfg.RegisterServicesFromAssembly(typeof(GetCategoriesQuery).Assembly);
+    cfg.RegisterServicesFromAssemblies(typeof(GetCategoriesQuery).Assembly, typeof(GetCartQuery).Assembly);
     cfg.AddOpenBehavior(typeof(ValidationBehavior<,>));
 });
 
