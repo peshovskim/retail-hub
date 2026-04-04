@@ -44,4 +44,19 @@ public sealed class CartController : ControllerBase
 
         return result.ToActionResult();
     }
+
+    [HttpPatch("items/{productId:guid}")]
+    [ProducesResponseType(typeof(CartResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> UpdateItem(
+        Guid productId,
+        [FromBody] UpdateCartItemRequest request,
+        CancellationToken cancellationToken)
+    {
+        Result<CartResponse> result = await _mediator
+            .Send(new UpdateCartItemQuantityCommand(request, productId), cancellationToken)
+            .ConfigureAwait(false);
+        return result.ToActionResult();
+    }
 }
