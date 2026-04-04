@@ -1,0 +1,79 @@
+using Cart.Application.Cart.Interfaces;
+using MediatR;
+using OrderAggregate = Orders.Domain.Order.Domain.Order;
+using Orders.Application.Order.Interfaces;
+using Orders.Application.Order.Responses;
+using RetailHub.SharedKernel.Application.Common.Cqrs;
+using RetailHub.SharedKernel.Domain;
+
+namespace Orders.Application.Order.Commands.PlaceOrder;
+
+public sealed record PlaceOrderCommand(Guid CartId, Guid? UserId) : ICommand<OrderResponse>;
+
+public sealed class PlaceOrderCommandHandler : IRequestHandler<PlaceOrderCommand, Result<OrderResponse>>
+{
+    public const string NewOrderStatus = "Pending";
+
+    private readonly ICartRepository _cartRepository;
+    private readonly IOrderRepository _orderRepository;
+
+    public PlaceOrderCommandHandler(ICartRepository cartRepository, IOrderRepository orderRepository)
+    {
+        _cartRepository = cartRepository;
+        _orderRepository = orderRepository;
+    }
+
+    public async Task<Result<OrderResponse>> Handle(PlaceOrderCommand request, CancellationToken cancellationToken)
+    {
+        var cart = await _cartRepository
+            .GetByIdWithItemsAsync(request.CartId, cancellationToken)
+            .ConfigureAwait(false);
+
+        if (cart is null)
+        {
+            return Result<OrderResponse>.NotFound(ResultCodes.NotFound, "Cart not found.");
+        }
+
+        var orderId = Guid.NewGuid();
+        var utcNow = DateTime.UtcNow;
+
+        var orderResult = OrderAggregate.PlaceFromCart(
+            orderId,
+            cart,
+            request.UserId,
+            NewOrderStatus,
+            utcNow,
+            Guid.NewGuid);
+
+        if (orderResult.IsFailure)
+        {
+            return Result.FromError<OrderResponse>(orderResult);
+        }
+
+        var order = orderResult.Value!;
+
+        await _orderRepository.AddAsync(order, cancellationToken).ConfigureAwait(false);
+        await _orderRepository.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+
+        cart.ClearAllActiveItems(utcNow);
+        await _cartRepository.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+
+        return Result<OrderResponse>.Success(ToResponse(order));
+    }
+
+    private static OrderResponse ToResponse(OrderAggregate order)
+    {
+        var lines = order.Lines
+            .OrderBy(l => l.ProductId)
+            .Select(l => new OrderLineResponse(l.ProductId, l.Quantity, l.UnitPrice, l.LineTotal))
+            .ToList();
+
+        return new OrderResponse(
+            order.Id,
+            order.UserId,
+            order.CartId,
+            order.Status,
+            order.TotalAmount,
+            lines);
+    }
+}
