@@ -1,6 +1,7 @@
 CREATE TABLE [cart].[Cart](
     [Id]            UNIQUEIDENTIFIER    NOT NULL,
     [CreatedOn]     DATETIME2(0)        NOT NULL,
+    [DeletedOn]     DATETIME2(0)        NULL,
     [UserId]        UNIQUEIDENTIFIER    NULL,
     [AnonymousKey]  NVARCHAR(128)       NULL,
     CONSTRAINT [PK_Cart] PRIMARY KEY CLUSTERED ([Id]),
