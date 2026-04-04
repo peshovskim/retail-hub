@@ -60,7 +60,7 @@ public sealed class AddCartItemCommandHandler : IRequestHandler<AddCartItemComma
 
         await _carts.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
 
-        var dto = await CartResponseFactory.CreateAsync(cart, _products, cancellationToken).ConfigureAwait(false);
+        CartResponse dto = await CartResponseFactory.CreateAsync(cart, _products, cancellationToken).ConfigureAwait(false);
 
         return Result<CartResponse>.Success(dto);
     }
