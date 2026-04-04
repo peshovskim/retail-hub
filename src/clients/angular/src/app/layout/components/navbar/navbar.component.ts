@@ -10,4 +10,9 @@ import { CatalogToolbarSearchService } from '../../../features/catalog/services/
 })
 export class NavbarComponent {
   protected readonly catalogSearch = inject(CatalogToolbarSearchService);
+
+  protected onSearchSubmit(event?: Event): void {
+    event?.preventDefault();
+    this.catalogSearch.applySearch();
+  }
 }

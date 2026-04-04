@@ -1,7 +1,7 @@
 import { Component, computed, effect, inject, signal } from '@angular/core';
 import { takeUntilDestroyed, toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { PageEvent } from '@angular/material/paginator';
-import { debounceTime, distinctUntilChanged, skip } from 'rxjs';
+import { distinctUntilChanged, skip } from 'rxjs';
 
 import type { CategoryMenuNode } from '../models/category.model';
 import type { ProductListParams, ProductListSort } from '../models/product-list.model';
@@ -88,13 +88,8 @@ export class ProductListPage {
       }
     });
 
-    toObservable(this.toolbarSearch.text)
-      .pipe(
-        debounceTime(350),
-        distinctUntilChanged(),
-        skip(1),
-        takeUntilDestroyed(),
-      )
+    toObservable(this.toolbarSearch.committed)
+      .pipe(distinctUntilChanged(), skip(1), takeUntilDestroyed())
       .subscribe(() => {
         this.currentPage.set(1);
         this.reloadProducts();
@@ -202,7 +197,7 @@ export class ProductListPage {
       this.selectedCategoryIds().size > 0 ||
       this.priceMin() != null ||
       this.priceMax() != null ||
-      this.toolbarSearch.text().trim().length > 0
+      this.toolbarSearch.committed().trim().length > 0
     );
   }
 
@@ -249,7 +244,7 @@ export class ProductListPage {
     const categoryIds = [...this.selectedCategoryIds()];
     const priceMin = this.priceMin();
     const priceMax = this.priceMax();
-    const search = this.toolbarSearch.text().trim();
+    const search = this.toolbarSearch.committed().trim();
     const params: ProductListParams = { sort };
     if (categoryIds.length > 0) {
       params.categoryIds = categoryIds;

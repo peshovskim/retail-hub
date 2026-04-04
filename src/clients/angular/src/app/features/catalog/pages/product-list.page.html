@@ -123,9 +123,11 @@
             appearance="outline"
             subscriptSizing="dynamic"
             class="shop-catalog__sort"
+            hideRequiredMarker
           >
             <mat-label>Sort by</mat-label>
             <mat-select
+              panelClass="shop-catalog-sort-panel"
               [value]="sortOption()"
               (selectionChange)="setSort($event.value)"
             >

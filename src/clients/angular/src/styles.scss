@@ -8,8 +8,8 @@ html {
     (
       color: (
         theme-type: light,
-        primary: mat.$azure-palette,
-        tertiary: mat.$violet-palette,
+        primary: mat.$orange-palette,
+        tertiary: mat.$rose-palette,
       ),
       typography: (
         plain-family: Roboto,
@@ -35,26 +35,27 @@ body {
   color: var(--mat-sys-on-surface);
 }
 
-/* Reference-style storefront shell (white header, orange CTA, neutral chrome). */
+/* Storefront: warm orange accents (reference-style). */
 :root {
   --shop-header-bg: #ffffff;
   --shop-on-header: #1a1a1a;
   --shop-on-surface: #1a1a1a;
-  --shop-header-border: #dedede;
-  --shop-outline-strong: #b8b8b8;
+  --shop-header-border: #f0c9a8;
+  --shop-outline-strong: #e8955c;
   --shop-muted: #6e6e6e;
-  --shop-surface-muted: #f5f5f5;
-  --shop-page-bg: #ebebeb;
-  --shop-cta: #e85d0c;
-  --shop-cta-hover: #cf5209;
+  --shop-surface-muted: #fff5eb;
+  --shop-page-bg: #ffffff;
+  --shop-cta: #ff7a00;
+  --shop-cta-hover: #e86e00;
+  --shop-cta-pressed: #cc5f00;
   --shop-content-max-width: 1200px;
   --shop-catalog-max-width: 1440px;
   --shop-catalog-surface: #ffffff;
-  --shop-catalog-border: #e4e4e4;
+  --shop-catalog-border: #f2c7a5;
   --shop-catalog-radius: 10px;
-  --shop-catalog-shadow: 0 1px 3px rgb(0 0 0 / 6%), 0 1px 2px rgb(0 0 0 / 4%);
-  --shop-catalog-shadow-hover: 0 8px 24px rgb(0 0 0 / 8%), 0 2px 8px rgb(0 0 0 / 5%);
-  --shop-badge-bg: #f3f3f3;
+  --shop-catalog-shadow: 0 1px 3px rgb(255 122 0 / 7%), 0 1px 2px rgb(0 0 0 / 4%);
+  --shop-catalog-shadow-hover: 0 8px 24px rgb(255 122 0 / 10%), 0 2px 8px rgb(0 0 0 / 5%);
+  --shop-badge-bg: #fff0e3;
   --shop-hero-overlay: rgb(0 0 0 / 48%);
 }
 
@@ -152,4 +153,31 @@ body {
     text-decoration: none;
     color: inherit;
   }
+}
+
+/* Catalog “Sort by” dropdown panel (overlay — must be global). */
+.mat-mdc-select-panel.shop-catalog-sort-panel {
+  border-radius: 10px !important;
+  border: 1px solid var(--shop-header-border) !important;
+  background: var(--shop-catalog-surface) !important;
+  box-shadow:
+    0 4px 18px rgb(0 0 0 / 8%),
+    0 2px 8px rgb(255 122 0 / 10%) !important;
+  margin-top: 6px;
+  padding-block: 0.35rem !important;
+}
+
+.mat-mdc-select-panel.shop-catalog-sort-panel .mat-mdc-option {
+  min-height: 2.55rem !important;
+  font-size: 0.875rem !important;
+  font-weight: 500 !important;
+}
+
+.mat-mdc-select-panel.shop-catalog-sort-panel .mat-mdc-option.mdc-list-item--selected:not(.mdc-list-item--disabled) {
+  background: color-mix(in srgb, var(--shop-cta) 16%, transparent) !important;
+}
+
+.mat-mdc-select-panel.shop-catalog-sort-panel .mat-mdc-option:hover:not(.mdc-list-item--disabled),
+.mat-mdc-select-panel.shop-catalog-sort-panel .mat-mdc-option.mat-mdc-option-active {
+  background: color-mix(in srgb, var(--shop-cta) 10%, transparent) !important;
 }

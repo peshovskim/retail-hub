@@ -243,39 +243,56 @@
   height: 2.5rem;
 }
 
-/* Range slider: thick dark track + white thumbs (reference-style). */
-:host ::ng-deep .shop-filters__range-slider {
-  --mat-slider-active-track-color: #0d0d0d;
-  --mat-slider-inactive-track-color: #d0d0d0;
-  --mat-slider-handle-color: #ffffff;
+/* Price range slider: orange track + solid orange thumbs (knob is the visible disc). */
+:host ::ng-deep .shop-filters__range-slider.mat-mdc-slider {
+  --mat-slider-active-track-color: var(--shop-cta);
+  --mat-slider-inactive-track-color: #ffd4b3;
+  --mat-slider-handle-color: var(--shop-cta);
 
   .mdc-slider__track {
     height: 6px !important;
     border-radius: 999px !important;
   }
 
-  .mdc-slider__track--active {
-    background-color: #0d0d0d !important;
-    border-radius: 999px !important;
-  }
-
   .mdc-slider__track--inactive {
-    background-color: #d0d0d0 !important;
+    background-color: #ffd4b3 !important;
     opacity: 1 !important;
     border-radius: 999px !important;
   }
 
-  .mdc-slider__thumb {
-    width: 20px !important;
-    height: 20px !important;
+  .mdc-slider__track--active {
+    border-radius: 999px !important;
   }
 
+  .mdc-slider__track--active_fill {
+    border-color: var(--shop-cta) !important;
+    border-top-color: var(--shop-cta) !important;
+  }
+
+  .mdc-slider__thumb {
+    width: 22px !important;
+    height: 22px !important;
+  }
+
+  /* Outer handle ring: transparent so only the knob reads as the thumb. */
   .mdc-slider__handle {
-    width: 20px !important;
-    height: 20px !important;
-    border: 2px solid #0d0d0d !important;
-    background-color: #fff !important;
-    box-shadow: 0 1px 4px rgb(0 0 0 / 14%) !important;
+    width: 22px !important;
+    height: 22px !important;
+    border: none !important;
+    background-color: transparent !important;
+    box-shadow: none !important;
+  }
+
+  /* Visible thumb: filled orange + white ring (matches storefront accent). */
+  .mdc-slider__thumb-knob {
+    width: 18px !important;
+    height: 18px !important;
+    border-radius: 50% !important;
+    background-color: var(--shop-cta) !important;
+    border: 2px solid #fff !important;
+    box-shadow:
+      0 0 0 1px color-mix(in srgb, var(--shop-cta) 55%, #000),
+      0 2px 6px rgb(255 122 0 / 40%) !important;
   }
 }
 
@@ -313,7 +330,65 @@
 }
 
 .shop-catalog__sort {
-  width: min(100%, 14rem);
+  width: min(100%, 15.5rem);
+}
+
+/* Sort control: match search / cards — soft fill, peach border, rounded. */
+:host ::ng-deep .shop-catalog__sort.mat-mdc-form-field {
+  .mat-mdc-text-field-wrapper {
+    background-color: #ffffff !important;
+    border-radius: 10px !important;
+    padding-bottom: 0 !important;
+  }
+
+  .mat-mdc-form-field-subscript-wrapper {
+    display: none;
+  }
+
+  .mat-mdc-form-field-infix {
+    min-height: 2.5rem !important;
+    padding-top: 0.65rem !important;
+    padding-bottom: 0.65rem !important;
+  }
+
+  .mdc-notched-outline__leading,
+  .mdc-notched-outline__notch,
+  .mdc-notched-outline__trailing {
+    border-color: var(--shop-header-border) !important;
+    border-width: 1px !important;
+  }
+
+  &.mat-focused .mdc-notched-outline__leading,
+  &.mat-focused .mdc-notched-outline__notch,
+  &.mat-focused .mdc-notched-outline__trailing {
+    border-color: var(--shop-outline-strong) !important;
+    border-width: 1.5px !important;
+  }
+
+  .mat-mdc-floating-label:not(.mdc-floating-label--float-above) {
+    top: 1.35rem;
+  }
+
+  .mdc-floating-label,
+  .mat-mdc-floating-label {
+    color: var(--shop-muted) !important;
+  }
+
+  &.mat-focused .mdc-floating-label,
+  &.mat-focused .mat-mdc-floating-label {
+    color: var(--shop-cta) !important;
+  }
+
+  .mat-mdc-select-value,
+  .mat-mdc-select-min-line {
+    font-weight: 600 !important;
+    font-size: 0.875rem !important;
+    color: var(--shop-on-surface) !important;
+  }
+
+  .mat-mdc-select-arrow {
+    color: var(--shop-cta) !important;
+  }
 }
 
 .shop-catalog__state {
@@ -418,10 +493,8 @@
   flex-direction: column;
   background: var(--shop-catalog-surface);
   border-radius: 8px;
-  box-shadow:
-    0 1px 2px rgb(0 0 0 / 4%),
-    0 4px 14px rgb(0 0 0 / 5%);
-  border: 1px solid rgb(0 0 0 / 6%);
+  box-shadow: var(--shop-catalog-shadow);
+  border: 1px solid var(--shop-catalog-border);
   overflow: hidden;
   transition:
     box-shadow 0.22s ease,
@@ -429,18 +502,16 @@
     border-color 0.22s ease;
 
   .shop-grid__link:hover & {
-    box-shadow:
-      0 4px 12px rgb(0 0 0 / 7%),
-      0 12px 28px rgb(0 0 0 / 6%);
+    box-shadow: var(--shop-catalog-shadow-hover);
     transform: translateY(-3px);
-    border-color: rgb(0 0 0 / 8%);
+    border-color: var(--shop-outline-strong);
   }
 }
 
 .shop-grid__media {
   position: relative;
   aspect-ratio: 1;
-  background: linear-gradient(160deg, #eceff4 0%, #dfe3ea 100%);
+  background: linear-gradient(165deg, #fff6ed 0%, #ffe8d4 45%, #ffd9b8 100%);
   overflow: hidden;
 }
 
