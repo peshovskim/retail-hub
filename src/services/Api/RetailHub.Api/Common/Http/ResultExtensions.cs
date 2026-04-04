@@ -1,5 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
-using RetailHub.SharedKernel.Application.Common.Results;
+using RetailHub.SharedKernel.Domain;
 
 namespace RetailHub.Api.Common.Http;
 
@@ -14,15 +14,27 @@ public static class ResultExtensions
 
         var error = result.Error!;
 
-        return error.Code switch
+        return error.Type switch
         {
-            ErrorCodes.Validation => new BadRequestObjectResult(new { code = error.Code, message = error.Message }),
-            ErrorCodes.NotFound => new NotFoundObjectResult(new { code = error.Code, message = error.Message }),
-            ErrorCodes.Conflict => new ConflictObjectResult(new { code = error.Code, message = error.Message }),
+            ResultType.Invalid => new BadRequestObjectResult(new { code = error.Code, message = error.Message }),
+            ResultType.NotFound => new NotFoundObjectResult(new { code = error.Code, message = error.Message }),
+            ResultType.Conflicted => new ConflictObjectResult(new { code = error.Code, message = error.Message }),
+            ResultType.Forbidden => new ObjectResult(new { code = error.Code, message = error.Message })
+            {
+                StatusCode = StatusCodes.Status403Forbidden,
+            },
+            ResultType.Unauthorized => new ObjectResult(new { code = error.Code, message = error.Message })
+            {
+                StatusCode = StatusCodes.Status401Unauthorized,
+            },
+            ResultType.InternalError or ResultType.Ok => new ObjectResult(new { code = error.Code, message = error.Message })
+            {
+                StatusCode = StatusCodes.Status500InternalServerError,
+            },
             _ => new ObjectResult(new { code = error.Code, message = error.Message })
             {
-                StatusCode = StatusCodes.Status500InternalServerError
-            }
+                StatusCode = StatusCodes.Status500InternalServerError,
+            },
         };
     }
 }

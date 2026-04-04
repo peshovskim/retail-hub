@@ -1,5 +1,5 @@
 using MediatR;
-using RetailHub.SharedKernel.Application.Common.Results;
+using RetailHub.SharedKernel.Domain;
 
 namespace RetailHub.SharedKernel.Application.Common.Cqrs;
 

@@ -6,14 +6,13 @@ using Catalog.Application.Product.Queries.GetProducts;
 using Catalog.Application.Product.Responses;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using RetailHub.Api.Common.Http;
-using RetailHub.SharedKernel.Application.Common.Results;
+using RetailHub.SharedKernel.Domain;
 
 namespace RetailHub.Api.Controllers;
 
 [ApiController]
 [Route("api/catalog")]
-public sealed class CatalogController : ControllerBase
+public sealed class CatalogController : ExtendedApiController
 {
     private readonly IMediator _mediator;
 
@@ -30,7 +29,7 @@ public sealed class CatalogController : ControllerBase
             .Send(new GetCategoriesQuery(), cancellationToken)
             .ConfigureAwait(false);
 
-        return result.ToActionResult();
+        return OkOrError(result);
     }
 
     [HttpGet("categories/menu")]
@@ -41,7 +40,7 @@ public sealed class CatalogController : ControllerBase
             .Send(new GetCategoryMenuQuery(), cancellationToken)
             .ConfigureAwait(false);
 
-        return result.ToActionResult();
+        return OkOrError(result);
     }
 
     [HttpGet("products")]
@@ -53,7 +52,7 @@ public sealed class CatalogController : ControllerBase
             .Send(query, cancellationToken)
             .ConfigureAwait(false);
 
-        return result.ToActionResult();
+        return OkOrError(result);
     }
 
     [HttpGet("products/{id:guid}")]
@@ -65,6 +64,6 @@ public sealed class CatalogController : ControllerBase
             .Send(new GetProductByIdQuery(id), cancellationToken)
             .ConfigureAwait(false);
 
-        return result.ToActionResult();
+        return OkOrError(result);
     }
 }

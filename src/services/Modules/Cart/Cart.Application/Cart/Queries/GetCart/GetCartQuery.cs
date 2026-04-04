@@ -3,7 +3,7 @@ using Cart.Application.Cart.Responses;
 using Catalog.Application.Product.Interfaces;
 using MediatR;
 using RetailHub.SharedKernel.Application.Common.Cqrs;
-using RetailHub.SharedKernel.Application.Common.Results;
+using RetailHub.SharedKernel.Domain;
 
 namespace Cart.Application.Cart.Queries.GetCart;
 
@@ -28,7 +28,7 @@ public sealed class GetCartQueryHandler : IRequestHandler<GetCartQuery, Result<C
 
         if (cart is null)
         {
-            return Result<CartResponse>.Failure(Error.NotFound("Cart not found."));
+            return Result<CartResponse>.NotFound(ResultCodes.NotFound, "Cart not found.");
         }
 
         CartResponse dto = await CartResponseFactory

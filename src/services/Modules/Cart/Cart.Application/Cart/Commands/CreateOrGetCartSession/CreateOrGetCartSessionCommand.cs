@@ -3,7 +3,7 @@ using Cart.Application.Cart.Responses;
 using CartEntity = Cart.Domain.Cart.Domain.Cart;
 using MediatR;
 using RetailHub.SharedKernel.Application.Common.Cqrs;
-using RetailHub.SharedKernel.Application.Common.Results;
+using RetailHub.SharedKernel.Domain;
 
 namespace Cart.Application.Cart.Commands.CreateOrGetCartSession;
 
@@ -26,7 +26,9 @@ public sealed class CreateOrGetCartSessionCommandHandler : IRequestHandler<Creat
 
         if (key.Length > 128)
         {
-            return Result<CartSessionResponse>.Failure(Error.Validation("Anonymous session key must be at most 128 characters."));
+            return Result<CartSessionResponse>.Invalid(
+                ResultCodes.Validation,
+                "Anonymous session key must be at most 128 characters.");
         }
 
         var existing = await _cartRepository

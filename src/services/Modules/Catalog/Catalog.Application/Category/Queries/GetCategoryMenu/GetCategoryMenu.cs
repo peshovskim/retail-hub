@@ -2,7 +2,7 @@ using Catalog.Application.Category.Interfaces;
 using Catalog.Application.Category.Responses;
 using MediatR;
 using RetailHub.SharedKernel.Application.Common.Cqrs;
-using RetailHub.SharedKernel.Application.Common.Results;
+using RetailHub.SharedKernel.Domain;
 
 namespace Catalog.Application.Category.Queries.GetCategoryMenu;
 

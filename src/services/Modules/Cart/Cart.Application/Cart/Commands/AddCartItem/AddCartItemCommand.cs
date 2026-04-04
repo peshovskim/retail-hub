@@ -5,7 +5,7 @@ using Cart.Application.Cart;
 using Catalog.Application.Product.Interfaces;
 using MediatR;
 using RetailHub.SharedKernel.Application.Common.Cqrs;
-using RetailHub.SharedKernel.Application.Common.Results;
+using RetailHub.SharedKernel.Domain;
 
 namespace Cart.Application.Cart.Commands.AddCartItem;
 
@@ -36,7 +36,7 @@ public sealed class AddCartItemCommandHandler : IRequestHandler<AddCartItemComma
 
         if (cart is null)
         {
-            return Result<CartResponse>.Failure(Error.NotFound("Cart not found."));
+            return Result<CartResponse>.NotFound(ResultCodes.NotFound, "Cart not found.");
         }
 
         var product = await _productReadRepository
@@ -45,7 +45,7 @@ public sealed class AddCartItemCommandHandler : IRequestHandler<AddCartItemComma
 
         if (product is null)
         {
-            return Result<CartResponse>.Failure(Error.NotFound("Product not found."));
+            return Result<CartResponse>.NotFound(ResultCodes.NotFound, "Product not found.");
         }
 
         var addResult = cart.AddOrUpdateItem(
@@ -57,7 +57,7 @@ public sealed class AddCartItemCommandHandler : IRequestHandler<AddCartItemComma
 
         if (addResult.IsFailure)
         {
-            return Result<CartResponse>.Failure(DomainResultAdapter.ToApplicationError(addResult.Error!));
+            return Result.FromError<CartResponse>(addResult);
         }
 
         await _cartRepository.SaveChangesAsync(cancellationToken).ConfigureAwait(false);

@@ -7,14 +7,13 @@ using Cart.Application.Cart.Requests;
 using Cart.Application.Cart.Responses;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using RetailHub.Api.Common.Http;
-using RetailHub.SharedKernel.Application.Common.Results;
+using RetailHub.SharedKernel.Domain;
 
 namespace RetailHub.Api.Controllers;
 
 [ApiController]
 [Route("api/cart")]
-public sealed class CartController : ControllerBase
+public sealed class CartController : ExtendedApiController
 {
     public const string CartSessionHeaderName = "X-Cart-Session";
 
@@ -38,7 +37,7 @@ public sealed class CartController : ControllerBase
             await _mediator.Send(new CreateOrGetCartSessionCommand(clientAnonymousKey), cancellationToken)
                 .ConfigureAwait(false);
 
-        return result.ToActionResult();
+        return OkOrError(result);
     }
 
     [HttpGet("{cartId:guid}")]
@@ -50,7 +49,7 @@ public sealed class CartController : ControllerBase
             .Send(new GetCartQuery(cartId), cancellationToken)
             .ConfigureAwait(false);
 
-        return result.ToActionResult();
+        return OkOrError(result);
     }
 
     [HttpPost("items")]
@@ -63,7 +62,7 @@ public sealed class CartController : ControllerBase
             .Send(new AddCartItemCommand(request), cancellationToken)
             .ConfigureAwait(false);
 
-        return result.ToActionResult();
+        return OkOrError(result);
     }
 
     [HttpPatch("items/{productId:guid}")]
@@ -79,7 +78,7 @@ public sealed class CartController : ControllerBase
             .Send(new UpdateCartItemQuantityCommand(request, productId), cancellationToken)
             .ConfigureAwait(false);
 
-        return result.ToActionResult();
+        return OkOrError(result);
     }
 
     [HttpDelete("items/{productId:guid}")]
@@ -94,6 +93,6 @@ public sealed class CartController : ControllerBase
             .Send(new RemoveCartItemCommand(request, productId), cancellationToken)
             .ConfigureAwait(false);
 
-        return result.ToActionResult();
+        return OkOrError(result);
     }
 }

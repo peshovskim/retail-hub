@@ -2,7 +2,7 @@ using Catalog.Application.Product.Interfaces;
 using Catalog.Application.Product.Responses;
 using MediatR;
 using RetailHub.SharedKernel.Application.Common.Cqrs;
-using RetailHub.SharedKernel.Application.Common.Results;
+using RetailHub.SharedKernel.Domain;
 
 namespace Catalog.Application.Product.Queries.GetProducts;
 

@@ -2,7 +2,7 @@ using Catalog.Application.Product.Interfaces;
 using Catalog.Application.Product.Responses;
 using MediatR;
 using RetailHub.SharedKernel.Application.Common.Cqrs;
-using RetailHub.SharedKernel.Application.Common.Results;
+using RetailHub.SharedKernel.Domain;
 
 namespace Catalog.Application.Product.Queries.GetProductById;
 
@@ -27,7 +27,7 @@ public sealed class GetProductByIdQueryHandler : IRequestHandler<GetProductByIdQ
 
         if (product is null)
         {
-            return Result<ProductResponse>.Failure(Error.NotFound("Product not found."));
+            return Result<ProductResponse>.NotFound(ResultCodes.NotFound, "Product not found.");
         }
 
         return Result<ProductResponse>.Success(product);

@@ -1,6 +1,7 @@
+using System.Reflection;
 using FluentValidation;
 using MediatR;
-using RetailHub.SharedKernel.Application.Common.Results;
+using RetailHub.SharedKernel.Domain;
 
 namespace RetailHub.SharedKernel.Application.Common.Behaviors;
 
@@ -46,19 +47,23 @@ public sealed class ValidationBehavior<TRequest, TResponse> : IPipelineBehavior<
             && typeof(TResponse).GetGenericTypeDefinition() == typeof(Result<>))
         {
             var valueType = typeof(TResponse).GenericTypeArguments[0];
-            var failureMethod = typeof(Result<>).MakeGenericType(valueType).GetMethod(
-                nameof(Result<object>.Failure),
-                new[] { typeof(Error) });
-            if (failureMethod is not null)
+            var resultType = typeof(Result<>).MakeGenericType(valueType);
+            var invalidMethod = resultType.GetMethod(
+                nameof(Result<int>.Invalid),
+                BindingFlags.Public | BindingFlags.Static,
+                null,
+                new[] { typeof(string), typeof(string) },
+                null);
+            if (invalidMethod is not null)
             {
-                var failureResult = failureMethod.Invoke(null, new object[] { Error.Validation(message) });
+                var failureResult = invalidMethod.Invoke(null, new object[] { ResultCodes.Validation, message });
                 return (TResponse)(failureResult ?? throw new InvalidOperationException("Result failure could not be created."));
             }
         }
 
         if (typeof(TResponse) == typeof(Result))
         {
-            return (TResponse)(object)Result.Failure(Error.Validation(message));
+            return (TResponse)(object)Result.Invalid(ResultCodes.Validation, message);
         }
 
         throw new ValidationException(message);

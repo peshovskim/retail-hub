@@ -5,7 +5,7 @@ using Cart.Application.Cart;
 using Catalog.Application.Product.Interfaces;
 using MediatR;
 using RetailHub.SharedKernel.Application.Common.Cqrs;
-using RetailHub.SharedKernel.Application.Common.Results;
+using RetailHub.SharedKernel.Domain;
 
 namespace Cart.Application.Cart.Commands.UpdateCartItemQuantity;
 
@@ -39,7 +39,7 @@ public sealed class UpdateCartItemQuantityCommandHandler : IRequestHandler<Updat
 
         if (cart is null)
         {
-            return Result<CartResponse>.Failure(Error.NotFound("Cart not found."));
+            return Result<CartResponse>.NotFound(ResultCodes.NotFound, "Cart not found.");
         }
 
         if (request.Quantity == 0)
@@ -54,7 +54,7 @@ public sealed class UpdateCartItemQuantityCommandHandler : IRequestHandler<Updat
 
             if (product is null)
             {
-                return Result<CartResponse>.Failure(Error.NotFound("Product not found."));
+                return Result<CartResponse>.NotFound(ResultCodes.NotFound, "Product not found.");
             }
 
             var setResult = cart.SetItemQuantity(
@@ -65,7 +65,7 @@ public sealed class UpdateCartItemQuantityCommandHandler : IRequestHandler<Updat
 
             if (setResult.IsFailure)
             {
-                return Result<CartResponse>.Failure(DomainResultAdapter.ToApplicationError(setResult.Error!));
+                return Result.FromError<CartResponse>(setResult);
             }
         }
 
