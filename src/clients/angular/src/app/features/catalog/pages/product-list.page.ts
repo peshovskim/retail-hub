@@ -1,7 +1,7 @@
 import { Component, computed, effect, inject, signal } from '@angular/core';
 import { takeUntilDestroyed, toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { PageEvent } from '@angular/material/paginator';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, ParamMap, Router } from '@angular/router';
 import { distinctUntilChanged, map, skip } from 'rxjs';
 
 import type { CategoryMenuNode } from '../models/category.model';
@@ -11,6 +11,9 @@ import { CatalogToolbarSearchService } from '../services/catalog-toolbar-search.
 import { CatalogFacade } from '../store/catalog.facade';
 
 export type ShopSortOption = 'name-asc' | 'name-desc' | 'price-asc' | 'price-desc';
+
+/** Default page size for catalog API requests (must stay ≤ API max, currently 100). */
+const DEFAULT_CATALOG_PAGE_SIZE = 24;
 
 function flattenCategoryNodes(nodes: CategoryMenuNode[]): CategoryMenuNode[] {
   const out: CategoryMenuNode[] = [];
@@ -73,8 +76,63 @@ function setsEqualString(a: Set<string>, b: Set<string>): boolean {
   return true;
 }
 
-/** Default page size for catalog API requests (must stay ≤ API max, currently 100). */
-const DEFAULT_CATALOG_PAGE_SIZE = 24;
+function shopSortOptionFromApiParam(value: string | null): ShopSortOption {
+  switch (value) {
+    case 'nameDesc':
+      return 'name-desc';
+    case 'priceAsc':
+      return 'price-asc';
+    case 'priceDesc':
+      return 'price-desc';
+    case 'nameAsc':
+    default:
+      return 'name-asc';
+  }
+}
+
+/** Stable string for comparing query state (sorted category ids). */
+function serializeCatalogQueryParams(record: Record<string, string>): string {
+  const keys = Object.keys(record).sort();
+  return keys.map((k) => `${k}=${record[k]}`).join('&');
+}
+
+function paramMapToRecord(qpm: ParamMap): Record<string, string> {
+  const out: Record<string, string> = {};
+  const search = qpm.get('search')?.trim();
+  if (search) {
+    out['search'] = search;
+  }
+  const cats = qpm.get('categoryIds')?.trim();
+  if (cats) {
+    out['categoryIds'] = cats
+      .split(',')
+      .map((s) => s.trim())
+      .filter(Boolean)
+      .sort()
+      .join(',');
+  }
+  const priceMin = qpm.get('priceMin');
+  if (priceMin != null && priceMin !== '') {
+    out['priceMin'] = priceMin;
+  }
+  const priceMax = qpm.get('priceMax');
+  if (priceMax != null && priceMax !== '') {
+    out['priceMax'] = priceMax;
+  }
+  const sort = qpm.get('sort');
+  if (sort != null && sort !== '' && sort !== 'nameAsc') {
+    out['sort'] = sort;
+  }
+  const page = qpm.get('page');
+  if (page != null && page !== '' && page !== '1') {
+    out['page'] = page;
+  }
+  const pageSize = qpm.get('pageSize');
+  if (pageSize != null && pageSize !== '' && pageSize !== String(DEFAULT_CATALOG_PAGE_SIZE)) {
+    out['pageSize'] = pageSize;
+  }
+  return out;
+}
 
 function shopSortToApi(sort: ShopSortOption): ProductListSort {
   switch (sort) {
@@ -100,6 +158,7 @@ export class ProductListPage {
   private readonly catalog = inject(CatalogFacade);
   private readonly toolbarSearch = inject(CatalogToolbarSearchService);
   private readonly route = inject(ActivatedRoute);
+  private readonly router = inject(Router);
 
   /** `category/:slug` from the router (header Categories menu navigates here). */
   private readonly routeCategorySlug = toSignal(
@@ -117,9 +176,50 @@ export class ProductListPage {
   sliderStart = 0;
   sliderEnd = this.priceSliderCeiling;
 
+  protected readonly productsView = toSignal(this.catalog.productsView$, {
+    initialValue: { kind: 'loading' } as CatalogProductsView,
+  });
+
+  protected readonly menu = toSignal(this.catalog.menu$, { initialValue: [] as CategoryMenuNode[] });
+
+  protected readonly menuLoading = toSignal(this.catalog.menuLoading$, { initialValue: false });
+
+  protected readonly sortOption = signal<ShopSortOption>('name-asc');
+  protected readonly selectedCategoryIds = signal(new Set<string>());
+  protected readonly priceMin = signal<number | null>(null);
+  protected readonly priceMax = signal<number | null>(null);
+  protected readonly currentPage = signal(1);
+  protected readonly pageSize = signal(DEFAULT_CATALOG_PAGE_SIZE);
+
+  protected readonly pageSizeOptions = [12, 24, 48] as const;
+
+  protected readonly flatCategories = computed(() => flattenCategoryNodes(this.menu()));
+
+  protected readonly categoryNameMap = computed(() => buildCategoryNameMap(this.menu()));
+
   constructor() {
     this.catalog.loadCategoryMenu();
-    this.reloadProducts();
+    this.applyQueryParamsFromParamMap(this.route.snapshot.queryParamMap);
+    this.reloadProducts({ skipUrlSync: true });
+
+    this.route.queryParamMap
+      .pipe(
+        distinctUntilChanged(
+          (a, b) => serializeCatalogQueryParams(paramMapToRecord(a)) === serializeCatalogQueryParams(paramMapToRecord(b)),
+        ),
+        skip(1),
+        takeUntilDestroyed(),
+      )
+      .subscribe((qpm) => {
+        if (
+          serializeCatalogQueryParams(paramMapToRecord(qpm)) ===
+          serializeCatalogQueryParams(this.buildQueryRecordFromState())
+        ) {
+          return;
+        }
+        this.applyQueryParamsFromParamMap(qpm);
+        this.reloadProducts({ skipUrlSync: true });
+      });
 
     effect(() => {
       const pv = this.productsView();
@@ -176,26 +276,93 @@ export class ProductListPage {
     });
   }
 
-  protected readonly productsView = toSignal(this.catalog.productsView$, {
-    initialValue: { kind: 'loading' } as CatalogProductsView,
-  });
+  private buildQueryRecordFromState(): Record<string, string> {
+    const out: Record<string, string> = {};
+    const search = this.toolbarSearch.committed().trim();
+    if (search.length > 0) {
+      out['search'] = search;
+    }
+    if (!this.route.snapshot.paramMap.get('slug')) {
+      const ids = [...this.selectedCategoryIds()].filter(Boolean).sort();
+      if (ids.length > 0) {
+        out['categoryIds'] = ids.join(',');
+      }
+    }
+    const pmin = this.priceMin();
+    if (pmin != null && !Number.isNaN(pmin)) {
+      out['priceMin'] = String(pmin);
+    }
+    const pmax = this.priceMax();
+    if (pmax != null && !Number.isNaN(pmax)) {
+      out['priceMax'] = String(pmax);
+    }
+    const sortApi = shopSortToApi(this.sortOption());
+    if (sortApi !== 'nameAsc') {
+      out['sort'] = sortApi;
+    }
+    const page = this.currentPage();
+    if (page !== 1) {
+      out['page'] = String(page);
+    }
+    const size = this.pageSize();
+    if (size !== DEFAULT_CATALOG_PAGE_SIZE) {
+      out['pageSize'] = String(size);
+    }
+    return out;
+  }
 
-  protected readonly menu = toSignal(this.catalog.menu$, { initialValue: [] as CategoryMenuNode[] });
+  private syncQueryStringFromState(): void {
+    const next = this.buildQueryRecordFromState();
+    const current = paramMapToRecord(this.route.snapshot.queryParamMap);
+    if (serializeCatalogQueryParams(next) === serializeCatalogQueryParams(current)) {
+      return;
+    }
+    void this.router.navigate([], {
+      relativeTo: this.route,
+      queryParams: next,
+      replaceUrl: true,
+      queryParamsHandling: '',
+    });
+  }
 
-  protected readonly menuLoading = toSignal(this.catalog.menuLoading$, { initialValue: false });
+  private applyQueryParamsFromParamMap(qpm: ParamMap): void {
+    const search = qpm.get('search')?.trim() ?? '';
+    this.toolbarSearch.draft.set(search);
+    this.toolbarSearch.committed.set(search);
 
-  protected readonly sortOption = signal<ShopSortOption>('name-asc');
-  protected readonly selectedCategoryIds = signal(new Set<string>());
-  protected readonly priceMin = signal<number | null>(null);
-  protected readonly priceMax = signal<number | null>(null);
-  protected readonly currentPage = signal(1);
-  protected readonly pageSize = signal(DEFAULT_CATALOG_PAGE_SIZE);
+    if (!this.route.snapshot.paramMap.get('slug')) {
+      const raw = qpm.get('categoryIds')?.trim();
+      const ids = raw ? raw.split(',').map((s) => s.trim()).filter((id) => id.length > 0) : [];
+      this.selectedCategoryIds.set(new Set(ids));
+    }
 
-  protected readonly pageSizeOptions = [12, 24, 48] as const;
+    const parseNum = (v: string | null): number | null => {
+      if (v == null || v === '') {
+        return null;
+      }
+      const n = Number(v);
+      return Number.isFinite(n) && n >= 0 ? n : null;
+    };
+    const pmin = parseNum(qpm.get('priceMin'));
+    const pmax = parseNum(qpm.get('priceMax'));
+    this.priceMin.set(pmin);
+    this.priceMax.set(pmax);
+    const ceil = this.priceSliderCeiling;
+    this.sliderStart = pmin != null && pmin > 0 ? pmin : 0;
+    this.sliderEnd = pmax != null ? Math.min(pmax, ceil) : ceil;
 
-  protected readonly flatCategories = computed(() => flattenCategoryNodes(this.menu()));
+    this.sortOption.set(shopSortOptionFromApiParam(qpm.get('sort')));
 
-  protected readonly categoryNameMap = computed(() => buildCategoryNameMap(this.menu()));
+    const pageRaw = qpm.get('page');
+    const page = pageRaw != null && pageRaw !== '' ? Number.parseInt(pageRaw, 10) : 1;
+    this.currentPage.set(Number.isFinite(page) && page >= 1 ? page : 1);
+
+    const sizeRaw = qpm.get('pageSize');
+    const size = sizeRaw != null && sizeRaw !== '' ? Number.parseInt(sizeRaw, 10) : DEFAULT_CATALOG_PAGE_SIZE;
+    this.pageSize.set(
+      Number.isFinite(size) && size >= 1 && size <= 100 ? size : DEFAULT_CATALOG_PAGE_SIZE,
+    );
+  }
 
   protected categoryLabel(categoryId: string): string {
     return this.categoryNameMap().get(categoryId) ?? 'General';
@@ -343,7 +510,10 @@ export class ProductListPage {
     return params;
   }
 
-  private reloadProducts(): void {
+  private reloadProducts(options?: { skipUrlSync?: boolean }): void {
     this.catalog.loadProducts(this.buildParams());
+    if (!options?.skipUrlSync) {
+      this.syncQueryStringFromState();
+    }
   }
 }
