@@ -176,12 +176,12 @@
                       <span class="shop-grid__badge">{{ categoryLabel(p.categoryId) }}</span>
                       <p class="shop-grid__price">{{ p.price | appCurrency }}</p>
                       <button
-                        mat-stroked-button
+                        mat-flat-button
                         type="button"
-                        color="primary"
                         class="shop-grid__add"
                         (click)="addOneToCart($event, p.id)"
                       >
+                        <mat-icon class="shop-grid__add-icon" aria-hidden="true">add_shopping_cart</mat-icon>
                         Add to cart
                       </button>
                     </div>

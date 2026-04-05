@@ -613,7 +613,53 @@
 
 .shop-grid__add {
   margin-top: 0.65rem;
-  align-self: flex-start;
+  align-self: stretch;
+  width: 100%;
+  justify-content: center;
+  gap: 0.4rem;
+  min-height: 2.55rem;
+  padding-inline: 1rem !important;
+  border-radius: 999px !important;
+  font-size: 0.75rem !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.08em !important;
+  text-transform: uppercase;
+  background: linear-gradient(
+    180deg,
+    var(--shop-add-cart-top) 0%,
+    var(--shop-add-cart-bottom) 100%
+  ) !important;
+  color: #fff !important;
+  box-shadow:
+    0 1px 0 rgb(255 255 255 / 22%) inset,
+    0 1px 3px rgb(194 86 26 / 35%) !important;
+
+  .shop-grid__add-icon {
+    font-size: 1.125rem;
+    width: 1.125rem;
+    height: 1.125rem;
+    margin-inline: -0.1rem 0;
+  }
+
+  &:hover:not(:disabled) {
+    background: linear-gradient(
+      180deg,
+      var(--shop-add-cart-hover-top) 0%,
+      var(--shop-add-cart-hover-bottom) 100%
+    ) !important;
+    box-shadow:
+      0 1px 0 rgb(255 255 255 / 24%) inset,
+      0 2px 8px rgb(194 86 26 / 38%) !important;
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--shop-add-cart-focus);
+    outline-offset: 2px;
+  }
+
+  &:disabled {
+    opacity: 0.45;
+  }
 }
 
 /* ——— Pagination ——— */

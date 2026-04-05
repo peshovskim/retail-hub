@@ -195,10 +195,29 @@
   white-space: nowrap;
 }
 
-.app-toolbar__register.mat-mdc-unelevated-button {
+.app-toolbar__register.mat-mdc-outlined-button {
   text-transform: none !important;
   font-size: 0.75rem !important;
   font-weight: 700 !important;
   letter-spacing: 0.04em !important;
   flex-shrink: 0;
+  border-radius: 999px !important;
+  padding: 0 1.1rem !important;
+  min-height: 2.25rem !important;
+  line-height: 1.2 !important;
+  background-color: var(--shop-register-bg) !important;
+  color: var(--shop-register-text) !important;
+  border-color: var(--shop-register-border) !important;
+  box-shadow: none !important;
+
+  &:hover:not(:disabled) {
+    background-color: var(--shop-register-hover-bg) !important;
+    border-color: var(--shop-register-border-hover) !important;
+    color: var(--shop-register-text) !important;
+  }
+
+  &:focus-visible {
+    outline: 2px solid color-mix(in srgb, var(--shop-cta) 45%, transparent);
+    outline-offset: 2px;
+  }
 }

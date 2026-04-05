@@ -92,11 +92,11 @@
             <button
               mat-flat-button
               type="button"
-              color="primary"
               class="product-detail__add-cart"
               (click)="addToCart(p)"
               aria-describedby="add_cart_hint"
             >
+              <mat-icon class="product-detail__add-cart-icon" aria-hidden="true">add_shopping_cart</mat-icon>
               Add to cart
             </button>
             <p id="add_cart_hint" class="product-detail__add-cart-hint">Uses the price shown above for this line.</p>

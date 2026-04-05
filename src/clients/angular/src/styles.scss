@@ -65,6 +65,18 @@ body {
   --shop-mega-link-hover: var(--shop-cta);
   --shop-mega-divider: #d8d8d8;
   --shop-mega-menu-width: min(94vw, 88rem);
+  /* Add to cart: muted warm orange (softer than main CTA orange). */
+  --shop-add-cart-top: #ea8f4e;
+  --shop-add-cart-bottom: #c2561a;
+  --shop-add-cart-hover-top: #f2a776;
+  --shop-add-cart-hover-bottom: #d46824;
+  --shop-add-cart-focus: #9a3412;
+  /* Header Register: light surface + accent border (not dark primary fill). */
+  --shop-register-bg: #ffffff;
+  --shop-register-hover-bg: #fff7ed;
+  --shop-register-border: #fdba74;
+  --shop-register-border-hover: var(--shop-cta);
+  --shop-register-text: #c2410c;
 }
 
 .app-toolbar--shop {
