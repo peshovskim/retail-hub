@@ -1,5 +1,4 @@
 using System.Net;
-using System.Security.Claims;
 using System.Security.Cryptography;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Primitives;
@@ -11,23 +10,6 @@ namespace RetailHub.Api.Controllers;
 public class ExtendedApiController : ControllerBase
 {
     protected const string PdfContentType = "application/pdf";
-
-    protected Guid UserUid
-    {
-        get
-        {
-            ClaimsIdentity? identity = User.Identity as ClaimsIdentity;
-
-            Claim? claim = identity?.FindFirst("uid");
-
-            if (Guid.TryParse(claim?.Value, out Guid userUid))
-            {
-                return userUid;
-            }
-
-            throw new InvalidOperationException("Identity must never be null");
-        }
-    }
 
     protected static HttpStatusCode GetStatusCode(ResultType resultType)
     {

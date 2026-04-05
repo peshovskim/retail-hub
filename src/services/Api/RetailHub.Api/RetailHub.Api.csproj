@@ -13,12 +13,15 @@
     <ProjectReference Include="..\..\Modules\Cart\Cart.Infrastructure\Cart.Infrastructure.csproj" />
     <ProjectReference Include="..\..\Modules\Catalog\Catalog.Application\Catalog.Application.csproj" />
     <ProjectReference Include="..\..\Modules\Catalog\Catalog.Infrastructure\Catalog.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\Modules\Identity\Identity.Application\Identity.Application.csproj" />
+    <ProjectReference Include="..\..\Modules\Identity\Identity.Infrastructure\Identity.Infrastructure.csproj" />
     <ProjectReference Include="..\..\Modules\Orders\Orders.Application\Orders.Application.csproj" />
     <ProjectReference Include="..\..\Modules\Orders\Orders.Infrastructure\Orders.Infrastructure.csproj" />
   </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="MediatR" Version="12.4.1" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.11" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.6.2" />
   </ItemGroup>
 
