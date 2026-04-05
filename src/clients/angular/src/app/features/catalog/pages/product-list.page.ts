@@ -1,4 +1,4 @@
-import { Component, computed, effect, inject, signal } from '@angular/core';
+import { Component, computed, effect, inject, signal, untracked } from '@angular/core';
 import { takeUntilDestroyed, toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { PageEvent } from '@angular/material/paginator';
 import { ActivatedRoute, ParamMap, Router } from '@angular/router';
@@ -245,36 +245,38 @@ export class ProductListPage {
       const slug = this.routeCategorySlug();
       const nodes = this.menu();
 
-      if (slug) {
-        if (nodes.length === 0) {
-          return;
-        }
-        const node = findCategoryNodeBySlug(nodes, slug);
-        if (!node) {
-          return;
-        }
-        const ids = categoryIdsForMenuNode(node);
-        if (ids.length === 0) {
-          return;
-        }
-        const next = new Set(ids);
-        if (setsEqualString(this.selectedCategoryIds(), next)) {
+      untracked(() => {
+        if (slug) {
+          if (nodes.length === 0) {
+            return;
+          }
+          const node = findCategoryNodeBySlug(nodes, slug);
+          if (!node) {
+            return;
+          }
+          const ids = categoryIdsForMenuNode(node);
+          if (ids.length === 0) {
+            return;
+          }
+          const next = new Set(ids);
+          if (setsEqualString(this.selectedCategoryIds(), next)) {
+            this.routeCategoryFilterActive.set(true);
+            return;
+          }
+          this.selectedCategoryIds.set(next);
           this.routeCategoryFilterActive.set(true);
+          this.currentPage.set(1);
+          this.reloadProducts();
           return;
         }
-        this.selectedCategoryIds.set(next);
-        this.routeCategoryFilterActive.set(true);
-        this.currentPage.set(1);
-        this.reloadProducts();
-        return;
-      }
 
-      if (this.routeCategoryFilterActive()) {
-        this.routeCategoryFilterActive.set(false);
-        this.selectedCategoryIds.set(new Set());
-        this.currentPage.set(1);
-        this.reloadProducts();
-      }
+        if (this.routeCategoryFilterActive()) {
+          this.routeCategoryFilterActive.set(false);
+          this.selectedCategoryIds.set(new Set());
+          this.currentPage.set(1);
+          this.reloadProducts();
+        }
+      });
     });
   }
 
@@ -389,7 +391,20 @@ export class ProductListPage {
     this.selectedCategoryIds.set(new Set());
     this.clearPriceFilter(false);
     this.toolbarSearch.clear();
-    this.goToFirstPageAndReload();
+    this.sortOption.set('name-asc');
+    this.pageSize.set(DEFAULT_CATALOG_PAGE_SIZE);
+    this.currentPage.set(1);
+
+    if (this.route.snapshot.paramMap.get('slug')) {
+      void this.router.navigate(['/catalog'], {
+        queryParams: {},
+        replaceUrl: true,
+        queryParamsHandling: '',
+      });
+      return;
+    }
+
+    this.reloadProducts();
   }
 
   /** Clears only min/max price (and slider). @param reload when false, caller reloads (e.g. clear all). */
