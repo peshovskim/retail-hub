@@ -47,6 +47,20 @@
     <Folder Include="Tables\User\" />
     <Folder Include="Tables\User\Table\" />
     <Folder Include="Tables\User\Seed\" />
+    <Folder Include="Tables\AspNetRoles\" />
+    <Folder Include="Tables\AspNetRoles\Table\" />
+    <Folder Include="Tables\AspNetRoles\Seed\" />
+    <Folder Include="Tables\AspNetUserRoles\" />
+    <Folder Include="Tables\AspNetUserRoles\Table\" />
+    <Folder Include="Tables\AspNetUserRoles\Seed\" />
+    <Folder Include="Tables\AspNetUserClaims\" />
+    <Folder Include="Tables\AspNetUserClaims\Table\" />
+    <Folder Include="Tables\AspNetRoleClaims\" />
+    <Folder Include="Tables\AspNetRoleClaims\Table\" />
+    <Folder Include="Tables\AspNetUserLogins\" />
+    <Folder Include="Tables\AspNetUserLogins\Table\" />
+    <Folder Include="Tables\AspNetUserTokens\" />
+    <Folder Include="Tables\AspNetUserTokens\Table\" />
   </ItemGroup>
   <!-- Convention: Tables/{Entity}/Table/{Entity}.sql (Build); Tables/{Entity}/Seed/{Entity}.Test.Seed.sql (None, :r from post-deploy) -->
   <ItemGroup>
@@ -61,12 +75,20 @@
     <Build Include="Tables\Order\Table\Order.sql" />
     <Build Include="Tables\Order\Table\OrderLine.sql" />
     <Build Include="Tables\User\Table\User.sql" />
+    <Build Include="Tables\AspNetRoles\Table\AspNetRoles.sql" />
+    <Build Include="Tables\AspNetUserRoles\Table\AspNetUserRoles.sql" />
+    <Build Include="Tables\AspNetUserClaims\Table\AspNetUserClaims.sql" />
+    <Build Include="Tables\AspNetRoleClaims\Table\AspNetRoleClaims.sql" />
+    <Build Include="Tables\AspNetUserLogins\Table\AspNetUserLogins.sql" />
+    <Build Include="Tables\AspNetUserTokens\Table\AspNetUserTokens.sql" />
     <None Include="Tables\Cart\Seed\Cart.Test.Seed.sql" />
     <None Include="Tables\Cart\Seed\CartItem.Test.Seed.sql" />
     <None Include="Tables\Category\Seed\Category.Test.Seed.sql" />
     <None Include="Tables\Product\Seed\Product.Test.Seed.sql" />
     <None Include="Tables\Order\Seed\Order.Test.Seed.sql" />
     <None Include="Tables\User\Seed\User.Test.Seed.sql" />
+    <None Include="Tables\AspNetRoles\Seed\AspNetRoles.Test.Seed.sql" />
+    <None Include="Tables\AspNetUserRoles\Seed\AspNetUserRoles.Test.Seed.sql" />
     <None Include="RetailHub.Database.publish.xml" />
     <PostDeploy Include="Script.PostDeployment.sql" />
   </ItemGroup>
