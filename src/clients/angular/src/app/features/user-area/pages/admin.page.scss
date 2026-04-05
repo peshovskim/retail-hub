@@ -1,0 +1,21 @@
+.admin-page {
+  max-width: 640px;
+  margin: 2rem auto;
+  padding: 0 1rem;
+}
+
+.admin-page__title {
+  margin: 0 0 1rem;
+  font-size: 1.5rem;
+  font-weight: 700;
+}
+
+.admin-page__text {
+  margin: 0 0 0.75rem;
+  line-height: 1.5;
+}
+
+.admin-page__muted {
+  color: var(--shop-muted);
+  font-size: 0.95rem;
+}

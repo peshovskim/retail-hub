@@ -3,11 +3,12 @@ import { CanActivateFn, Router } from '@angular/router';
 
 import { AuthTokenStorage } from '../services/auth-token.storage';
 
-export const authGuard: CanActivateFn = (_route, state) => {
+/** Redirect signed-in users away from login/register. */
+export const guestGuard: CanActivateFn = () => {
   const tokens = inject(AuthTokenStorage);
   const router = inject(Router);
-  if (tokens.getAccessToken()) {
+  if (!tokens.getAccessToken()) {
     return true;
   }
-  return router.createUrlTree(['/auth/login'], { queryParams: { returnUrl: state.url } });
+  return router.createUrlTree(['/catalog']);
 };

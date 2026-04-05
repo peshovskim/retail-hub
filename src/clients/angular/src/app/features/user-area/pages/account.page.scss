@@ -1,0 +1,49 @@
+.account-page {
+  max-width: 520px;
+  margin: 2rem auto;
+  padding: 0 1rem;
+}
+
+.account-page__title {
+  margin: 0 0 1.25rem;
+  font-size: 1.5rem;
+  font-weight: 700;
+}
+
+.account-page__state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  color: var(--shop-muted);
+}
+
+.account-page__card {
+  border-radius: var(--shop-catalog-radius, 10px);
+  border-color: var(--shop-catalog-border);
+}
+
+.account-page__label {
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--shop-muted);
+}
+
+.account-page__email {
+  margin: 0.25rem 0 0.5rem;
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+.account-page__roles {
+  margin: 0 0 1rem;
+  font-size: 0.9rem;
+  color: var(--shop-muted);
+}
+
+.account-page__notice--error mat-card-content {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.75rem;
+}

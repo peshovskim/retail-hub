@@ -1,0 +1,28 @@
+<section class="account-page" aria-labelledby="account-heading">
+  <h1 id="account-heading" class="account-page__title">Your account</h1>
+
+  @if (loading()) {
+    <div class="account-page__state" role="status">
+      <mat-progress-spinner diameter="40" mode="indeterminate" />
+      <p>Loading profile…</p>
+    </div>
+  } @else if (error(); as err) {
+    <mat-card appearance="outlined" class="account-page__notice account-page__notice--error">
+      <mat-card-content>
+        <p role="alert">{{ err }}</p>
+        <a mat-button color="primary" routerLink="/auth/login">Sign in</a>
+      </mat-card-content>
+    </mat-card>
+  } @else if (user(); as u) {
+    <mat-card appearance="outlined" class="account-page__card">
+      <mat-card-content>
+        <p class="account-page__label">Signed in as</p>
+        <p class="account-page__email">{{ u.email }}</p>
+        @if (u.roles.length) {
+          <p class="account-page__roles">Roles: {{ u.roles.join(', ') }}</p>
+        }
+        <button mat-stroked-button type="button" color="primary" (click)="logout()">Sign out</button>
+      </mat-card-content>
+    </mat-card>
+  }
+</section>
