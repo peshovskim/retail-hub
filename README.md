@@ -78,7 +78,27 @@ In **Development**, Swagger UI is enabled. Open **`/swagger`** on the running si
 
 ---
 
-## 5. Frontend (optional)
+## 5. Unit tests
+
+Command-handler tests for **Cart** and **Orders** live in **`src/services/Tests/RetailHub.Services.Tests/`** (NUnit, FluentAssertions, Moq). They target application commands only; **Identity** is not covered.
+
+**Layout:** under the test project root, one folder per aggregate/entity (for example **`Cart/`**, **`Order/`**), then a subfolder per command (for example **`Cart/AddCartItemCommand/`**) containing:
+
+- **`*CommandHandlerBuilder.cs`** — wires the handler with Moq dependencies
+- **`*CommandTests.cs`** — NUnit tests
+
+Shared test data factories for the cart domain live in **`Cart/CartTestsHelper.cs`**.
+
+**Run from the repo root:**
+
+```bash
+cd src/services
+dotnet test Tests/RetailHub.Services.Tests/RetailHub.Services.Tests.csproj
+```
+
+---
+
+## 6. Frontend (optional)
 
 An Angular client lives under **`src/clients/angular`**. Running it is separate from the API; follow the usual **`npm install`** / **`ng serve`** workflow when you work on the storefront. Point the Angular environment **`apiBaseUrl`** at your running API URL.
 
@@ -103,4 +123,9 @@ An Angular client lives under **`src/clients/angular`**. Running it is separate 
 | **`src/services/RetailHub.sln`** | Main Visual Studio solution |
 | **`src/services/Api/RetailHub.Api/`** | ASP.NET Core Web API |
 | **`src/services/Database/RetailHub.Database/`** | SQL Server Database project (schema + publish profile) |
+| **`src/services/Tests/RetailHub.Services.Tests/`** | Unit tests (NUnit) for Cart and Orders command handlers |
 | **`src/services/Modules/Catalog/`** | Catalog domain, application, and infrastructure |
+| **`src/services/Modules/Cart/`** | Cart domain, application, and infrastructure |
+| **`src/services/Modules/Orders/`** | Orders domain, application, and infrastructure |
+| **`src/services/Modules/Identity/`** | Identity domain, application, and infrastructure |
+| **`src/services/SharedKernel/`** | Shared kernel (domain, application, infrastructure) |
