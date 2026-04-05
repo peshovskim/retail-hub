@@ -1,4 +1,4 @@
-
+﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.0.31903.59
@@ -58,6 +58,10 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Database", "Database", "{8D7C6B5A-4938-4E27-9182-5647382910AB}"
 EndProject
 Project("{00D1A9C2-B5F0-4AF3-8072-F6C62B433612}") = "RetailHub.Database", "Database\RetailHub.Database\RetailHub.Database.sqlproj", "{2C9E4B1A-7F3D-4E85-9C12-0A1B2C3D4E5F}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{0AB3BF05-4346-4AA6-1389-037BE0695223}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RetailHub.Services.Tests", "Tests\RetailHub.Services.Tests\RetailHub.Services.Tests.csproj", "{EC2BFE88-AC64-4E9B-9D98-2CE250989207}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -279,6 +283,18 @@ Global
 		{2C9E4B1A-7F3D-4E85-9C12-0A1B2C3D4E5F}.Release|x86.ActiveCfg = Release|Any CPU
 		{2C9E4B1A-7F3D-4E85-9C12-0A1B2C3D4E5F}.Release|x86.Build.0 = Release|Any CPU
 		{2C9E4B1A-7F3D-4E85-9C12-0A1B2C3D4E5F}.Release|x86.Deploy.0 = Release|Any CPU
+		{EC2BFE88-AC64-4E9B-9D98-2CE250989207}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EC2BFE88-AC64-4E9B-9D98-2CE250989207}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EC2BFE88-AC64-4E9B-9D98-2CE250989207}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{EC2BFE88-AC64-4E9B-9D98-2CE250989207}.Debug|x64.Build.0 = Debug|Any CPU
+		{EC2BFE88-AC64-4E9B-9D98-2CE250989207}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{EC2BFE88-AC64-4E9B-9D98-2CE250989207}.Debug|x86.Build.0 = Debug|Any CPU
+		{EC2BFE88-AC64-4E9B-9D98-2CE250989207}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EC2BFE88-AC64-4E9B-9D98-2CE250989207}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EC2BFE88-AC64-4E9B-9D98-2CE250989207}.Release|x64.ActiveCfg = Release|Any CPU
+		{EC2BFE88-AC64-4E9B-9D98-2CE250989207}.Release|x64.Build.0 = Release|Any CPU
+		{EC2BFE88-AC64-4E9B-9D98-2CE250989207}.Release|x86.ActiveCfg = Release|Any CPU
+		{EC2BFE88-AC64-4E9B-9D98-2CE250989207}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -308,5 +324,6 @@ Global
 		{BCD2FC7D-A75B-4FC4-AC69-A8E2895F0F84} = {293C06CD-4E17-48BD-9F3B-B5ADDFFA9425}
 		{259A5C6A-212B-428C-AAF4-3A4EB17EF389} = {293C06CD-4E17-48BD-9F3B-B5ADDFFA9425}
 		{2C9E4B1A-7F3D-4E85-9C12-0A1B2C3D4E5F} = {8D7C6B5A-4938-4E27-9182-5647382910AB}
+		{EC2BFE88-AC64-4E9B-9D98-2CE250989207} = {0AB3BF05-4346-4AA6-1389-037BE0695223}
 	EndGlobalSection
 EndGlobal
