@@ -11,7 +11,6 @@ import { MatToolbarModule } from '@angular/material/toolbar';
 
 import { CatalogMenuModule } from '../features/catalog/catalog-menu.module';
 import { AccountPage } from '../features/user-area/pages/account.page';
-import { AdminPage } from '../features/user-area/pages/admin.page';
 import { SharedModule } from '../shared/shared.module';
 import { FooterComponent } from './components/footer/footer.component';
 import { NavbarComponent } from './components/navbar/navbar.component';
@@ -26,7 +25,6 @@ import { MainLayoutPage } from './pages/main-layout.page';
     SidebarComponent,
     FooterComponent,
     AccountPage,
-    AdminPage,
   ],
   imports: [
     CommonModule,
