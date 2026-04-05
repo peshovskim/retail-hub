@@ -1,6 +1,10 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 
+import { authGuard } from '../core/guards/auth.guard';
+import { rolesGuard } from '../core/guards/roles.guard';
+import { AccountPage } from '../features/user-area/pages/account.page';
+import { AdminPage } from '../features/user-area/pages/admin.page';
 import { MainLayoutPage } from './pages/main-layout.page';
 
 const routes: Routes = [
@@ -17,6 +21,21 @@ const routes: Routes = [
       {
         path: 'cart',
         loadChildren: () => import('../features/cart/cart.module').then((m) => m.CartModule),
+      },
+      {
+        path: 'auth',
+        loadChildren: () => import('../features/auth/auth.module').then((m) => m.AuthModule),
+      },
+      {
+        path: 'account',
+        component: AccountPage,
+        canActivate: [authGuard],
+      },
+      {
+        path: 'admin',
+        component: AdminPage,
+        canActivate: [authGuard, rolesGuard],
+        data: { roles: ['Admin'] },
       },
     ],
   },

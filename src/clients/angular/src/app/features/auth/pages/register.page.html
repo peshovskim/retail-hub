@@ -1,0 +1,46 @@
+<section class="auth-page" aria-labelledby="auth-register-heading">
+  <mat-card class="auth-page__card" appearance="outlined">
+    <mat-card-content>
+      <h1 id="auth-register-heading" class="auth-page__title">Create account</h1>
+      <p class="auth-page__hint">Register with your email to save carts and orders.</p>
+
+      @if (errorMessage(); as err) {
+        <div class="auth-page__alert" role="alert">{{ err }}</div>
+      }
+
+      <form class="auth-page__form" [formGroup]="form" (ngSubmit)="submit()">
+        <mat-form-field appearance="outline" class="auth-page__field">
+          <mat-label>Email</mat-label>
+          <input matInput type="email" formControlName="email" autocomplete="email" />
+        </mat-form-field>
+        <mat-form-field appearance="outline" class="auth-page__field">
+          <mat-label>Password</mat-label>
+          <input matInput type="password" formControlName="password" autocomplete="new-password" />
+        </mat-form-field>
+        <mat-form-field appearance="outline" class="auth-page__field">
+          <mat-label>Confirm password</mat-label>
+          <input matInput type="password" formControlName="confirmPassword" autocomplete="new-password" />
+        </mat-form-field>
+
+        <button
+          mat-flat-button
+          color="primary"
+          class="auth-page__submit"
+          type="submit"
+          [disabled]="submitting()"
+        >
+          @if (submitting()) {
+            <mat-progress-spinner diameter="20" mode="indeterminate" />
+          } @else {
+            Register
+          }
+        </button>
+      </form>
+
+      <p class="auth-page__footer">
+        Already have an account?
+        <a routerLink="/auth/login">Sign in</a>
+      </p>
+    </mat-card-content>
+  </mat-card>
+</section>

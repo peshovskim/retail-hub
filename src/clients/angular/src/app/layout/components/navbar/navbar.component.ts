@@ -2,6 +2,7 @@ import { Component, inject } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { Router } from '@angular/router';
 
+import { AuthService } from '../../../core/services/auth.service';
 import { CartFacade } from '../../../features/cart/store/cart.facade';
 import { CatalogToolbarSearchService } from '../../../features/catalog/services/catalog-toolbar-search.service';
 
@@ -15,6 +16,7 @@ export class NavbarComponent {
   protected readonly catalogSearch = inject(CatalogToolbarSearchService);
   private readonly router = inject(Router);
   private readonly cartFacade = inject(CartFacade);
+  protected readonly auth = inject(AuthService);
 
   protected readonly cartItemCount = toSignal(this.cartFacade.itemCount$, { initialValue: 0 });
 
@@ -60,5 +62,10 @@ export class NavbarComponent {
       queryParams: search.length > 0 ? { search } : {},
       queryParamsHandling: '',
     });
+  }
+
+  protected logout(): void {
+    this.auth.logout();
+    void this.router.navigateByUrl('/catalog');
   }
 }

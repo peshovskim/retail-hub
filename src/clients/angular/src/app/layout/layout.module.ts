@@ -4,9 +4,14 @@ import { FormsModule } from '@angular/forms';
 import { MatBadgeModule } from '@angular/material/badge';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
+import { MatCardModule } from '@angular/material/card';
+import { MatMenuModule } from '@angular/material/menu';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatToolbarModule } from '@angular/material/toolbar';
 
 import { CatalogMenuModule } from '../features/catalog/catalog-menu.module';
+import { AccountPage } from '../features/user-area/pages/account.page';
+import { AdminPage } from '../features/user-area/pages/admin.page';
 import { SharedModule } from '../shared/shared.module';
 import { FooterComponent } from './components/footer/footer.component';
 import { NavbarComponent } from './components/navbar/navbar.component';
@@ -15,7 +20,14 @@ import { LayoutRoutingModule } from './layout-routing.module';
 import { MainLayoutPage } from './pages/main-layout.page';
 
 @NgModule({
-  declarations: [MainLayoutPage, NavbarComponent, SidebarComponent, FooterComponent],
+  declarations: [
+    MainLayoutPage,
+    NavbarComponent,
+    SidebarComponent,
+    FooterComponent,
+    AccountPage,
+    AdminPage,
+  ],
   imports: [
     CommonModule,
     FormsModule,
@@ -26,6 +38,9 @@ import { MainLayoutPage } from './pages/main-layout.page';
     MatButtonModule,
     MatIconModule,
     MatBadgeModule,
+    MatCardModule,
+    MatMenuModule,
+    MatProgressSpinnerModule,
   ],
 })
 export class LayoutModule {}

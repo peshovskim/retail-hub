@@ -176,3 +176,29 @@
     color: var(--shop-cta);
   }
 }
+
+.app-toolbar__account.mat-mdc-button {
+  max-width: 12rem;
+  text-transform: none;
+  letter-spacing: normal;
+  font-size: 0.8rem;
+  color: var(--shop-on-header) !important;
+}
+
+.app-toolbar__account.mat-mdc-button .mat-icon {
+  margin-right: 0.25rem;
+}
+
+.app-toolbar__account-label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.app-toolbar__register.mat-mdc-unelevated-button {
+  text-transform: none !important;
+  font-size: 0.75rem !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.04em !important;
+  flex-shrink: 0;
+}

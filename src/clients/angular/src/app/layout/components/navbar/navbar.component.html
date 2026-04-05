@@ -63,6 +63,31 @@
           shopping_cart
         </mat-icon>
       </a>
+
+      @if (auth.isAuthenticated()) {
+        <button
+          type="button"
+          mat-button
+          class="app-toolbar__account"
+          [matMenuTriggerFor]="accountMenu"
+          [attr.aria-label]="'Account menu for ' + (auth.user()?.email ?? 'signed-in user')"
+        >
+          <mat-icon aria-hidden="true">account_circle</mat-icon>
+          <span class="app-toolbar__account-label">{{ auth.user()?.email ?? 'Account' }}</span>
+        </button>
+        <mat-menu #accountMenu="matMenu">
+          <a mat-menu-item routerLink="/account">Your account</a>
+          @if (auth.hasRole('Admin')) {
+            <a mat-menu-item routerLink="/admin">Admin</a>
+          }
+          <button mat-menu-item type="button" (click)="logout()">Sign out</button>
+        </mat-menu>
+      } @else {
+        <a mat-button class="app-toolbar__link" routerLink="/auth/login">Sign in</a>
+        <a mat-flat-button color="primary" class="app-toolbar__register" routerLink="/auth/register">
+          Register
+        </a>
+      }
     </div>
   </div>
 </mat-toolbar>

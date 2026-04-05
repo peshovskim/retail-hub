@@ -1,0 +1,65 @@
+.auth-page {
+  max-width: 420px;
+  margin: 2rem auto;
+  padding: 0 1rem;
+}
+
+.auth-page__card {
+  border-radius: var(--shop-catalog-radius, 10px);
+  border-color: var(--shop-catalog-border);
+}
+
+.auth-page__title {
+  margin: 0 0 0.5rem;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--shop-on-surface);
+}
+
+.auth-page__hint {
+  margin: 0 0 1rem;
+  color: var(--shop-muted);
+  font-size: 0.9rem;
+}
+
+.auth-page__alert {
+  padding: 0.75rem 1rem;
+  margin-bottom: 1rem;
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--mat-sys-error) 12%, transparent);
+  color: var(--mat-sys-error);
+  font-size: 0.9rem;
+}
+
+.auth-page__form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.auth-page__field {
+  width: 100%;
+}
+
+.auth-page__submit {
+  margin-top: 0.5rem;
+  width: 100%;
+  height: 44px;
+  position: relative;
+}
+
+.auth-page__footer {
+  margin: 1.25rem 0 0;
+  font-size: 0.9rem;
+  color: var(--shop-muted);
+
+  a {
+    color: var(--shop-cta);
+    font-weight: 600;
+    text-decoration: none;
+  }
+
+  a:hover {
+    text-decoration: underline;
+  }
+}
