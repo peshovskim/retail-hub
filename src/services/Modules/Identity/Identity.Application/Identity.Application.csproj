@@ -4,6 +4,16 @@
     <TargetFramework>net8.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <RootNamespace>Identity.Application</RootNamespace>
   </PropertyGroup>
+
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Identity.Infrastructure\Identity.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\..\SharedKernel\Application\SharedKernel.Application\SharedKernel.Application.csproj" />
+  </ItemGroup>
 
 </Project>
