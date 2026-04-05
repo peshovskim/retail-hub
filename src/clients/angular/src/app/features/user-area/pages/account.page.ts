@@ -1,3 +1,4 @@
+import { HttpErrorResponse } from '@angular/common/http';
 import { Component, inject, signal } from '@angular/core';
 import { Router } from '@angular/router';
 
@@ -25,9 +26,15 @@ export class AccountPage {
     }
     this.auth.refreshUser().subscribe({
       next: () => this.loading.set(false),
-      error: () => {
-        this.error.set('Could not load your profile. Try signing in again.');
+      error: (err) => {
         this.loading.set(false);
+        if (err instanceof HttpErrorResponse && err.status === 401) {
+          void this.router.navigate(['/auth/login'], { queryParams: { returnUrl: this.router.url } });
+          return;
+        }
+        this.error.set(
+          'Could not load your profile. Start the API (e.g. https://localhost:7296) and ensure `environment.apiBaseUrl` matches it.',
+        );
       },
     });
   }

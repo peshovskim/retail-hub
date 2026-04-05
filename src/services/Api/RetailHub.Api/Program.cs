@@ -51,6 +51,8 @@ builder.Services
     })
     .AddJwtBearer(options =>
     {
+        // Keep JWT claim types as issued (e.g. `uid`, `sub`) so HttpContextCurrentUserAccessor can resolve the user id reliably.
+        options.MapInboundClaims = false;
         options.TokenValidationParameters = new TokenValidationParameters
         {
             ValidateIssuer = true,

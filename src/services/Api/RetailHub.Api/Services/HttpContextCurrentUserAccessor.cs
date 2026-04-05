@@ -17,12 +17,12 @@ public sealed class HttpContextCurrentUserAccessor : ICurrentUserAccessor
     {
         ClaimsPrincipal? user = _httpContextAccessor.HttpContext?.User;
 
-        if (user?.Identity is not ClaimsIdentity identity || !identity.IsAuthenticated)
+        if (user?.Identity?.IsAuthenticated != true)
         {
             return null;
         }
 
-        Claim? idClaim = identity.FindFirst("uid") ?? identity.FindFirst(ClaimTypes.NameIdentifier);
+        Claim? idClaim = FindUserIdClaim(user);
 
         if (idClaim is null || !Guid.TryParse(idClaim.Value, out Guid userId))
         {
@@ -38,5 +38,34 @@ public sealed class HttpContextCurrentUserAccessor : ICurrentUserAccessor
             .ToArray();
 
         return new CurrentUserSnapshot(userId, email, roles);
+    }
+
+    private static Claim? FindUserIdClaim(ClaimsPrincipal user)
+    {
+        Claim? direct = user.FindFirst("uid")
+            ?? user.FindFirst(JwtRegisteredClaimNames.Sub)
+            ?? user.FindFirst(ClaimTypes.NameIdentifier);
+
+        if (direct is not null)
+        {
+            return direct;
+        }
+
+        foreach (Claim claim in user.Claims)
+        {
+            if (!Guid.TryParse(claim.Value, out _))
+            {
+                continue;
+            }
+
+            if (claim.Type.Equals("uid", StringComparison.OrdinalIgnoreCase)
+                || claim.Type.Equals(JwtRegisteredClaimNames.Sub, StringComparison.OrdinalIgnoreCase)
+                || claim.Type.Equals(ClaimTypes.NameIdentifier, StringComparison.OrdinalIgnoreCase))
+            {
+                return claim;
+            }
+        }
+
+        return null;
     }
 }
