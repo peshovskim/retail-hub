@@ -1,4 +1,4 @@
-namespace Identity.Application.Common.Abstractions;
+namespace Identity.Application.User.Interfaces;
 
 public interface ITokenIssuer
 {

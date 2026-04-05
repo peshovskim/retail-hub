@@ -1,6 +1,6 @@
-namespace Identity.Application.Auth;
+namespace Identity.Application.User;
 
-public static class AuthRoles
+public static class UserRoles
 {
     public const string Customer = "Customer";
 

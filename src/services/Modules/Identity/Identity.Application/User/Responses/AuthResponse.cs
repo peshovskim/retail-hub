@@ -1,4 +1,4 @@
-namespace Identity.Application.Auth.Responses;
+namespace Identity.Application.User.Responses;
 
 public sealed record AuthResponse(
     string AccessToken,
