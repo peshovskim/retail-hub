@@ -43,7 +43,6 @@ public sealed class CreateOrGetCartSessionCommandHandler : IRequestHandler<Creat
         var cart = CartEntity.Create(DateTime.UtcNow, userId: null, anonymousKey: key);
 
         await _cartRepository.AddAsync(cart, cancellationToken).ConfigureAwait(false);
-
         await _cartRepository.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
 
         return Result<CartSessionResponse>.Success(new CartSessionResponse(cart.Uid, key));
