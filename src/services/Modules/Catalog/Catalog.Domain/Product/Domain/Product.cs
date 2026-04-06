@@ -5,7 +5,7 @@ namespace Catalog.Domain.Product.Domain;
 
 public sealed partial class Product : AggregateRoot
 {
-    public Guid CategoryId { get; set; }
+    public int CategoryId { get; set; }
 
     /// <summary>EF / read-model navigation. Not required for <see cref="Create"/>.</summary>
     public CategoryAggregate? Category { get; set; }

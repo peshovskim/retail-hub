@@ -8,7 +8,7 @@ public sealed partial class Category : AggregateRoot
 
     public string Slug { get; private set; } = null!;
 
-    public Guid? ParentId { get; private set; }
+    public int? ParentId { get; private set; }
 
     /// <summary>Parent category when <see cref="ParentId"/> is set (EF navigation).</summary>
     public Category? Parent { get; set; }

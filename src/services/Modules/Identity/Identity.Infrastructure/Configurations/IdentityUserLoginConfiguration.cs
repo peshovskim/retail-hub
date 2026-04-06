@@ -4,9 +4,9 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Identity.Infrastructure.Configurations;
 
-internal sealed class IdentityUserLoginConfiguration : IEntityTypeConfiguration<IdentityUserLogin<Guid>>
+internal sealed class IdentityUserLoginConfiguration : IEntityTypeConfiguration<IdentityUserLogin<int>>
 {
-    public void Configure(EntityTypeBuilder<IdentityUserLogin<Guid>> builder)
+    public void Configure(EntityTypeBuilder<IdentityUserLogin<int>> builder)
     {
         builder.ToTable("AspNetUserLogins", "identity");
         builder.HasKey(l => new { l.LoginProvider, l.ProviderKey });

@@ -7,13 +7,11 @@ namespace RetailHub.Services.Tests.Cart;
 public static class CartTestsHelper
 {
     public static CartEntity CreateCart(
-        Guid? id = null,
         DateTime? createdOn = null,
-        Guid? userId = null,
+        int? userId = null,
         string? anonymousKey = "test-anon-key")
     {
         return CartEntity.Create(
-            id ?? Guid.NewGuid(),
             createdOn ?? DateTime.UtcNow,
             userId,
             anonymousKey);
@@ -21,14 +19,13 @@ public static class CartTestsHelper
 
     /// <summary>Adds a line using domain rules; throws if the domain rejects the add.</summary>
     public static CartEntity CreateCartWithLine(
-        Guid cartId,
-        Guid productId,
+        int productId,
         int quantity,
         decimal unitPrice,
         string? anonymousKey = "test-anon-key")
     {
-        var cart = CreateCart(id: cartId, anonymousKey: anonymousKey);
-        var add = cart.AddOrUpdateItem(productId, quantity, unitPrice, DateTime.UtcNow, Guid.NewGuid);
+        var cart = CreateCart(anonymousKey: anonymousKey);
+        var add = cart.AddOrUpdateItem(productId, quantity, unitPrice, DateTime.UtcNow);
         if (add.IsFailure)
         {
             throw new InvalidOperationException(add.Error!.Message);
@@ -38,8 +35,9 @@ public static class CartTestsHelper
     }
 
     public static ProductResponse CreateProduct(
+        int productId = 1,
         Guid? id = null,
-        Guid? categoryId = null,
+        int categoryId = 1,
         string name = "Test product",
         string slug = "test-product",
         string sku = "SKU-1",
@@ -49,8 +47,9 @@ public static class CartTestsHelper
         string? categoryName = "Cat")
     {
         return new ProductResponse(
+            productId,
             id ?? Guid.NewGuid(),
-            categoryId ?? Guid.NewGuid(),
+            categoryId,
             name,
             slug,
             sku,

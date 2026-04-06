@@ -28,8 +28,8 @@ public sealed class GetProductsQueryValidator : AbstractValidator<GetProductsQue
             .WithMessage("PriceMin must be less than or equal to PriceMax.");
 
         RuleFor(x => x.CategoryIds)
-            .Must(static ids => ids is null || ids.All(id => id != Guid.Empty))
-            .WithMessage("Category id must not be empty.");
+            .Must(static ids => ids is null || ids.All(id => id > 0))
+            .WithMessage("Category id must be a positive integer.");
 
         RuleFor(x => x)
             .Must(static x => x.Page.HasValue == x.PageSize.HasValue)

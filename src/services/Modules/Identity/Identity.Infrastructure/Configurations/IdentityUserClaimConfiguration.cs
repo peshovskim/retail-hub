@@ -4,9 +4,9 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Identity.Infrastructure.Configurations;
 
-internal sealed class IdentityUserClaimConfiguration : IEntityTypeConfiguration<IdentityUserClaim<Guid>>
+internal sealed class IdentityUserClaimConfiguration : IEntityTypeConfiguration<IdentityUserClaim<int>>
 {
-    public void Configure(EntityTypeBuilder<IdentityUserClaim<Guid>> builder)
+    public void Configure(EntityTypeBuilder<IdentityUserClaim<int>> builder)
     {
         builder.ToTable("AspNetUserClaims", "identity");
         builder.Property(c => c.Id).UseIdentityColumn();

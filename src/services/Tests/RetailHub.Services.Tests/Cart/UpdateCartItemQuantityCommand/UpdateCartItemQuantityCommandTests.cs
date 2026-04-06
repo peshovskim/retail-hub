@@ -3,6 +3,7 @@ using Catalog.Application.Product.Interfaces;
 using NUnit.Framework;
 using FluentAssertions;
 using Moq;
+using RetailHub.Services.Tests.Cart;
 using RetailHub.SharedKernel.Domain;
 using UpdateQtyCommand = Cart.Application.Cart.Commands.UpdateCartItemQuantity.UpdateCartItemQuantityCommand;
 using CartEntity = Cart.Domain.Cart.Domain.Cart;
@@ -39,16 +40,19 @@ public sealed class UpdateCartItemQuantityCommandTests
     [Test]
     public async Task UpdateCartItemQuantityCommand_QuantityZero_RemovesLine()
     {
-        var cartId = Guid.NewGuid();
-        var productId = Guid.NewGuid();
-        var cart = CartTestsHelper.CreateCartWithLine(cartId, productId, 4, 2m);
-        var command = new UpdateQtyCommand(cartId, productId, 0);
+        var productUid = Guid.NewGuid();
+        var product = CartTestsHelper.CreateProduct(productId: 5, id: productUid);
+        var cart = CartTestsHelper.CreateCartWithLine(5, 4, 2m);
+        var cartId = cart.Uid;
+        var command = new UpdateQtyCommand(cartId, productUid, 0);
 
         var cartRepo = new Mock<ICartRepository>();
         cartRepo.Setup(x => x.GetByIdWithItemsAsync(cartId, It.IsAny<CancellationToken>()))
             .ReturnsAsync(cart);
 
         var productRepo = new Mock<IProductReadRepository>();
+        productRepo.Setup(x => x.GetActiveProductByUidAsync(productUid, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(product);
 
         var handler = new UpdateCartItemQuantityCommandHandlerBuilder()
             .WithCartRepository(cartRepo)
@@ -59,26 +63,23 @@ public sealed class UpdateCartItemQuantityCommandTests
 
         result.IsSuccess.Should().BeTrue();
         result.Value!.Lines.Should().BeEmpty();
-        productRepo.Verify(
-            x => x.GetActiveProductByIdAsync(It.IsAny<Guid>(), It.IsAny<CancellationToken>()),
-            Times.Never);
     }
 
     [Test]
     public async Task UpdateCartItemQuantityCommand_ProductNotInCart_ReturnsNotFound()
     {
-        var cartId = Guid.NewGuid();
-        var missingProductId = Guid.NewGuid();
-        var cart = CartTestsHelper.CreateCart(id: cartId);
-        var command = new UpdateQtyCommand(cartId, missingProductId, 2);
+        var missingProductUid = Guid.NewGuid();
+        var cart = CartTestsHelper.CreateCart();
+        var cartId = cart.Uid;
+        var command = new UpdateQtyCommand(cartId, missingProductUid, 2);
 
         var cartRepo = new Mock<ICartRepository>();
         cartRepo.Setup(x => x.GetByIdWithItemsAsync(cartId, It.IsAny<CancellationToken>()))
             .ReturnsAsync(cart);
 
         var productRepo = new Mock<IProductReadRepository>();
-        productRepo.Setup(x => x.GetActiveProductByIdAsync(missingProductId, It.IsAny<CancellationToken>()))
-            .ReturnsAsync(CartTestsHelper.CreateProduct(id: missingProductId));
+        productRepo.Setup(x => x.GetActiveProductByUidAsync(missingProductUid, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(CartTestsHelper.CreateProduct(productId: 99, id: missingProductUid));
 
         var handler = new UpdateCartItemQuantityCommandHandlerBuilder()
             .WithCartRepository(cartRepo)
@@ -94,18 +95,18 @@ public sealed class UpdateCartItemQuantityCommandTests
     [Test]
     public async Task UpdateCartItemQuantityCommand_Valid_UpdatesQuantity()
     {
-        var cartId = Guid.NewGuid();
-        var productId = Guid.NewGuid();
-        var cart = CartTestsHelper.CreateCartWithLine(cartId, productId, 1, 10m);
-        var product = CartTestsHelper.CreateProduct(id: productId, price: 10m);
-        var command = new UpdateQtyCommand(cartId, productId, 5);
+        var productUid = Guid.NewGuid();
+        var cart = CartTestsHelper.CreateCartWithLine(1, 1, 10m);
+        var cartId = cart.Uid;
+        var product = CartTestsHelper.CreateProduct(productId: 1, id: productUid, price: 10m);
+        var command = new UpdateQtyCommand(cartId, productUid, 5);
 
         var cartRepo = new Mock<ICartRepository>();
         cartRepo.Setup(x => x.GetByIdWithItemsAsync(cartId, It.IsAny<CancellationToken>()))
             .ReturnsAsync(cart);
 
         var productRepo = new Mock<IProductReadRepository>();
-        productRepo.Setup(x => x.GetActiveProductByIdAsync(productId, It.IsAny<CancellationToken>()))
+        productRepo.Setup(x => x.GetActiveProductByUidAsync(productUid, It.IsAny<CancellationToken>()))
             .ReturnsAsync(product);
 
         var handler = new UpdateCartItemQuantityCommandHandlerBuilder()

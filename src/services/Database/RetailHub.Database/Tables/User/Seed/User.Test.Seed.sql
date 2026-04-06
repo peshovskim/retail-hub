@@ -48,7 +48,7 @@ USING (
                 0
             )
     ) AS V (
-        [Id],
+        [Uid],
         [CreatedOn],
         [UserName],
         [NormalizedUserName],
@@ -66,7 +66,7 @@ USING (
         [AccessFailedCount]
     )
 ) AS S
-    ON T.[Id] = S.[Id]
+    ON T.[Uid] = S.[Uid]
 WHEN MATCHED THEN
     UPDATE SET
         T.[UserName] = S.[UserName],
@@ -85,7 +85,7 @@ WHEN MATCHED THEN
         T.[AccessFailedCount] = S.[AccessFailedCount]
 WHEN NOT MATCHED THEN
     INSERT (
-        [Id],
+        [Uid],
         [CreatedOn],
         [UserName],
         [NormalizedUserName],
@@ -103,7 +103,7 @@ WHEN NOT MATCHED THEN
         [AccessFailedCount]
     )
     VALUES (
-        S.[Id],
+        S.[Uid],
         S.[CreatedOn],
         S.[UserName],
         S.[NormalizedUserName],

@@ -38,7 +38,16 @@ public sealed class RemoveCartItemCommandHandler : IRequestHandler<RemoveCartIte
             return Result<CartResponse>.NotFound(ResultCodes.NotFound, "Cart not found.");
         }
 
-        cart.RemoveItem(request.ProductId, DateTime.UtcNow);
+        var product = await _productReadRepository
+            .GetActiveProductByUidAsync(request.ProductId, cancellationToken)
+            .ConfigureAwait(false);
+
+        if (product is null)
+        {
+            return Result<CartResponse>.NotFound(ResultCodes.NotFound, "Product not found.");
+        }
+
+        cart.RemoveItem(product.ProductId, DateTime.UtcNow);
 
         await _cartRepository.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
 

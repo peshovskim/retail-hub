@@ -9,9 +9,8 @@ public sealed partial class CartItem
     }
 
     internal static Result<CartItem> Create(
-        Guid id,
-        Guid cartId,
-        Guid productId,
+        int cartId,
+        int productId,
         int quantity,
         decimal unitPrice,
         DateTime createdOn)
@@ -26,7 +25,7 @@ public sealed partial class CartItem
         return Result<CartItem>.Success(
             new CartItem
             {
-                Id = id,
+                Uid = Guid.NewGuid(),
                 CartId = cartId,
                 ProductId = productId,
                 Quantity = quantity,

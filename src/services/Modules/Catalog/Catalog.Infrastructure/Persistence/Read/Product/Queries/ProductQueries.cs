@@ -26,7 +26,9 @@ internal sealed class ProductQueries : IProductReadRepository
 
         if (criteria.CategoryIds is { Count: > 0 } categoryIds)
         {
-            query = query.Where(p => categoryIds.Contains(p.CategoryId));
+            query = query.Where(p =>
+                categoryIds.Contains(p.CategoryId)
+                && _dbContext.Categories.Any(c => c.Id == p.CategoryId && c.DeletedOn == null));
         }
 
         if (criteria.PriceMin is { } priceMin)
@@ -55,7 +57,14 @@ internal sealed class ProductQueries : IProductReadRepository
             query = query.Skip(skip).Take(pageSize);
         }
 
-        var rows = await query.ToListAsync(cancellationToken).ConfigureAwait(false);
+        var rows = await (
+                from p in query
+                join c in _dbContext.Categories on p.CategoryId equals c.Id
+                where c.DeletedOn == null
+                select p)
+            .ToListAsync(cancellationToken)
+            .ConfigureAwait(false);
+
         var items = rows.ConvertAll(p => _readFactory.ToResponse(p));
         return new ProductListResult(items, totalCount);
     }
@@ -73,18 +82,53 @@ internal sealed class ProductQueries : IProductReadRepository
             _ => query.OrderBy(p => p.Name),
         };
 
-    public async Task<ProductResponse?> GetActiveProductByIdAsync(
-        Guid id,
+    public async Task<ProductResponse?> GetActiveProductByUidAsync(
+        Guid uid,
         CancellationToken cancellationToken = default)
     {
         var row = await (
                 from p in _dbContext.Products
                 join c in _dbContext.Categories on p.CategoryId equals c.Id
-                where p.Id == id && p.DeletedOn == null && c.DeletedOn == null
+                where p.Uid == uid && p.DeletedOn == null && c.DeletedOn == null
                 select new { Product = p, c.Name })
             .FirstOrDefaultAsync(cancellationToken)
             .ConfigureAwait(false);
 
         return row is null ? null : _readFactory.ToResponse(row.Product, row.Name);
+    }
+
+    public async Task<ProductResponse?> GetActiveProductByInternalIdAsync(
+        int productId,
+        CancellationToken cancellationToken = default)
+    {
+        var row = await (
+                from p in _dbContext.Products
+                join c in _dbContext.Categories on p.CategoryId equals c.Id
+                where p.Id == productId && p.DeletedOn == null && c.DeletedOn == null
+                select new { Product = p, c.Name })
+            .FirstOrDefaultAsync(cancellationToken)
+            .ConfigureAwait(false);
+
+        return row is null ? null : _readFactory.ToResponse(row.Product, row.Name);
+    }
+
+    public async Task<IReadOnlyDictionary<int, Guid>> GetProductUidsByIdsAsync(
+        IEnumerable<int> productIds,
+        CancellationToken cancellationToken = default)
+    {
+        int[] ids = productIds.Distinct().ToArray();
+        if (ids.Length == 0)
+        {
+            return new Dictionary<int, Guid>();
+        }
+
+        var rows = await _dbContext.Products
+            .AsNoTracking()
+            .Where(p => ids.Contains(p.Id) && p.DeletedOn == null)
+            .Select(p => new { p.Id, p.Uid })
+            .ToListAsync(cancellationToken)
+            .ConfigureAwait(false);
+
+        return rows.ToDictionary(r => r.Id, r => r.Uid);
     }
 }

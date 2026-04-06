@@ -42,23 +42,23 @@ public sealed class UpdateCartItemQuantityCommandHandler : IRequestHandler<Updat
             return Result<CartResponse>.NotFound(ResultCodes.NotFound, "Cart not found.");
         }
 
+        var product = await _productReadRepository
+            .GetActiveProductByUidAsync(request.ProductId, cancellationToken)
+            .ConfigureAwait(false);
+
+        if (product is null)
+        {
+            return Result<CartResponse>.NotFound(ResultCodes.NotFound, "Product not found.");
+        }
+
         if (request.Quantity == 0)
         {
-            cart.RemoveItem(request.ProductId, DateTime.UtcNow);
+            cart.RemoveItem(product.ProductId, DateTime.UtcNow);
         }
         else
         {
-            var product = await _productReadRepository
-                .GetActiveProductByIdAsync(request.ProductId, cancellationToken)
-                .ConfigureAwait(false);
-
-            if (product is null)
-            {
-                return Result<CartResponse>.NotFound(ResultCodes.NotFound, "Product not found.");
-            }
-
             var setResult = cart.SetItemQuantity(
-                request.ProductId,
+                product.ProductId,
                 request.Quantity,
                 product.Price,
                 DateTime.UtcNow);

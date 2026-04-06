@@ -12,7 +12,13 @@ internal sealed class ProductReadConfiguration : IEntityTypeConfiguration<Produc
 
         builder.HasKey(p => p.Id);
 
-        builder.Property(p => p.Id).ValueGeneratedNever();
+        builder.Property(p => p.Id).ValueGeneratedOnAdd();
+
+        builder.Property(p => p.Uid).ValueGeneratedNever();
+
+        builder.HasIndex(p => p.Uid).IsUnique();
+
+        builder.HasIndex(p => p.CategoryId).HasDatabaseName("IX_Product_CategoryId");
 
         builder.Property(p => p.CreatedOn).HasColumnType("datetime2(0)").IsRequired();
 

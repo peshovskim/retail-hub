@@ -7,5 +7,13 @@ public interface IProductReadRepository
 {
     Task<ProductListResult> ListActiveProductsAsync(GetProductsQuery criteria, CancellationToken cancellationToken = default);
 
-    Task<ProductResponse?> GetActiveProductByIdAsync(Guid id, CancellationToken cancellationToken = default);
+    Task<ProductResponse?> GetActiveProductByUidAsync(Guid uid, CancellationToken cancellationToken = default);
+
+    Task<ProductResponse?> GetActiveProductByInternalIdAsync(
+        int productId,
+        CancellationToken cancellationToken = default);
+
+    Task<IReadOnlyDictionary<int, Guid>> GetProductUidsByIdsAsync(
+        IEnumerable<int> productIds,
+        CancellationToken cancellationToken = default);
 }

@@ -10,6 +10,7 @@
   <ItemGroup>
     <ProjectReference Include="..\..\..\SharedKernel\Application\SharedKernel.Application\SharedKernel.Application.csproj" />
     <ProjectReference Include="..\..\Cart\Cart.Application\Cart.Application.csproj" />
+    <ProjectReference Include="..\..\Catalog\Catalog.Application\Catalog.Application.csproj" />
     <ProjectReference Include="..\Orders.Domain\Orders.Domain.csproj" />
   </ItemGroup>
 

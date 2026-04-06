@@ -2,10 +2,10 @@ using Cart.Application.Cart.Interfaces;
 using FluentAssertions;
 using NUnit.Framework;
 using Moq;
+using RetailHub.Services.Tests.Cart;
 using RetailHub.SharedKernel.Domain;
 using CartEntity = Cart.Domain.Cart.Domain.Cart;
 using SessionCommand = Cart.Application.Cart.Commands.CreateOrGetCartSession.CreateOrGetCartSessionCommand;
-
 namespace RetailHub.Services.Tests.Cart.CreateOrGetCartSessionCommand;
 
 [TestFixture(Category = nameof(CreateOrGetCartSessionCommandTests))]
@@ -34,9 +34,9 @@ public sealed class CreateOrGetCartSessionCommandTests
     [Test]
     public async Task CreateOrGetCartSessionCommand_ExistingKey_ReturnsExistingCart()
     {
-        var cartId = Guid.NewGuid();
         var key = "  stable-key  ";
-        var existing = CartTestsHelper.CreateCart(id: cartId, anonymousKey: key.Trim());
+        var existing = CartTestsHelper.CreateCart(anonymousKey: key.Trim());
+        var cartId = existing.Uid;
         var command = new SessionCommand(key);
 
         var cartRepo = new Mock<ICartRepository>();

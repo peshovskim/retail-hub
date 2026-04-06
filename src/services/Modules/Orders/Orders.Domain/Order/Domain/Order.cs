@@ -8,11 +8,15 @@ public sealed partial class Order : AggregateRoot
     {
     }
 
-    public Guid? UserId { get; private set; }
+    public int? UserId { get; private set; }
+
+    public Guid? UserUid { get; private set; }
 
     public string Status { get; private set; } = null!;
 
-    public Guid? CartId { get; private set; }
+    public int? CartId { get; private set; }
+
+    public Guid? CartUid { get; private set; }
 
     public decimal TotalAmount { get; private set; }
 

@@ -14,7 +14,7 @@ internal sealed class CartQueries : ICartReadRepository
     public async Task<CartEntity?> GetByIdWithItemsAsync(Guid id, CancellationToken cancellationToken = default)
     {
         return await ActiveCartsWithActiveItems(_dbContext)
-            .FirstOrDefaultAsync(c => c.Id == id, cancellationToken)
+            .FirstOrDefaultAsync(c => c.Uid == id, cancellationToken)
             .ConfigureAwait(false);
     }
 

@@ -2,6 +2,6 @@ using Microsoft.AspNetCore.Identity;
 
 namespace Identity.Infrastructure.IdentityEntities;
 
-public sealed class ApplicationRole : IdentityRole<Guid>
+public sealed class ApplicationRole : IdentityRole<int>
 {
 }

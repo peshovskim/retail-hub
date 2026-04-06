@@ -6,7 +6,7 @@ export type ProductListSort = 'nameAsc' | 'nameDesc' | 'priceAsc' | 'priceDesc';
 /** Query parameters for `GET /api/catalog/products` (omit fields you do not need). */
 export interface ProductListParams {
   search?: string;
-  categoryIds?: string[];
+  categoryIds?: number[];
   priceMin?: number;
   priceMax?: number;
   sort?: ProductListSort;

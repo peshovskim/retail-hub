@@ -4,9 +4,9 @@ namespace Cart.Domain.Cart.Domain;
 
 public sealed partial class CartItem : Entity
 {
-    public Guid CartId { get; private set; }
+    public int CartId { get; private set; }
 
-    public Guid ProductId { get; private set; }
+    public int ProductId { get; private set; }
 
     public int Quantity { get; private set; }
 

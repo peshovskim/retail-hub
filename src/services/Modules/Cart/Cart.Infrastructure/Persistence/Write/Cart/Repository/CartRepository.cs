@@ -18,7 +18,7 @@ internal sealed class CartRepository : ICartRepository
     {
         return await _dbContext.Carts
             .Include(c => c.Items)
-            .FirstOrDefaultAsync(c => c.Id == id, cancellationToken)
+            .FirstOrDefaultAsync(c => c.Uid == id, cancellationToken)
             .ConfigureAwait(false);
     }
 

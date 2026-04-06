@@ -40,7 +40,7 @@ public sealed class RegisterUserCommandHandler : IRequestHandler<RegisterUserCom
 
         var user = new ApplicationUser
         {
-            Id = Guid.NewGuid(),
+            Uid = Guid.NewGuid(),
             UserName = normalizedEmail,
             Email = normalizedEmail,
             EmailConfirmed = true,
@@ -75,13 +75,13 @@ public sealed class RegisterUserCommandHandler : IRequestHandler<RegisterUserCom
             .GetRolesAsync(user)
             .ConfigureAwait(false);
 
-        AccessTokenResult token = _tokenIssuer.CreateAccessToken(user.Id, user.Email ?? normalizedEmail, roles);
+        AccessTokenResult token = _tokenIssuer.CreateAccessToken(user.Uid, user.Email ?? normalizedEmail, roles);
 
         return Result<AuthResponse>.Success(
             new AuthResponse(
                 token.Token,
                 token.ExpiresAtUtc,
-                user.Id,
+                user.Uid,
                 user.Email ?? normalizedEmail,
                 roles.ToArray()));
     }

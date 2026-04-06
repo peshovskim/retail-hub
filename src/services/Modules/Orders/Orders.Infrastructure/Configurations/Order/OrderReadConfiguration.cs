@@ -12,7 +12,11 @@ internal sealed class OrderReadConfiguration : IEntityTypeConfiguration<OrderEnt
 
         builder.HasKey(o => o.Id);
 
-        builder.Property(o => o.Id).ValueGeneratedNever();
+        builder.Property(o => o.Id).ValueGeneratedOnAdd();
+
+        builder.Property(o => o.Uid).ValueGeneratedNever();
+
+        builder.HasIndex(o => o.Uid).IsUnique();
 
         builder.Property(o => o.CreatedOn).HasColumnType("datetime2(0)").IsRequired();
 
@@ -20,9 +24,13 @@ internal sealed class OrderReadConfiguration : IEntityTypeConfiguration<OrderEnt
 
         builder.Property(o => o.UserId);
 
+        builder.Property(o => o.UserUid);
+
         builder.Property(o => o.Status).HasMaxLength(64).IsRequired();
 
         builder.Property(o => o.CartId);
+
+        builder.Property(o => o.CartUid);
 
         builder.Property(o => o.TotalAmount).HasColumnType("decimal(18,2)").IsRequired();
     }

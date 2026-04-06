@@ -4,8 +4,8 @@ namespace Catalog.Domain.Product.DomainEvents;
 
 public sealed record ProductCreatedDomainEvent : IDomainEvent
 {
-    public Guid ProductId { get; init; }
-    public Guid CategoryId { get; init; }
+    public Guid ProductUid { get; init; }
+    public Guid CategoryUid { get; init; }
     public string Name { get; init; } = null!;
     public string Slug { get; init; } = null!;
     public string Sku { get; init; } = null!;
@@ -15,8 +15,8 @@ public sealed record ProductCreatedDomainEvent : IDomainEvent
     public DateTime CreatedOn { get; init; }
 
     public ProductCreatedDomainEvent(
-        Guid productId,
-        Guid categoryId,
+        Guid productUid,
+        Guid categoryUid,
         string name,
         string slug,
         string sku,
@@ -25,8 +25,8 @@ public sealed record ProductCreatedDomainEvent : IDomainEvent
         string description,
         DateTime createdOn)
     {
-        ProductId = productId;
-        CategoryId = categoryId;
+        ProductUid = productUid;
+        CategoryUid = categoryUid;
         Name = name;
         Slug = slug;
         Sku = sku;

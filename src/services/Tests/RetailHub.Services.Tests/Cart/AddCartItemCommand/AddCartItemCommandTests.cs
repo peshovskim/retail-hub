@@ -3,8 +3,8 @@ using Catalog.Application.Product.Interfaces;
 using NUnit.Framework;
 using FluentAssertions;
 using Moq;
-using RetailHub.SharedKernel.Domain;
-using AddItemCommand = Cart.Application.Cart.Commands.AddCartItem.AddCartItemCommand;
+using RetailHub.Services.Tests.Cart;
+using RetailHub.SharedKernel.Domain;using AddItemCommand = Cart.Application.Cart.Commands.AddCartItem.AddCartItemCommand;
 using CartEntity = Cart.Domain.Cart.Domain.Cart;
 
 namespace RetailHub.Services.Tests.Cart.AddCartItemCommand;
@@ -40,17 +40,17 @@ public sealed class AddCartItemCommandTests
     [Test]
     public async Task AddCartItemCommand_ProductNotFound_ReturnsNotFound()
     {
-        var cartId = Guid.NewGuid();
         var productId = Guid.NewGuid();
+        var cart = CartTestsHelper.CreateCart();
+        var cartId = cart.Uid;
         var command = new AddItemCommand(cartId, productId, 2);
-        var cart = CartTestsHelper.CreateCart(id: cartId);
 
         var cartRepo = new Mock<ICartRepository>();
         cartRepo.Setup(x => x.GetByIdWithItemsAsync(cartId, It.IsAny<CancellationToken>()))
             .ReturnsAsync(cart);
 
         var productRepo = new Mock<IProductReadRepository>();
-        productRepo.Setup(x => x.GetActiveProductByIdAsync(productId, It.IsAny<CancellationToken>()))
+        productRepo.Setup(x => x.GetActiveProductByUidAsync(productId, It.IsAny<CancellationToken>()))
             .ReturnsAsync((Catalog.Application.Product.Responses.ProductResponse?)null);
 
         var handler = new AddCartItemCommandHandlerBuilder()
@@ -68,10 +68,10 @@ public sealed class AddCartItemCommandTests
     [Test]
     public async Task AddCartItemCommand_Valid_AddsLineAndReturnsCart()
     {
-        var cartId = Guid.NewGuid();
         var productId = Guid.NewGuid();
+        var cart = CartTestsHelper.CreateCart();
+        var cartId = cart.Uid;
         var command = new AddItemCommand(cartId, productId, 3);
-        var cart = CartTestsHelper.CreateCart(id: cartId);
         var product = CartTestsHelper.CreateProduct(id: productId, price: 5m);
 
         var cartRepo = new Mock<ICartRepository>();
@@ -79,7 +79,9 @@ public sealed class AddCartItemCommandTests
             .ReturnsAsync(cart);
 
         var productRepo = new Mock<IProductReadRepository>();
-        productRepo.Setup(x => x.GetActiveProductByIdAsync(productId, It.IsAny<CancellationToken>()))
+        productRepo.Setup(x => x.GetActiveProductByUidAsync(productId, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(product);
+        productRepo.Setup(x => x.GetActiveProductByInternalIdAsync(product.ProductId, It.IsAny<CancellationToken>()))
             .ReturnsAsync(product);
 
         var handler = new AddCartItemCommandHandlerBuilder()
@@ -94,6 +96,6 @@ public sealed class AddCartItemCommandTests
         result.Value.ItemCount.Should().Be(3);
         result.Value.Lines.Should().ContainSingle(l => l.ProductId == productId && l.Quantity == 3);
         cartRepo.Verify(x => x.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Once);
-        productRepo.Verify(x => x.GetActiveProductByIdAsync(productId, It.IsAny<CancellationToken>()), Times.AtLeastOnce);
+        productRepo.Verify(x => x.GetActiveProductByUidAsync(productId, It.IsAny<CancellationToken>()), Times.AtLeastOnce);
     }
 }

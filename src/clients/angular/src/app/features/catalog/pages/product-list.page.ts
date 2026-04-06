@@ -30,8 +30,8 @@ function flattenCategoryNodes(nodes: CategoryMenuNode[]): CategoryMenuNode[] {
   return out;
 }
 
-function buildCategoryNameMap(nodes: CategoryMenuNode[]): Map<string, string> {
-  const map = new Map<string, string>();
+function buildCategoryNameMap(nodes: CategoryMenuNode[]): Map<number, string> {
+  const map = new Map<number, string>();
   const walk = (list: CategoryMenuNode[]) => {
     for (const n of list) {
       map.set(n.id, n.name);
@@ -58,14 +58,25 @@ function findCategoryNodeBySlug(nodes: CategoryMenuNode[], slug: string): Catego
 }
 
 /** All product category IDs under this node (leaf = self; parent = all descendant leaves). */
-function categoryIdsForMenuNode(node: CategoryMenuNode): string[] {
+function categoryIdsForMenuNode(node: CategoryMenuNode): number[] {
   if (!node.children?.length) {
     return [node.id];
   }
   return node.children.flatMap(categoryIdsForMenuNode);
 }
 
-function setsEqualString(a: Set<string>, b: Set<string>): boolean {
+function parseCategoryIdsQueryParam(raw: string | null | undefined): number[] {
+  const s = raw?.trim();
+  if (!s) {
+    return [];
+  }
+  return s
+    .split(',')
+    .map((part) => Number.parseInt(part.trim(), 10))
+    .filter((n) => Number.isFinite(n) && n > 0);
+}
+
+function setsEqualNumber(a: Set<number>, b: Set<number>): boolean {
   if (a.size !== b.size) {
     return false;
   }
@@ -103,14 +114,9 @@ function paramMapToRecord(qpm: ParamMap): Record<string, string> {
   if (search) {
     out['search'] = search;
   }
-  const cats = qpm.get('categoryIds')?.trim();
-  if (cats) {
-    out['categoryIds'] = cats
-      .split(',')
-      .map((s) => s.trim())
-      .filter(Boolean)
-      .sort()
-      .join(',');
+  const cats = parseCategoryIdsQueryParam(qpm.get('categoryIds'));
+  if (cats.length > 0) {
+    out['categoryIds'] = [...new Set(cats)].sort((a, b) => a - b).join(',');
   }
   const priceMin = qpm.get('priceMin');
   if (priceMin != null && priceMin !== '') {
@@ -187,7 +193,7 @@ export class ProductListPage {
   protected readonly menuLoading = toSignal(this.catalog.menuLoading$, { initialValue: false });
 
   protected readonly sortOption = signal<ShopSortOption>('name-asc');
-  protected readonly selectedCategoryIds = signal(new Set<string>());
+  protected readonly selectedCategoryIds = signal(new Set<number>());
   protected readonly priceMin = signal<number | null>(null);
   protected readonly priceMax = signal<number | null>(null);
   protected readonly currentPage = signal(1);
@@ -259,7 +265,7 @@ export class ProductListPage {
             return;
           }
           const next = new Set(ids);
-          if (setsEqualString(this.selectedCategoryIds(), next)) {
+          if (setsEqualNumber(this.selectedCategoryIds(), next)) {
             this.routeCategoryFilterActive.set(true);
             return;
           }
@@ -287,7 +293,7 @@ export class ProductListPage {
       out['search'] = search;
     }
     if (!this.route.snapshot.paramMap.get('slug')) {
-      const ids = [...this.selectedCategoryIds()].filter(Boolean).sort();
+      const ids = [...this.selectedCategoryIds()].filter((n) => n > 0).sort((a, b) => a - b);
       if (ids.length > 0) {
         out['categoryIds'] = ids.join(',');
       }
@@ -335,9 +341,7 @@ export class ProductListPage {
     this.toolbarSearch.committed.set(search);
 
     if (!this.route.snapshot.paramMap.get('slug')) {
-      const raw = qpm.get('categoryIds')?.trim();
-      const ids = raw ? raw.split(',').map((s) => s.trim()).filter((id) => id.length > 0) : [];
-      this.selectedCategoryIds.set(new Set(ids));
+      this.selectedCategoryIds.set(new Set(parseCategoryIdsQueryParam(qpm.get('categoryIds'))));
     }
 
     const parseNum = (v: string | null): number | null => {
@@ -368,15 +372,15 @@ export class ProductListPage {
     );
   }
 
-  protected categoryLabel(categoryId: string): string {
+  protected categoryLabel(categoryId: number): string {
     return this.categoryNameMap().get(categoryId) ?? 'General';
   }
 
-  protected isCategorySelected(id: string): boolean {
+  protected isCategorySelected(id: number): boolean {
     return this.selectedCategoryIds().has(id);
   }
 
-  protected toggleCategory(id: string, checked: boolean): void {
+  protected toggleCategory(id: number, checked: boolean): void {
     const next = new Set(this.selectedCategoryIds());
     if (checked) {
       next.add(id);

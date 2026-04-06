@@ -48,8 +48,8 @@ export function buildProductListHttpParams(criteria: ProductListParams): HttpPar
   }
   if (criteria.categoryIds?.length) {
     for (const id of criteria.categoryIds) {
-      if (id) {
-        params = params.append('categoryIds', id);
+      if (id != null && id > 0) {
+        params = params.append('categoryIds', String(id));
       }
     }
   }

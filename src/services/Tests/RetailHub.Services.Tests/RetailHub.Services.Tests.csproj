@@ -23,8 +23,10 @@
   <ItemGroup>
     <ProjectReference Include="..\..\Modules\Cart\Cart.Application\Cart.Application.csproj" />
     <ProjectReference Include="..\..\Modules\Cart\Cart.Domain\Cart.Domain.csproj" />
+    <ProjectReference Include="..\..\Modules\Catalog\Catalog.Application\Catalog.Application.csproj" />
     <ProjectReference Include="..\..\Modules\Orders\Orders.Application\Orders.Application.csproj" />
     <ProjectReference Include="..\..\Modules\Orders\Orders.Domain\Orders.Domain.csproj" />
+    <ProjectReference Include="..\..\SharedKernel\Application\SharedKernel.Application\SharedKernel.Application.csproj" />
     <ProjectReference Include="..\..\SharedKernel\Domain\SharedKernel.Domain\SharedKernel.Domain.csproj" />
   </ItemGroup>
 

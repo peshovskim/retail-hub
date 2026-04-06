@@ -59,7 +59,7 @@ public sealed class LoginCommandHandler : IRequestHandler<LoginCommand, Result<A
             .ConfigureAwait(false);
 
         AccessTokenResult token = _tokenIssuer.CreateAccessToken(
-            user.Id,
+            user.Uid,
             user.Email ?? normalizedEmail,
             roles);
 
@@ -67,7 +67,7 @@ public sealed class LoginCommandHandler : IRequestHandler<LoginCommand, Result<A
             new AuthResponse(
                 token.Token,
                 token.ExpiresAtUtc,
-                user.Id,
+                user.Uid,
                 user.Email ?? normalizedEmail,
                 roles.ToArray()));
     }

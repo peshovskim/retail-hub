@@ -8,7 +8,7 @@ public sealed partial class Cart : AggregateRoot
     {
     }
 
-    public Guid? UserId { get; private set; }
+    public int? UserId { get; private set; }
 
     public string? AnonymousKey { get; private set; }
 

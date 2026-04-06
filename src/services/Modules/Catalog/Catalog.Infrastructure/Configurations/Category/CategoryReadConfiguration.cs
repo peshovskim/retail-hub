@@ -12,7 +12,11 @@ internal sealed class CategoryReadConfiguration : IEntityTypeConfiguration<Categ
 
         builder.HasKey(c => c.Id);
 
-        builder.Property(c => c.Id).ValueGeneratedNever();
+        builder.Property(c => c.Id).ValueGeneratedOnAdd();
+
+        builder.Property(c => c.Uid).ValueGeneratedNever();
+
+        builder.HasIndex(c => c.Uid).IsUnique();
 
         builder.Property(c => c.CreatedOn).HasColumnType("datetime2(0)").IsRequired();
 

@@ -30,10 +30,12 @@ internal sealed class CategoryQueries : ICategoryReadRepository
     public async Task<IReadOnlyList<CategoryMenuSourceRow>> GetAllActiveCategoriesAsync(
         CancellationToken cancellationToken = default)
     {
-        var rows = await _dbContext.Categories
-            .Where(c => c.DeletedOn == null)
-            .OrderBy(c => c.Name)
-            .Select(c => new CategoryMenuSourceRow(c.Id, c.Name, c.Slug, c.ParentId))
+        var rows = await (
+                from c in _dbContext.Categories.Where(c => c.DeletedOn == null)
+                join p in _dbContext.Categories on c.ParentId equals (int?)p.Id into parents
+                from p in parents.DefaultIfEmpty()
+                orderby c.Name
+                select new CategoryMenuSourceRow(c.Id, c.Name, c.Slug, p == null ? null : (int?)p.Id))
             .ToListAsync(cancellationToken)
             .ConfigureAwait(false);
         return rows;

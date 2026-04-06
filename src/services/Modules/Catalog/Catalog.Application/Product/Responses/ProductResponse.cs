@@ -1,8 +1,11 @@
+using System.Text.Json.Serialization;
+
 namespace Catalog.Application.Product.Responses;
 
 public sealed record ProductResponse(
+    [property: JsonIgnore] int ProductId,
     Guid Id,
-    Guid CategoryId,
+    int CategoryId,
     string Name,
     string Slug,
     string Sku,

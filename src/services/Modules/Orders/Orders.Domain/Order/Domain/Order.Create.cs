@@ -6,16 +6,16 @@ namespace Orders.Domain.Order.Domain;
 public sealed partial class Order
 {
     public static Result<Order> PlaceFromCart(
-        Guid orderId,
         CartAggregate cart,
-        Guid? userId,
+        int? userId,
+        Guid? userUid,
+        IReadOnlyDictionary<int, Guid> productUidByProductId,
         string status,
-        DateTime utcNow,
-        Func<Guid> orderLineIdFactory)
+        DateTime utcNow)
     {
         ArgumentNullException.ThrowIfNull(cart);
         ArgumentNullException.ThrowIfNull(status);
-        ArgumentNullException.ThrowIfNull(orderLineIdFactory);
+        ArgumentNullException.ThrowIfNull(productUidByProductId);
 
         if (cart.DeletedOn is not null)
         {
@@ -38,10 +38,16 @@ public sealed partial class Order
 
         foreach (var item in activeItems)
         {
+            if (!productUidByProductId.TryGetValue(item.ProductId, out Guid productUid))
+            {
+                return Result<Order>.Invalid(
+                    ResultCodes.Validation,
+                    "One or more cart products could not be resolved.");
+            }
+
             var lineResult = OrderLine.Create(
-                orderLineIdFactory(),
-                orderId,
                 item.ProductId,
+                productUid,
                 item.Quantity,
                 item.UnitPrice,
                 utcNow);
@@ -58,12 +64,14 @@ public sealed partial class Order
 
         var order = new Order
         {
-            Id = orderId,
+            Uid = Guid.NewGuid(),
             CreatedOn = utcNow,
             DeletedOn = null,
             UserId = userId,
+            UserUid = userUid,
             Status = status,
             CartId = cart.Id,
+            CartUid = cart.Uid,
             TotalAmount = total,
         };
 

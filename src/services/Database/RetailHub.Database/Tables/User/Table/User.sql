@@ -1,5 +1,6 @@
 CREATE TABLE [identity].[User](
-    [Id]                    UNIQUEIDENTIFIER    NOT NULL,
+    [Id]                    INT                 NOT NULL IDENTITY(1, 1),
+    [Uid]                   UNIQUEIDENTIFIER    NOT NULL,
     [CreatedOn]             DATETIME2(0)        NOT NULL,
     [UserName]              NVARCHAR(256)       NULL,
     [NormalizedUserName]    NVARCHAR(256)       NULL,
@@ -16,6 +17,7 @@ CREATE TABLE [identity].[User](
     [LockoutEnabled]        BIT                 NOT NULL CONSTRAINT [DF_User_LockoutEnabled] DEFAULT ((1)),
     [AccessFailedCount]     INT                 NOT NULL CONSTRAINT [DF_User_AccessFailedCount] DEFAULT ((0)),
     CONSTRAINT [PK_User] PRIMARY KEY CLUSTERED ([Id]),
+    CONSTRAINT [UQ_User_Uid] UNIQUE ([Uid]),
     CONSTRAINT [UQ_User_NormalizedUserName] UNIQUE ([NormalizedUserName]),
     CONSTRAINT [UQ_User_NormalizedEmail] UNIQUE ([NormalizedEmail])
 );

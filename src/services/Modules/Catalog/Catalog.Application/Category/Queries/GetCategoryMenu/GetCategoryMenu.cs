@@ -30,8 +30,8 @@ public sealed class GetCategoryMenuQueryHandler : IRequestHandler<GetCategoryMen
     }
 
     private static IReadOnlyList<CategoryMenuNodeResponse> BuildTree(
-        ILookup<Guid?, CategoryMenuSourceRow> byParent,
-        Guid? parentId)
+        ILookup<int?, CategoryMenuSourceRow> byParent,
+        int? parentId)
     {
         var children = byParent[parentId].ToList();
         if (children.Count == 0)

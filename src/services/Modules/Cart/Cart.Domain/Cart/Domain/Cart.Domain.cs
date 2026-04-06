@@ -7,11 +7,10 @@ public sealed partial class Cart
     private const int MaxDistinctItems = 200;
 
     public Result AddOrUpdateItem(
-        Guid productId,
+        int productId,
         int quantityToAdd,
         decimal unitPrice,
-        DateTime utcNow,
-        Func<Guid> idFactory)
+        DateTime utcNow)
     {
         if (quantityToAdd <= 0)
         {
@@ -34,7 +33,7 @@ public sealed partial class Cart
                 $"Cart cannot contain more than {MaxDistinctItems} distinct products.");
         }
 
-        var itemResult = CartItem.Create(idFactory(), Id, productId, quantityToAdd, unitPrice, utcNow);
+        var itemResult = CartItem.Create(Id, productId, quantityToAdd, unitPrice, utcNow);
 
         if (itemResult.IsFailure)
         {
@@ -46,7 +45,7 @@ public sealed partial class Cart
         return Result.Success();
     }
 
-    public Result SetItemQuantity(Guid productId, int quantity, decimal unitPrice, DateTime utcNow)
+    public Result SetItemQuantity(int productId, int quantity, decimal unitPrice, DateTime utcNow)
     {
         var existing = Items.FirstOrDefault(i => i.IsActive && i.ProductId == productId);
 
@@ -65,7 +64,7 @@ public sealed partial class Cart
         return existing.SetQuantity(quantity, unitPrice, utcNow);
     }
 
-    public void RemoveItem(Guid productId, DateTime utcNow)
+    public void RemoveItem(int productId, DateTime utcNow)
     {
         var existing = Items.FirstOrDefault(i => i.IsActive && i.ProductId == productId);
         if (existing is not null)

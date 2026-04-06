@@ -1,9 +1,11 @@
 using Cart.Application.Cart.Interfaces;
+using Catalog.Application.Product.Interfaces;
 using FluentAssertions;
-using NUnit.Framework;
 using Moq;
+using NUnit.Framework;
 using Orders.Application.Order.Interfaces;
 using RetailHub.Services.Tests.Cart;
+using RetailHub.SharedKernel.Application.Common.Abstractions;
 using RetailHub.SharedKernel.Domain;
 using OrderEntity = Orders.Domain.Order.Domain.Order;
 using CartEntity = Cart.Domain.Cart.Domain.Cart;
@@ -26,10 +28,14 @@ public sealed class PlaceOrderCommandTests
             .ReturnsAsync((CartEntity?)null);
 
         var orderRepo = new Mock<IOrderRepository>();
+        var productRepo = new Mock<IProductReadRepository>();
+        var userLookup = new Mock<IUserIdentityLookup>();
 
         var handler = new PlaceOrderCommandHandlerBuilder()
             .WithCartRepository(cartRepo)
             .WithOrderRepository(orderRepo)
+            .WithProductReadRepository(productRepo)
+            .WithUserIdentityLookup(userLookup)
             .Build();
 
         var result = await handler.Handle(command, CancellationToken.None);
@@ -42,8 +48,8 @@ public sealed class PlaceOrderCommandTests
     [Test]
     public async Task PlaceOrderCommand_EmptyCart_ReturnsValidationError()
     {
-        var cartId = Guid.NewGuid();
-        var cart = CartTestsHelper.CreateCart(id: cartId);
+        var cart = CartTestsHelper.CreateCart();
+        var cartId = cart.Uid;
         var command = new PlaceOrderAppCommand(cartId, UserId: Guid.NewGuid());
 
         var cartRepo = new Mock<ICartRepository>();
@@ -51,10 +57,17 @@ public sealed class PlaceOrderCommandTests
             .ReturnsAsync(cart);
 
         var orderRepo = new Mock<IOrderRepository>();
+        var productRepo = new Mock<IProductReadRepository>();
+        productRepo
+            .Setup(x => x.GetProductUidsByIdsAsync(It.IsAny<IEnumerable<int>>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new Dictionary<int, Guid>());
+        var userLookup = new Mock<IUserIdentityLookup>();
 
         var handler = new PlaceOrderCommandHandlerBuilder()
             .WithCartRepository(cartRepo)
             .WithOrderRepository(orderRepo)
+            .WithProductReadRepository(productRepo)
+            .WithUserIdentityLookup(userLookup)
             .Build();
 
         var result = await handler.Handle(command, CancellationToken.None);
@@ -66,11 +79,11 @@ public sealed class PlaceOrderCommandTests
     [Test]
     public async Task PlaceOrderCommand_Valid_CreatesOrderAndClearsCart()
     {
-        var cartId = Guid.NewGuid();
-        var productId = Guid.NewGuid();
-        var userId = Guid.NewGuid();
-        var cart = CartTestsHelper.CreateCartWithLine(cartId, productId, 2, 12.5m);
-        var command = new PlaceOrderAppCommand(cartId, userId);
+        var productUid = Guid.NewGuid();
+        var userUid = Guid.NewGuid();
+        var cart = CartTestsHelper.CreateCartWithLine(1, 2, 12.5m);
+        var cartId = cart.Uid;
+        var command = new PlaceOrderAppCommand(cartId, userUid);
 
         var cartRepo = new Mock<ICartRepository>();
         cartRepo.Setup(x => x.GetByIdWithItemsAsync(cartId, It.IsAny<CancellationToken>()))
@@ -78,19 +91,31 @@ public sealed class PlaceOrderCommandTests
 
         var orderRepo = new Mock<IOrderRepository>();
 
+        var productRepo = new Mock<IProductReadRepository>();
+        productRepo
+            .Setup(x => x.GetProductUidsByIdsAsync(It.IsAny<IEnumerable<int>>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new Dictionary<int, Guid> { { 1, productUid } });
+
+        var userLookup = new Mock<IUserIdentityLookup>();
+        userLookup
+            .Setup(x => x.GetUserIdByUidAsync(userUid, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(99);
+
         var handler = new PlaceOrderCommandHandlerBuilder()
             .WithCartRepository(cartRepo)
             .WithOrderRepository(orderRepo)
+            .WithProductReadRepository(productRepo)
+            .WithUserIdentityLookup(userLookup)
             .Build();
 
         var result = await handler.Handle(command, CancellationToken.None);
 
         result.IsSuccess.Should().BeTrue();
         result.Value!.CartId.Should().Be(cartId);
-        result.Value.UserId.Should().Be(userId);
+        result.Value.UserId.Should().Be(userUid);
         result.Value.Status.Should().Be(PlaceOrderCommandHandler.NewOrderStatus);
         result.Value.TotalAmount.Should().Be(25m);
-        result.Value.Lines.Should().ContainSingle(l => l.ProductId == productId && l.Quantity == 2);
+        result.Value.Lines.Should().ContainSingle(l => l.ProductId == productUid && l.Quantity == 2);
 
         orderRepo.Verify(x => x.AddAsync(It.IsAny<OrderEntity>(), It.IsAny<CancellationToken>()), Times.Once);
         orderRepo.Verify(x => x.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Once);

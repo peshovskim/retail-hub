@@ -4,9 +4,9 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Identity.Infrastructure.Configurations;
 
-internal sealed class IdentityUserRoleConfiguration : IEntityTypeConfiguration<IdentityUserRole<Guid>>
+internal sealed class IdentityUserRoleConfiguration : IEntityTypeConfiguration<IdentityUserRole<int>>
 {
-    public void Configure(EntityTypeBuilder<IdentityUserRole<Guid>> builder)
+    public void Configure(EntityTypeBuilder<IdentityUserRole<int>> builder)
     {
         builder.ToTable("AspNetUserRoles", "identity");
         builder.HasKey(r => new { r.UserId, r.RoleId });

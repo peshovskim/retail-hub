@@ -17,7 +17,7 @@ internal static class CartResponseFactory
         foreach (var item in cart.Items.Where(static i => i.IsActive).OrderBy(static i => i.ProductId))
         {
             var product = await productReadRepository
-                .GetActiveProductByIdAsync(item.ProductId, cancellationToken)
+                .GetActiveProductByInternalIdAsync(item.ProductId, cancellationToken)
                 .ConfigureAwait(false);
 
             var name = product?.Name ?? "Unavailable";
@@ -25,9 +25,9 @@ internal static class CartResponseFactory
             var lineTotal = item.UnitPrice * item.Quantity;
             subtotal += lineTotal;
             itemCount += item.Quantity;
-            lines.Add(new CartLineResponse(item.ProductId, name, sku, item.Quantity, item.UnitPrice, lineTotal));
+            lines.Add(new CartLineResponse(product?.Id ?? Guid.Empty, name, sku, item.Quantity, item.UnitPrice, lineTotal));
         }
 
-        return new CartResponse(cart.Id, cart.AnonymousKey, lines, subtotal, itemCount);
+        return new CartResponse(cart.Uid, cart.AnonymousKey, lines, subtotal, itemCount);
     }
 }

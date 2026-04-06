@@ -40,7 +40,7 @@ public sealed class AddCartItemCommandHandler : IRequestHandler<AddCartItemComma
         }
 
         var product = await _productReadRepository
-            .GetActiveProductByIdAsync(request.ProductId, cancellationToken)
+            .GetActiveProductByUidAsync(request.ProductId, cancellationToken)
             .ConfigureAwait(false);
 
         if (product is null)
@@ -49,11 +49,10 @@ public sealed class AddCartItemCommandHandler : IRequestHandler<AddCartItemComma
         }
 
         var addResult = cart.AddOrUpdateItem(
-            request.ProductId,
+            product.ProductId,
             request.Quantity,
             product.Price,
-            DateTime.UtcNow,
-            Guid.NewGuid);
+            DateTime.UtcNow);
 
         if (addResult.IsFailure)
         {

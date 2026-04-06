@@ -5,9 +5,8 @@ namespace Orders.Domain.Order.Domain;
 public sealed partial class OrderLine
 {
     internal static Result<OrderLine> Create(
-        Guid id,
-        Guid orderId,
-        Guid productId,
+        int productId,
+        Guid productUid,
         int quantity,
         decimal unitPrice,
         DateTime createdOn)
@@ -24,9 +23,10 @@ public sealed partial class OrderLine
         return Result<OrderLine>.Success(
             new OrderLine
             {
-                Id = id,
-                OrderId = orderId,
+                Uid = Guid.NewGuid(),
+                OrderId = 0,
                 ProductId = productId,
+                ProductUid = productUid,
                 Quantity = quantity,
                 UnitPrice = unitPrice,
                 LineTotal = lineTotal,

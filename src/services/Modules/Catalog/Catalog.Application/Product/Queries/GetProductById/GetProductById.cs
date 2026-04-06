@@ -6,7 +6,7 @@ using RetailHub.SharedKernel.Domain;
 
 namespace Catalog.Application.Product.Queries.GetProductById;
 
-public sealed record GetProductByIdQuery(Guid Id) : IQuery<ProductResponse>;
+public sealed record GetProductByIdQuery(Guid Uid) : IQuery<ProductResponse>;
 
 public sealed class GetProductByIdQueryHandler : IRequestHandler<GetProductByIdQuery, Result<ProductResponse>>
 {
@@ -22,7 +22,7 @@ public sealed class GetProductByIdQueryHandler : IRequestHandler<GetProductByIdQ
         CancellationToken cancellationToken)
     {
         var product = await _productReadRepository
-            .GetActiveProductByIdAsync(request.Id, cancellationToken)
+            .GetActiveProductByUidAsync(request.Uid, cancellationToken)
             .ConfigureAwait(false);
 
         if (product is null)

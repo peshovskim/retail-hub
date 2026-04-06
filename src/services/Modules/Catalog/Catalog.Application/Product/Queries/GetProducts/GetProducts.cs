@@ -9,7 +9,7 @@ namespace Catalog.Application.Product.Queries.GetProducts;
 /// <summary>List criteria for products: optional search, category and price filters, sort, and optional paging.</summary>
 public sealed record GetProductsQuery(
     string? Search = null,
-    List<Guid>? CategoryIds = null,
+    List<int>? CategoryIds = null,
     decimal? PriceMin = null,
     decimal? PriceMax = null,
     ProductListSort Sort = ProductListSort.NameAsc,

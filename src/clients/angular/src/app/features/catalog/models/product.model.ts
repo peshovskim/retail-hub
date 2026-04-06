@@ -1,7 +1,7 @@
 /** Product from catalog API (camelCase JSON). */
 export interface Product {
   id: string;
-  categoryId: string;
+  categoryId: number;
   name: string;
   slug: string;
   sku: string;

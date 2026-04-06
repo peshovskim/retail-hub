@@ -2,11 +2,11 @@ namespace Cart.Domain.Cart.Domain;
 
 public sealed partial class Cart
 {
-    public static Cart Create(Guid id, DateTime createdOn, Guid? userId, string? anonymousKey)
+    public static Cart Create(DateTime createdOn, int? userId, string? anonymousKey)
     {
         return new Cart
         {
-            Id = id,
+            Uid = Guid.NewGuid(),
             CreatedOn = createdOn,
             DeletedOn = null,
             UserId = userId,

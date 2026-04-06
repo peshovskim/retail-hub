@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Identity.Infrastructure;
 
-public sealed class RetailHubIdentityDbContext : IdentityDbContext<ApplicationUser, ApplicationRole, Guid>
+public sealed class RetailHubIdentityDbContext : IdentityDbContext<ApplicationUser, ApplicationRole, int>
 {
     public RetailHubIdentityDbContext(DbContextOptions<RetailHubIdentityDbContext> options)
         : base(options)

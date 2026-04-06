@@ -5,7 +5,9 @@ namespace RetailHub.SharedKernel.Domain;
 /// </summary>
 public abstract class Entity
 {
-    public Guid Id { get; protected set; }
+    public int Id { get; protected set; }
+
+    public Guid Uid { get; protected set; }
 
     public DateTime CreatedOn { get; protected set; }
 

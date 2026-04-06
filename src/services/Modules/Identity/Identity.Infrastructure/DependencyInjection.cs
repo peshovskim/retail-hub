@@ -2,6 +2,7 @@ using Identity.Infrastructure.IdentityEntities;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using RetailHub.SharedKernel.Application.Common.Abstractions;
 
 namespace Identity.Infrastructure;
 
@@ -21,6 +22,8 @@ public static class DependencyInjection
             })
             .AddEntityFrameworkStores<RetailHubIdentityDbContext>()
             .AddDefaultTokenProviders();
+
+        services.AddScoped<IUserIdentityLookup, UserIdentityLookup>();
 
         return services;
     }

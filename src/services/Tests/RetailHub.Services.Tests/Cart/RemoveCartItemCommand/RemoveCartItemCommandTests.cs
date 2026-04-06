@@ -3,10 +3,10 @@ using Catalog.Application.Product.Interfaces;
 using NUnit.Framework;
 using FluentAssertions;
 using Moq;
+using RetailHub.Services.Tests.Cart;
 using RetailHub.SharedKernel.Domain;
 using RemoveItemCommand = Cart.Application.Cart.Commands.RemoveCartItem.RemoveCartItemCommand;
 using CartEntity = Cart.Domain.Cart.Domain.Cart;
-
 namespace RetailHub.Services.Tests.Cart.RemoveCartItemCommand;
 
 [TestFixture(Category = nameof(RemoveCartItemCommandTests))]
@@ -39,16 +39,19 @@ public sealed class RemoveCartItemCommandTests
     [Test]
     public async Task RemoveCartItemCommand_Valid_RemovesLineAndPersists()
     {
-        var cartId = Guid.NewGuid();
-        var productId = Guid.NewGuid();
-        var cart = CartTestsHelper.CreateCartWithLine(cartId, productId, 2, 4.5m);
-        var command = new RemoveItemCommand(cartId, productId);
+        var productUid = Guid.NewGuid();
+        var product = CartTestsHelper.CreateProduct(productId: 3, id: productUid);
+        var cart = CartTestsHelper.CreateCartWithLine(3, 2, 4.5m);
+        var cartId = cart.Uid;
+        var command = new RemoveItemCommand(cartId, productUid);
 
         var cartRepo = new Mock<ICartRepository>();
         cartRepo.Setup(x => x.GetByIdWithItemsAsync(cartId, It.IsAny<CancellationToken>()))
             .ReturnsAsync(cart);
 
         var productRepo = new Mock<IProductReadRepository>();
+        productRepo.Setup(x => x.GetActiveProductByUidAsync(productUid, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(product);
 
         var handler = new RemoveCartItemCommandHandlerBuilder()
             .WithCartRepository(cartRepo)

@@ -14,11 +14,19 @@ internal sealed class OrderLineWriteConfiguration : IEntityTypeConfiguration<Ord
 
         builder.HasQueryFilter(l => l.DeletedOn == null);
 
-        builder.Property(l => l.Id).ValueGeneratedNever();
+        builder.Property(l => l.Id).ValueGeneratedOnAdd();
+
+        builder.Property(l => l.Uid).ValueGeneratedNever();
+
+        builder.HasIndex(l => l.Uid).IsUnique();
+
+        builder.HasIndex(l => l.OrderId).HasDatabaseName("IX_OrderLine_OrderId");
 
         builder.Property(l => l.OrderId).IsRequired();
 
         builder.Property(l => l.ProductId).IsRequired();
+
+        builder.Property(l => l.ProductUid).IsRequired();
 
         builder.Property(l => l.Quantity).IsRequired();
 

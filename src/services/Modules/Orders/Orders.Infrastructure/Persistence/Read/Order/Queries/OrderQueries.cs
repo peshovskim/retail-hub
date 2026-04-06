@@ -16,7 +16,7 @@ internal sealed class OrderQueries : IOrderReadRepository
     public async Task<OrderResponse?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)
     {
         var order = await ActiveOrdersWithActiveLines(_dbContext)
-            .FirstOrDefaultAsync(o => o.Id == id, cancellationToken)
+            .FirstOrDefaultAsync(o => o.Uid == id, cancellationToken)
             .ConfigureAwait(false);
 
         if (order is null)
@@ -25,13 +25,13 @@ internal sealed class OrderQueries : IOrderReadRepository
         }
 
         var lines = order.Lines
-            .Select(l => new OrderLineResponse(l.ProductId, l.Quantity, l.UnitPrice, l.LineTotal))
+            .Select(l => new OrderLineResponse(l.ProductUid, l.Quantity, l.UnitPrice, l.LineTotal))
             .ToList();
 
         return new OrderResponse(
-            order.Id,
-            order.UserId,
-            order.CartId,
+            order.Uid,
+            order.UserUid,
+            order.CartUid,
             order.Status,
             order.TotalAmount,
             lines);

@@ -1,8 +1,10 @@
 using Cart.Application.Cart.Interfaces;
+using Catalog.Application.Product.Interfaces;
 using MediatR;
 using OrderAggregate = Orders.Domain.Order.Domain.Order;
 using Orders.Application.Order.Interfaces;
 using Orders.Application.Order.Responses;
+using RetailHub.SharedKernel.Application.Common.Abstractions;
 using RetailHub.SharedKernel.Application.Common.Cqrs;
 using RetailHub.SharedKernel.Domain;
 
@@ -16,11 +18,19 @@ public sealed class PlaceOrderCommandHandler : IRequestHandler<PlaceOrderCommand
 
     private readonly ICartRepository _cartRepository;
     private readonly IOrderRepository _orderRepository;
+    private readonly IProductReadRepository _productReadRepository;
+    private readonly IUserIdentityLookup _userIdentityLookup;
 
-    public PlaceOrderCommandHandler(ICartRepository cartRepository, IOrderRepository orderRepository)
+    public PlaceOrderCommandHandler(
+        ICartRepository cartRepository,
+        IOrderRepository orderRepository,
+        IProductReadRepository productReadRepository,
+        IUserIdentityLookup userIdentityLookup)
     {
         _cartRepository = cartRepository;
         _orderRepository = orderRepository;
+        _productReadRepository = productReadRepository;
+        _userIdentityLookup = userIdentityLookup;
     }
 
     public async Task<Result<OrderResponse>> Handle(PlaceOrderCommand request, CancellationToken cancellationToken)
@@ -34,16 +44,35 @@ public sealed class PlaceOrderCommandHandler : IRequestHandler<PlaceOrderCommand
             return Result<OrderResponse>.NotFound(ResultCodes.NotFound, "Cart not found.");
         }
 
-        var orderId = Guid.NewGuid();
         var utcNow = DateTime.UtcNow;
 
+        int? userId = null;
+        if (request.UserId is { } userUid)
+        {
+            userId = await _userIdentityLookup
+                .GetUserIdByUidAsync(userUid, cancellationToken)
+                .ConfigureAwait(false);
+        }
+
+        var activeProductIds = cart.Items.Where(i => i.IsActive).Select(i => i.ProductId).Distinct().ToList();
+        var productUidById = await _productReadRepository
+            .GetProductUidsByIdsAsync(activeProductIds, cancellationToken)
+            .ConfigureAwait(false);
+
+        if (productUidById.Count != activeProductIds.Count)
+        {
+            return Result<OrderResponse>.Invalid(
+                ResultCodes.Validation,
+                "One or more cart products could not be resolved.");
+        }
+
         var orderResult = OrderAggregate.PlaceFromCart(
-            orderId,
             cart,
+            userId,
             request.UserId,
+            productUidById,
             NewOrderStatus,
-            utcNow,
-            Guid.NewGuid);
+            utcNow);
 
         if (orderResult.IsFailure)
         {
@@ -65,13 +94,13 @@ public sealed class PlaceOrderCommandHandler : IRequestHandler<PlaceOrderCommand
     {
         var lines = order.Lines
             .OrderBy(l => l.ProductId)
-            .Select(l => new OrderLineResponse(l.ProductId, l.Quantity, l.UnitPrice, l.LineTotal))
+            .Select(l => new OrderLineResponse(l.ProductUid, l.Quantity, l.UnitPrice, l.LineTotal))
             .ToList();
 
         return new OrderResponse(
-            order.Id,
-            order.UserId,
-            order.CartId,
+            order.Uid,
+            order.UserUid,
+            order.CartUid,
             order.Status,
             order.TotalAmount,
             lines);

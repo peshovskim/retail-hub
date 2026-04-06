@@ -8,19 +8,20 @@ public sealed partial class Product
     {
     }
 
-    public static Product Create(Guid id,
-                                 DateTime createdOn,
-                                 Guid categoryId,
-                                 string name,
-                                 string slug,
-                                 string sku,
-                                 decimal price,
-                                 string shortDescription,
-                                 string description)
+    public static Product Create(
+        DateTime createdOn,
+        int categoryId,
+        Guid categoryUid,
+        string name,
+        string slug,
+        string sku,
+        decimal price,
+        string shortDescription,
+        string description)
     {
         var product = new Product
         {
-            Id = id,
+            Uid = Guid.NewGuid(),
             CreatedOn = createdOn,
             CategoryId = categoryId,
             Name = name,
@@ -33,8 +34,8 @@ public sealed partial class Product
         };
 
         product.AddDomainEvent(new ProductCreatedDomainEvent(
-            id,
-            categoryId,
+            product.Uid,
+            categoryUid,
             name,
             slug,
             sku,
@@ -42,7 +43,7 @@ public sealed partial class Product
             shortDescription,
             description,
             createdOn));
-        
+
         return product;
     }
 }

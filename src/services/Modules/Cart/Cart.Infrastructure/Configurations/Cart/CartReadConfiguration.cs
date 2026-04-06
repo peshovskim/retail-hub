@@ -12,7 +12,13 @@ internal sealed class CartReadConfiguration : IEntityTypeConfiguration<CartEntit
 
         builder.HasKey(c => c.Id);
 
-        builder.Property(c => c.Id).ValueGeneratedNever();
+        builder.Property(c => c.Id).ValueGeneratedOnAdd();
+
+        builder.Property(c => c.Uid).ValueGeneratedNever();
+
+        builder.HasIndex(c => c.Uid).IsUnique();
+
+        builder.HasIndex(c => c.AnonymousKey).HasDatabaseName("IX_Cart_AnonymousKey");
 
         builder.Property(c => c.CreatedOn).HasColumnType("datetime2(0)").IsRequired();
 

@@ -8,18 +8,18 @@ public sealed partial class Category
     {
     }
 
-    public static Category Create(Guid id, DateTime createdOn, string name, string slug, Guid? parentId)
+    public static Category Create(DateTime createdOn, string name, string slug, int? parentId)
     {
         var category = new Category
         {
-            Id = id,
+            Uid = Guid.NewGuid(),
             CreatedOn = createdOn,
             Name = name,
             Slug = slug,
             ParentId = parentId,
             DeletedOn = null
         };
-        category.AddDomainEvent(new CategoryCreatedDomainEvent(id, name, slug, parentId, createdOn));
+        category.AddDomainEvent(new CategoryCreatedDomainEvent(category.Uid, name, slug, createdOn));
         return category;
     }
 }

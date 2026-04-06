@@ -2,12 +2,12 @@ namespace Catalog.Application.Category.Responses;
 
 public sealed record CategoryMenuSourceRow
 {
-    public Guid Id { get; init; }
+    public int Id { get; init; }
     public string Name { get; init; } = null!;
     public string Slug { get; init; } = null!;
-    public Guid? ParentId { get; init; }
+    public int? ParentId { get; init; }
 
-    public CategoryMenuSourceRow(Guid id, string name, string slug, Guid? parentId)
+    public CategoryMenuSourceRow(int id, string name, string slug, int? parentId)
     {
         Id = id;
         Name = name;

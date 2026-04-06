@@ -10,6 +10,10 @@ internal sealed class ApplicationUserConfiguration : IEntityTypeConfiguration<Ap
     {
         builder.ToTable("User", "identity");
 
+        builder.Property(u => u.Uid).IsRequired();
+
+        builder.HasIndex(u => u.Uid).IsUnique();
+
         builder.Property(u => u.CreatedOn).HasColumnType("datetime2(0)").IsRequired();
 
         builder.Property(u => u.UserName).HasMaxLength(256);
