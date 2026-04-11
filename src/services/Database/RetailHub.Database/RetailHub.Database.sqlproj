@@ -72,6 +72,7 @@
     <Build Include="Tables\Cart\Table\CartItem.sql" />
     <Build Include="Tables\Category\Table\Category.sql" />
     <Build Include="Tables\Product\Table\Product.sql" />
+    <Build Include="Tables\Product\Table\ProductImage.sql" />
     <Build Include="Tables\Order\Table\Order.sql" />
     <Build Include="Tables\Order\Table\OrderLine.sql" />
     <Build Include="Tables\User\Table\User.sql" />
@@ -85,6 +86,7 @@
     <None Include="Tables\Cart\Seed\CartItem.Test.Seed.sql" />
     <None Include="Tables\Category\Seed\Category.Test.Seed.sql" />
     <None Include="Tables\Product\Seed\Product.Test.Seed.sql" />
+    <None Include="Tables\Product\Seed\ProductImage.Test.Seed.sql" />
     <None Include="Tables\Order\Seed\Order.Test.Seed.sql" />
     <None Include="Tables\User\Seed\User.Test.Seed.sql" />
     <None Include="Tables\AspNetRoles\Seed\AspNetRoles.Test.Seed.sql" />

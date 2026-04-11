@@ -44,7 +44,8 @@ public static class CartTestsHelper
         decimal price = 19.99m,
         string shortDescription = "Short",
         string description = "Description",
-        string? categoryName = "Cat")
+        string? categoryName = "Cat",
+        IReadOnlyList<ProductImageResponse>? images = null)
     {
         return new ProductResponse(
             productId,
@@ -56,6 +57,7 @@ public static class CartTestsHelper
             price,
             shortDescription,
             description,
-            categoryName);
+            categoryName,
+            images ?? Array.Empty<ProductImageResponse>());
     }
 }

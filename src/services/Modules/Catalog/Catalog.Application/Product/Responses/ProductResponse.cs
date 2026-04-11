@@ -12,4 +12,5 @@ public sealed record ProductResponse(
     decimal Price,
     string ShortDescription,
     string Description,
-    string? CategoryName);
+    string? CategoryName,
+    IReadOnlyList<ProductImageResponse> Images);

@@ -65,7 +65,15 @@ internal sealed class ProductQueries : IProductReadRepository
             .ToListAsync(cancellationToken)
             .ConfigureAwait(false);
 
-        var items = rows.ConvertAll(p => _readFactory.ToResponse(p));
+        var imagesByProductId = await LoadImagesByProductIdAsync(
+                rows.ConvertAll(p => p.Id),
+                cancellationToken)
+            .ConfigureAwait(false);
+
+        var items = rows.ConvertAll(p =>
+            _readFactory.ToResponse(
+                p,
+                images: imagesByProductId.GetValueOrDefault(p.Id)));
         return new ProductListResult(items, totalCount);
     }
 
@@ -94,7 +102,13 @@ internal sealed class ProductQueries : IProductReadRepository
             .FirstOrDefaultAsync(cancellationToken)
             .ConfigureAwait(false);
 
-        return row is null ? null : _readFactory.ToResponse(row.Product, row.Name);
+        if (row is null)
+        {
+            return null;
+        }
+
+        var images = await LoadImagesForProductAsync(row.Product.Id, cancellationToken).ConfigureAwait(false);
+        return _readFactory.ToResponse(row.Product, row.Name, images);
     }
 
     public async Task<ProductResponse?> GetActiveProductByInternalIdAsync(
@@ -109,7 +123,13 @@ internal sealed class ProductQueries : IProductReadRepository
             .FirstOrDefaultAsync(cancellationToken)
             .ConfigureAwait(false);
 
-        return row is null ? null : _readFactory.ToResponse(row.Product, row.Name);
+        if (row is null)
+        {
+            return null;
+        }
+
+        var images = await LoadImagesForProductAsync(row.Product.Id, cancellationToken).ConfigureAwait(false);
+        return _readFactory.ToResponse(row.Product, row.Name, images);
     }
 
     public async Task<IReadOnlyDictionary<int, Guid>> GetProductUidsByIdsAsync(
@@ -130,5 +150,47 @@ internal sealed class ProductQueries : IProductReadRepository
             .ConfigureAwait(false);
 
         return rows.ToDictionary(r => r.Id, r => r.Uid);
+    }
+
+    private async Task<IReadOnlyList<ProductImageResponse>> LoadImagesForProductAsync(
+        int productId,
+        CancellationToken cancellationToken)
+    {
+        var rows = await _dbContext.ProductImages
+            .AsNoTracking()
+            .Where(pi => pi.ProductId == productId && pi.DeletedOn == null)
+            .OrderBy(pi => pi.SortOrder)
+            .ThenBy(pi => pi.Uid)
+            .Select(pi => new ProductImageResponse(pi.Uid, pi.SortOrder, pi.ImageUrl))
+            .ToListAsync(cancellationToken)
+            .ConfigureAwait(false);
+
+        return rows;
+    }
+
+    private async Task<Dictionary<int, IReadOnlyList<ProductImageResponse>>> LoadImagesByProductIdAsync(
+        IReadOnlyList<int> productIds,
+        CancellationToken cancellationToken)
+    {
+        if (productIds.Count == 0)
+        {
+            return new Dictionary<int, IReadOnlyList<ProductImageResponse>>();
+        }
+
+        var rows = await _dbContext.ProductImages
+            .AsNoTracking()
+            .Where(pi => productIds.Contains(pi.ProductId) && pi.DeletedOn == null)
+            .ToListAsync(cancellationToken)
+            .ConfigureAwait(false);
+
+        return rows
+            .GroupBy(pi => pi.ProductId)
+            .ToDictionary(
+                g => g.Key,
+                g => (IReadOnlyList<ProductImageResponse>)g
+                    .OrderBy(pi => pi.SortOrder)
+                    .ThenBy(pi => pi.Uid)
+                    .Select(pi => new ProductImageResponse(pi.Uid, pi.SortOrder, pi.ImageUrl))
+                    .ToList());
     }
 }

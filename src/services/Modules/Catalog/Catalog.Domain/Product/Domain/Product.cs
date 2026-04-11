@@ -10,6 +10,9 @@ public sealed partial class Product : AggregateRoot
     /// <summary>EF / read-model navigation. Not required for <see cref="Create"/>.</summary>
     public CategoryAggregate? Category { get; set; }
 
+    /// <summary>Product images (EF navigation).</summary>
+    public ICollection<ProductImage> Images { get; set; } = new List<ProductImage>();
+
     public string Name { get; private set; } = null!;
 
     public string Slug { get; private set; } = null!;

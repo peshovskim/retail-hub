@@ -7,7 +7,8 @@ public sealed class ProductReadFactory
 {
     public ProductResponse ToResponse(
         ProductEntity product,
-        string? categoryName = null) =>
+        string? categoryName = null,
+        IReadOnlyList<ProductImageResponse>? images = null) =>
         new(
             product.Id,
             product.Uid,
@@ -18,5 +19,6 @@ public sealed class ProductReadFactory
             product.Price,
             product.ShortDescription,
             product.Description,
-            categoryName);
+            categoryName,
+            images ?? Array.Empty<ProductImageResponse>());
 }
