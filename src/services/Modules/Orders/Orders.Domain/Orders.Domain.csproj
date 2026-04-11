@@ -8,7 +8,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\Cart\Cart.Domain\Cart.Domain.csproj" />
     <ProjectReference Include="..\..\..\SharedKernel\Domain\SharedKernel.Domain\SharedKernel.Domain.csproj" />
   </ItemGroup>
 

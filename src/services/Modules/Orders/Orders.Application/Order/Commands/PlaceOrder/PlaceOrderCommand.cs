@@ -66,8 +66,9 @@ public sealed class PlaceOrderCommandHandler : IRequestHandler<PlaceOrderCommand
                 "One or more cart products could not be resolved.");
         }
 
-        var orderResult = OrderAggregate.PlaceFromCart(
-            cart,
+        var placement = CartPlacementSnapshotMapper.FromCart(cart);
+        var orderResult = OrderAggregate.PlaceFromCartPlacement(
+            placement,
             userId,
             request.UserId,
             productUidById,

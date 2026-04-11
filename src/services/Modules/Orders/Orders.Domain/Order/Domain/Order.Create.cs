@@ -1,30 +1,30 @@
-using CartAggregate = Cart.Domain.Cart.Domain.Cart;
+using Orders.Domain.Order.ValueObjects;
 using RetailHub.SharedKernel.Domain;
 
 namespace Orders.Domain.Order.Domain;
 
 public sealed partial class Order
 {
-    public static Result<Order> PlaceFromCart(
-        CartAggregate cart,
+    public static Result<Order> PlaceFromCartPlacement(
+        CartPlacementSnapshot placement,
         int? userId,
         Guid? userUid,
         IReadOnlyDictionary<int, Guid> productUidByProductId,
         string status,
         DateTime utcNow)
     {
-        ArgumentNullException.ThrowIfNull(cart);
+        ArgumentNullException.ThrowIfNull(placement);
         ArgumentNullException.ThrowIfNull(status);
         ArgumentNullException.ThrowIfNull(productUidByProductId);
 
-        if (cart.DeletedOn is not null)
+        if (placement.DeletedOn is not null)
         {
             return Result<Order>.Invalid(
                 ResultCodes.Validation,
                 "Cannot place an order from a deleted cart.");
         }
 
-        var activeItems = cart.Items.Where(i => i.IsActive).ToList();
+        var activeItems = placement.Lines.Where(i => i.IsActive).ToList();
 
         if (activeItems.Count == 0)
         {
@@ -70,8 +70,8 @@ public sealed partial class Order
             UserId = userId,
             UserUid = userUid,
             Status = status,
-            CartId = cart.Id,
-            CartUid = cart.Uid,
+            CartId = placement.CartId,
+            CartUid = placement.CartUid,
             TotalAmount = total,
         };
 
