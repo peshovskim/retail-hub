@@ -12,6 +12,8 @@ export interface CatalogState {
   loading: boolean;
   error: string | null;
   menu: CategoryMenuNode[];
+  /** True after a successful category menu fetch; avoids redundant HTTP while the SPA session lasts. */
+  menuLoaded: boolean;
   menuLoading: boolean;
   menuError: string | null;
   products: Product[];
@@ -26,6 +28,7 @@ const initialState: CatalogState = {
   loading: false,
   error: null,
   menu: [],
+  menuLoaded: false,
   menuLoading: false,
   menuError: null,
   products: [],
@@ -52,14 +55,20 @@ export const catalogReducer = createReducer(
     loading: false,
     error,
   })),
-  on(catalogActions.loadCategoryMenu, (state) => ({
-    ...state,
-    menuLoading: true,
-    menuError: null,
-  })),
+  on(catalogActions.loadCategoryMenu, (state) => {
+    if (state.menuLoaded) {
+      return state;
+    }
+    return {
+      ...state,
+      menuLoading: true,
+      menuError: null,
+    };
+  }),
   on(catalogActions.loadCategoryMenuSuccess, (state, { menu }) => ({
     ...state,
     menu,
+    menuLoaded: true,
     menuLoading: false,
   })),
   on(catalogActions.loadCategoryMenuFailure, (state, { error }) => ({

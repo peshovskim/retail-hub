@@ -1,9 +1,11 @@
 import { inject, Injectable } from '@angular/core';
 import { Actions, createEffect, ofType } from '@ngrx/effects';
-import { catchError, map, of, switchMap } from 'rxjs';
+import { Store } from '@ngrx/store';
+import { catchError, exhaustMap, filter, map, of, switchMap, withLatestFrom } from 'rxjs';
 
 import { CatalogApiService } from '../services/catalog-api.service';
 import { catalogActions } from './catalog.actions';
+import { catalogFeature } from './catalog.reducer';
 
 /**
  * `inject()` fields must run before `createEffect` fields: class field initializers run
@@ -13,6 +15,7 @@ import { catalogActions } from './catalog.actions';
 @Injectable()
 export class CatalogEffects {
   private readonly actions$ = inject(Actions);
+  private readonly store = inject(Store);
   private readonly api = inject(CatalogApiService);
 
   loadCategories$ = createEffect(() =>
@@ -36,7 +39,9 @@ export class CatalogEffects {
   loadCategoryMenu$ = createEffect(() =>
     this.actions$.pipe(
       ofType(catalogActions.loadCategoryMenu),
-      switchMap(() =>
+      withLatestFrom(this.store.select(catalogFeature.selectMenuLoaded)),
+      filter(([, menuLoaded]) => !menuLoaded),
+      exhaustMap(() =>
         this.api.getCategoryMenu().pipe(
           map((menu) => catalogActions.loadCategoryMenuSuccess({ menu })),
           catchError((err: unknown) =>

@@ -9,6 +9,7 @@ export const selectCatalogLoading = catalogFeature.selectLoading;
 export const selectCatalogError = catalogFeature.selectError;
 
 export const selectCategoryMenu = catalogFeature.selectMenu;
+export const selectCategoryMenuLoaded = catalogFeature.selectMenuLoaded;
 export const selectCategoryMenuLoading = catalogFeature.selectMenuLoading;
 export const selectCategoryMenuError = catalogFeature.selectMenuError;
 
@@ -26,6 +27,7 @@ export const catalogQuery = {
   getLoading: catalogFeature.selectLoading,
   getError: catalogFeature.selectError,
   getMenu: catalogFeature.selectMenu,
+  getMenuLoaded: catalogFeature.selectMenuLoaded,
   getMenuLoading: catalogFeature.selectMenuLoading,
   getMenuError: catalogFeature.selectMenuError,
   getProducts: catalogFeature.selectProducts,

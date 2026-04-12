@@ -207,7 +207,6 @@ export class ProductListPage {
   protected readonly categoryNameMap = computed(() => buildCategoryNameMap(this.menu()));
 
   constructor() {
-    this.catalog.loadCategoryMenu();
     this.applyQueryParamsFromParamMap(this.route.snapshot.queryParamMap);
     this.reloadProducts({ skipUrlSync: true });
 
