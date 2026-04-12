@@ -5,7 +5,7 @@ import { ActivatedRoute } from '@angular/router';
 import { catchError, map, Observable, of, startWith, switchMap } from 'rxjs';
 
 import { CartFacade } from '../../cart/store/cart.facade';
-import type { Product } from '../models/product.model';
+import { primaryImageUrl, type Product } from '../models/product.model';
 import { CatalogApiService } from '../services/catalog-api.service';
 
 export type ProductDetailVm =
@@ -92,5 +92,9 @@ export class ProductDetailsPage {
       return s;
     }
     return 'No description is available for this product yet.';
+  }
+
+  protected productPrimaryImageUrl(product: Product): string | null {
+    return primaryImageUrl(product);
   }
 }

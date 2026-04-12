@@ -6,6 +6,7 @@ import { distinctUntilChanged, map, skip } from 'rxjs';
 
 import type { CategoryMenuNode } from '../models/category.model';
 import type { ProductListParams, ProductListSort } from '../models/product-list.model';
+import { primaryImageUrl, type Product } from '../models/product.model';
 import type { CatalogProductsView } from '../store/catalog.selectors';
 import { CartFacade } from '../../cart/store/cart.facade';
 import { CatalogToolbarSearchService } from '../services/catalog-toolbar-search.service';
@@ -542,5 +543,9 @@ export class ProductListPage {
     event.preventDefault();
     event.stopPropagation();
     this.cart.addToCart(productId, 1);
+  }
+
+  protected productPrimaryImageUrl(product: Product): string | null {
+    return primaryImageUrl(product);
   }
 }

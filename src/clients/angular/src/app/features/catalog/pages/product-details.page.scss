@@ -65,14 +65,26 @@
 }
 
 .product-detail__image-frame {
+  position: relative;
   background: linear-gradient(165deg, #f0f2f5 0%, #e2e6ec 100%);
   border-radius: var(--shop-catalog-radius);
   box-shadow: var(--shop-catalog-shadow-hover);
   overflow: hidden;
+  aspect-ratio: 1;
+}
+
+.product-detail__image {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
 }
 
 .product-detail__image-placeholder {
-  aspect-ratio: 1;
+  position: absolute;
+  inset: 0;
   display: flex;
   align-items: center;
   justify-content: center;

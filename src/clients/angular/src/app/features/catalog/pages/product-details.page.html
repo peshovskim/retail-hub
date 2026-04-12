@@ -31,9 +31,19 @@
       <div class="product-detail__grid">
         <div class="product-detail__media">
           <div class="product-detail__image-frame">
-            <div class="product-detail__image-placeholder" aria-hidden="true">
-              <mat-icon>inventory_2</mat-icon>
-            </div>
+            @if (productPrimaryImageUrl(p); as imgSrc) {
+              <img
+                class="product-detail__image"
+                [src]="imgSrc"
+                [alt]="p.name"
+                loading="eager"
+                decoding="async"
+              />
+            } @else {
+              <div class="product-detail__image-placeholder" aria-hidden="true">
+                <mat-icon>inventory_2</mat-icon>
+              </div>
+            }
           </div>
         </div>
 

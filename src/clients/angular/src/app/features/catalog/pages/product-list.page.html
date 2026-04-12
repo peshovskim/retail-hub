@@ -162,9 +162,19 @@
                 <app-product-card>
                   <div class="shop-grid__card-inner">
                     <div class="shop-grid__media">
-                      <div class="shop-grid__media-placeholder" aria-hidden="true">
-                        <mat-icon>image</mat-icon>
-                      </div>
+                      @if (productPrimaryImageUrl(p); as imgSrc) {
+                        <img
+                          class="shop-grid__media-img"
+                          [src]="imgSrc"
+                          [alt]="p.name"
+                          loading="lazy"
+                          decoding="async"
+                        />
+                      } @else {
+                        <div class="shop-grid__media-placeholder" aria-hidden="true">
+                          <mat-icon>image</mat-icon>
+                        </div>
+                      }
                       <div class="shop-grid__media-hover">
                         <span>View details</span>
                         <mat-icon>arrow_forward</mat-icon>
