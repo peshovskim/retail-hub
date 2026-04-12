@@ -61,6 +61,42 @@ In JSON, backslashes in the server name must be escaped (`\\`).
 
 ---
 
+## Redis (optional — distributed cache)
+
+The API can use **ASP.NET Core `IDistributedCache`** backed by **Redis** for catalog reads (for example categories). When **`Redis:ConnectionString`** is **empty**, Redis is not registered and a **no-op** cache is used instead—the API still runs against SQL; only distributed caching is skipped.
+
+Configuration lives in **`src/services/Api/RetailHub.Api/appsettings.json`** under **`Redis`**:
+
+| Setting | Purpose |
+|---------|--------|
+| **`ConnectionString`** | Redis endpoint and options (see below). Leave empty for local dev without Redis. |
+| **`InstanceName`** | Optional key prefix when several apps share one Redis server (default in repo: `RetailHub:`). |
+
+**Override via environment variables** (for App Service, containers, or CI):
+
+- **`Redis__ConnectionString`**
+- **`Redis__InstanceName`** (optional)
+
+### Local development options
+
+Pick any approach that gives you a Redis server reachable from the API process (default port **6379** unless you change it).
+
+| Option | Notes |
+|--------|--------|
+| **Docker** (optional) | Run a single container, for example: `docker run -d --name retailhub-redis -p 6379:6379 redis:7-alpine`. No Compose file is required. Stop/remove the container when finished. |
+| **WSL or Linux (native)** | Install Redis with your distro’s package manager (for example `redis-server` on Ubuntu), start the service, and use **`localhost:6379`** (or the configured port). |
+| **Windows** | There is no first-party Redis server on Windows. Use **Docker**, **WSL**, or point development at a **remote** Redis instance (see Azure below). |
+| **Azure Cache for Redis (dev)** | Create a cache in a dev subscription or resource group and use the connection string from the portal—useful when you want SSL, firewall rules, or parity with production without running Redis locally. |
+
+### Connection string examples
+
+- **Local Redis (no TLS, default port):** `localhost:6379`
+- **Azure Cache for Redis:** Use the **connection string** from the Azure portal (typically host **`yourname.redis.cache.windows.net`**, port **6380**, **`ssl=true`**, and the access key). Prefer this for production-like or team-shared caches.
+
+After Redis is running and configured, restart the API so it picks up **`AddStackExchangeRedisCache`**.
+
+---
+
 ## 4. Run the API
 
 **Visual Studio:** Set **`RetailHub.Api`** as the startup project and press **F5** (or **Ctrl+F5**).

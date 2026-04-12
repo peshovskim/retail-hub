@@ -1,0 +1,8 @@
+# Redis only — no API/SQL in this compose file. Connection from host: localhost:6379
+services:
+  redis:
+    image: redis:7-alpine
+    container_name: retailhub-redis
+    ports:
+      - "6379:6379"
+    restart: unless-stopped

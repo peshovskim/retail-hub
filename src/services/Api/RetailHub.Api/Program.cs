@@ -6,6 +6,7 @@ using Catalog.Application;
 using Catalog.Application.Category.Queries.GetCategories;
 using Cart.Infrastructure;
 using Catalog.Infrastructure;
+using Catalog.Infrastructure.Options;
 using Identity.Application;
 using Identity.Application.User.Commands.Login;
 using Identity.Application.User.Commands.RegisterUser;
@@ -13,11 +14,12 @@ using Identity.Infrastructure;
 using Orders.Application;
 using Orders.Application.Order.Queries.GetOrderById;
 using Orders.Infrastructure;
+using Azure.Storage.Blobs;
+using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Hosting.Server;
 using Microsoft.AspNetCore.Hosting.Server.Features;
 using Microsoft.IdentityModel.Tokens;
-using Microsoft.Extensions.Azure;
 using Microsoft.OpenApi.Models;
 using RetailHub.Api.Options;
 using RetailHub.Api.Services;
@@ -34,15 +36,13 @@ ArgumentException.ThrowIfNullOrEmpty(connectionString);
 builder.Services.Configure<JwtOptions>(builder.Configuration.GetSection(JwtOptions.SectionName));
 builder.Services.Configure<AzureStorageOptions>(builder.Configuration.GetSection(AzureStorageOptions.SectionName));
 builder.Services.Configure<RedisOptions>(builder.Configuration.GetSection(RedisOptions.SectionName));
+builder.Services.Configure<CatalogCacheOptions>(builder.Configuration.GetSection(CatalogCacheOptions.SectionName));
 
 var azureStorageOptions = builder.Configuration.GetSection(AzureStorageOptions.SectionName).Get<AzureStorageOptions>()
     ?? new AzureStorageOptions();
 if (!string.IsNullOrWhiteSpace(azureStorageOptions.ConnectionString))
 {
-    builder.Services.AddAzureClients(clientBuilder =>
-    {
-        clientBuilder.AddBlobServiceClient(azureStorageOptions.ConnectionString);
-    });
+    builder.Services.AddSingleton(_ => new BlobServiceClient(azureStorageOptions.ConnectionString));
 }
 
 var redisOptions = builder.Configuration.GetSection(RedisOptions.SectionName).Get<RedisOptions>()
@@ -57,6 +57,11 @@ if (!string.IsNullOrWhiteSpace(redisOptions.ConnectionString))
             options.InstanceName = redisOptions.InstanceName;
         }
     });
+}
+else
+{
+    // In-process cache when Redis is not configured (typical local dev). Use Redis for shared cache across instances.
+    builder.Services.AddDistributedMemoryCache();
 }
 
 builder.Services.AddSingleton<ITokenIssuer, JwtTokenIssuer>();

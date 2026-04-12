@@ -29,7 +29,8 @@ public static class DependencyInjection
                 .UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking);
         });
         services.AddScoped<CategoryReadFactory>();
-        services.AddScoped<ICategoryReadRepository, CategoryQueries>();
+        services.AddScoped<CategoryQueries>();
+        services.AddScoped<ICategoryReadRepository, CachingCategoryReadRepository>();
         services.AddScoped<ICategoryRepository, CategoryRepository>();
 
         services.AddScoped<ProductReadFactory>();
