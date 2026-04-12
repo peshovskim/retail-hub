@@ -47,7 +47,7 @@ export class CartEffects {
       switchMap(() => {
         const { anonymousKey } = this.storage.read();
         return this.api.createSession(anonymousKey ?? undefined).pipe(
-          tap((s) => this.storage.save(s.cartId, s.anonymousKey)),
+          tap((s) => this.storage.save(s.anonymousKey)),
           switchMap((s) => this.api.getCart(s.cartId)),
           map((cart) => cartActions.bootstrapSuccess({ cart })),
           catchError((err: unknown) =>
@@ -71,7 +71,7 @@ export class CartEffects {
           cart?.id != null
             ? of(cart.id)
             : this.api.createSession(this.storage.read().anonymousKey ?? undefined).pipe(
-                tap((s) => this.storage.save(s.cartId, s.anonymousKey)),
+                tap((s) => this.storage.save(s.anonymousKey)),
                 map((s) => s.cartId),
               );
 
