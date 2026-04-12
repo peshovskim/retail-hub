@@ -17,6 +17,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Hosting.Server;
 using Microsoft.AspNetCore.Hosting.Server.Features;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.Extensions.Azure;
 using Microsoft.OpenApi.Models;
 using RetailHub.Api.Options;
 using RetailHub.Api.Services;
@@ -31,6 +32,18 @@ var connectionString = builder.Configuration.GetConnectionString("RetailHubDatab
 ArgumentException.ThrowIfNullOrEmpty(connectionString);
 
 builder.Services.Configure<JwtOptions>(builder.Configuration.GetSection(JwtOptions.SectionName));
+builder.Services.Configure<AzureStorageOptions>(builder.Configuration.GetSection(AzureStorageOptions.SectionName));
+
+var azureStorageOptions = builder.Configuration.GetSection(AzureStorageOptions.SectionName).Get<AzureStorageOptions>()
+    ?? new AzureStorageOptions();
+if (!string.IsNullOrWhiteSpace(azureStorageOptions.ConnectionString))
+{
+    builder.Services.AddAzureClients(clientBuilder =>
+    {
+        clientBuilder.AddBlobServiceClient(azureStorageOptions.ConnectionString);
+    });
+}
+
 builder.Services.AddSingleton<ITokenIssuer, JwtTokenIssuer>();
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<ICurrentUserAccessor, HttpContextCurrentUserAccessor>();
