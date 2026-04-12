@@ -1,5 +1,6 @@
 using Cart.Application.Cart.Interfaces;
 using Catalog.Application.Product.Interfaces;
+using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 using Orders.Application.Order.Commands.PlaceOrder;
 using Orders.Application.Order.Interfaces;
@@ -43,5 +44,6 @@ public sealed class PlaceOrderCommandHandlerBuilder
             _cartRepository.Object,
             _orderRepository.Object,
             _productReadRepository.Object,
-            _userIdentityLookup.Object);
+            _userIdentityLookup.Object,
+            NullLogger<PlaceOrderCommandHandler>.Instance);
 }

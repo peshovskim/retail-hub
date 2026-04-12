@@ -4,6 +4,7 @@ using Identity.Application.User.Responses;
 using Identity.Infrastructure.IdentityEntities;
 using MediatR;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Logging;
 using RetailHub.SharedKernel.Application.Common.Cqrs;
 using RetailHub.SharedKernel.Domain;
 
@@ -21,11 +22,16 @@ public sealed class LoginCommandHandler : IRequestHandler<LoginCommand, Result<A
 {
     private readonly ITokenIssuer _tokenIssuer;
     private readonly UserManager<ApplicationUser> _userManager;
+    private readonly ILogger<LoginCommandHandler> _logger;
 
-    public LoginCommandHandler(ITokenIssuer tokenIssuer, UserManager<ApplicationUser> userManager)
+    public LoginCommandHandler(
+        ITokenIssuer tokenIssuer,
+        UserManager<ApplicationUser> userManager,
+        ILogger<LoginCommandHandler> logger)
     {
         _tokenIssuer = tokenIssuer;
         _userManager = userManager;
+        _logger = logger;
     }
 
     public async Task<Result<AuthResponse>> Handle(LoginCommand request, CancellationToken cancellationToken)
@@ -62,6 +68,8 @@ public sealed class LoginCommandHandler : IRequestHandler<LoginCommand, Result<A
             user.Uid,
             user.Email ?? normalizedEmail,
             roles);
+
+        _logger.LogInformation("User {UserUid} signed in", user.Uid);
 
         return Result<AuthResponse>.Success(
             new AuthResponse(

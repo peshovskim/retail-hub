@@ -8,14 +8,12 @@ using Cart.Infrastructure;
 using Catalog.Infrastructure;
 using Catalog.Infrastructure.Options;
 using Identity.Application;
-using Identity.Application.User.Commands.Login;
 using Identity.Application.User.Commands.RegisterUser;
 using Identity.Infrastructure;
 using Orders.Application;
 using Orders.Application.Order.Queries.GetOrderById;
 using Orders.Infrastructure;
 using Azure.Storage.Blobs;
-using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Hosting.Server;
 using Microsoft.AspNetCore.Hosting.Server.Features;
@@ -120,6 +118,7 @@ builder.Services.AddMediatR(cfg =>
         typeof(GetCartQuery).Assembly,
         typeof(GetOrderByIdQuery).Assembly,
         typeof(RegisterUserCommand).Assembly);
+    cfg.AddOpenBehavior(typeof(RequestLoggingBehavior<,>));
     cfg.AddOpenBehavior(typeof(ValidationBehavior<,>));
 });
 

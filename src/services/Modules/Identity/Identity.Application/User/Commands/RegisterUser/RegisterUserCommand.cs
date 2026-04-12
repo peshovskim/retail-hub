@@ -5,6 +5,7 @@ using Identity.Application.User.Responses;
 using Identity.Infrastructure.IdentityEntities;
 using MediatR;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Logging;
 using RetailHub.SharedKernel.Application.Common.Cqrs;
 using RetailHub.SharedKernel.Domain;
 
@@ -23,15 +24,18 @@ public sealed class RegisterUserCommandHandler : IRequestHandler<RegisterUserCom
     private readonly ITokenIssuer _tokenIssuer;
     private readonly UserManager<ApplicationUser> _userManager;
     private readonly RoleManager<ApplicationRole> _roleManager;
+    private readonly ILogger<RegisterUserCommandHandler> _logger;
 
     public RegisterUserCommandHandler(
         ITokenIssuer tokenIssuer,
         UserManager<ApplicationUser> userManager,
-        RoleManager<ApplicationRole> roleManager)
+        RoleManager<ApplicationRole> roleManager,
+        ILogger<RegisterUserCommandHandler> logger)
     {
         _tokenIssuer = tokenIssuer;
         _userManager = userManager;
         _roleManager = roleManager;
+        _logger = logger;
     }
 
     public async Task<Result<AuthResponse>> Handle(RegisterUserCommand request, CancellationToken cancellationToken)
@@ -76,6 +80,8 @@ public sealed class RegisterUserCommandHandler : IRequestHandler<RegisterUserCom
             .ConfigureAwait(false);
 
         AccessTokenResult token = _tokenIssuer.CreateAccessToken(user.Uid, user.Email ?? normalizedEmail, roles);
+
+        _logger.LogInformation("User {UserUid} registered", user.Uid);
 
         return Result<AuthResponse>.Success(
             new AuthResponse(

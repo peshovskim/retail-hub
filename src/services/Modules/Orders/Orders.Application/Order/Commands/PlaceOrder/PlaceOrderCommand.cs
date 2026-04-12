@@ -1,6 +1,7 @@
 using Cart.Application.Cart.Interfaces;
 using Catalog.Application.Product.Interfaces;
 using MediatR;
+using Microsoft.Extensions.Logging;
 using OrderAggregate = Orders.Domain.Order.Domain.Order;
 using Orders.Application.Order.Interfaces;
 using Orders.Application.Order.Responses;
@@ -20,17 +21,20 @@ public sealed class PlaceOrderCommandHandler : IRequestHandler<PlaceOrderCommand
     private readonly IOrderRepository _orderRepository;
     private readonly IProductReadRepository _productReadRepository;
     private readonly IUserIdentityLookup _userIdentityLookup;
+    private readonly ILogger<PlaceOrderCommandHandler> _logger;
 
     public PlaceOrderCommandHandler(
         ICartRepository cartRepository,
         IOrderRepository orderRepository,
         IProductReadRepository productReadRepository,
-        IUserIdentityLookup userIdentityLookup)
+        IUserIdentityLookup userIdentityLookup,
+        ILogger<PlaceOrderCommandHandler> logger)
     {
         _cartRepository = cartRepository;
         _orderRepository = orderRepository;
         _productReadRepository = productReadRepository;
         _userIdentityLookup = userIdentityLookup;
+        _logger = logger;
     }
 
     public async Task<Result<OrderResponse>> Handle(PlaceOrderCommand request, CancellationToken cancellationToken)
@@ -87,6 +91,13 @@ public sealed class PlaceOrderCommandHandler : IRequestHandler<PlaceOrderCommand
 
         cart.ClearAllActiveItems(utcNow);
         await _cartRepository.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+
+        _logger.LogInformation(
+            "Order {OrderUid} placed from cart {CartUid} for {TotalAmount} with {LineCount} line(s)",
+            order.Uid,
+            order.CartUid,
+            order.TotalAmount,
+            order.Lines.Count);
 
         return Result<OrderResponse>.Success(ToResponse(order));
     }

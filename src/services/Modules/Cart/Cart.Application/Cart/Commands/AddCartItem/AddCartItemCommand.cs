@@ -4,6 +4,7 @@ using Cart.Application.Cart.Responses;
 using Cart.Application.Cart;
 using Catalog.Application.Product.Interfaces;
 using MediatR;
+using Microsoft.Extensions.Logging;
 using RetailHub.SharedKernel.Application.Common.Cqrs;
 using RetailHub.SharedKernel.Domain;
 
@@ -21,11 +22,16 @@ public sealed class AddCartItemCommandHandler : IRequestHandler<AddCartItemComma
 {
     private readonly ICartRepository _cartRepository;
     private readonly IProductReadRepository _productReadRepository;
+    private readonly ILogger<AddCartItemCommandHandler> _logger;
 
-    public AddCartItemCommandHandler(ICartRepository cartRepository, IProductReadRepository productReadRepository)
+    public AddCartItemCommandHandler(
+        ICartRepository cartRepository,
+        IProductReadRepository productReadRepository,
+        ILogger<AddCartItemCommandHandler> logger)
     {
         _cartRepository = cartRepository;
         _productReadRepository = productReadRepository;
+        _logger = logger;
     }
 
     public async Task<Result<CartResponse>> Handle(AddCartItemCommand request, CancellationToken cancellationToken)
@@ -64,6 +70,12 @@ public sealed class AddCartItemCommandHandler : IRequestHandler<AddCartItemComma
         CartResponse dto = await CartResponseFactory
             .CreateAsync(cart, _productReadRepository, cancellationToken)
             .ConfigureAwait(false);
+
+        _logger.LogInformation(
+            "Added product {ProductUid} x {Quantity} to cart {CartId}",
+            request.ProductId,
+            request.Quantity,
+            request.CartId);
 
         return Result<CartResponse>.Success(dto);
     }

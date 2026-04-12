@@ -1,6 +1,7 @@
 using Cart.Application.Cart.Commands.AddCartItem;
 using Cart.Application.Cart.Interfaces;
 using Catalog.Application.Product.Interfaces;
+using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 
 namespace RetailHub.Services.Tests.Cart.AddCartItemCommand;
@@ -23,5 +24,8 @@ public sealed class AddCartItemCommandHandlerBuilder
     }
 
     public AddCartItemCommandHandler Build() =>
-        new(_cartRepository.Object, _productReadRepository.Object);
+        new(
+            _cartRepository.Object,
+            _productReadRepository.Object,
+            NullLogger<AddCartItemCommandHandler>.Instance);
 }
