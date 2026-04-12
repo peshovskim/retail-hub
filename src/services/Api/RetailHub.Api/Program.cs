@@ -33,6 +33,7 @@ ArgumentException.ThrowIfNullOrEmpty(connectionString);
 
 builder.Services.Configure<JwtOptions>(builder.Configuration.GetSection(JwtOptions.SectionName));
 builder.Services.Configure<AzureStorageOptions>(builder.Configuration.GetSection(AzureStorageOptions.SectionName));
+builder.Services.Configure<RedisOptions>(builder.Configuration.GetSection(RedisOptions.SectionName));
 
 var azureStorageOptions = builder.Configuration.GetSection(AzureStorageOptions.SectionName).Get<AzureStorageOptions>()
     ?? new AzureStorageOptions();
@@ -41,6 +42,20 @@ if (!string.IsNullOrWhiteSpace(azureStorageOptions.ConnectionString))
     builder.Services.AddAzureClients(clientBuilder =>
     {
         clientBuilder.AddBlobServiceClient(azureStorageOptions.ConnectionString);
+    });
+}
+
+var redisOptions = builder.Configuration.GetSection(RedisOptions.SectionName).Get<RedisOptions>()
+    ?? new RedisOptions();
+if (!string.IsNullOrWhiteSpace(redisOptions.ConnectionString))
+{
+    builder.Services.AddStackExchangeRedisCache(options =>
+    {
+        options.Configuration = redisOptions.ConnectionString;
+        if (!string.IsNullOrWhiteSpace(redisOptions.InstanceName))
+        {
+            options.InstanceName = redisOptions.InstanceName;
+        }
     });
 }
 
