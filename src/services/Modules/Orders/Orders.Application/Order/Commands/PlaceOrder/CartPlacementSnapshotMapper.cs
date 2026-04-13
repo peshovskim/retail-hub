@@ -8,7 +8,7 @@ internal static class CartPlacementSnapshotMapper
     public static CartPlacementSnapshot FromCart(CartAggregate cart)
     {
         ArgumentNullException.ThrowIfNull(cart);
-        var lines = cart.Items
+        CartPlacementLineSnapshot[] lines = cart.Items
             .Select(i => new CartPlacementLineSnapshot(
                 i.ProductId,
                 i.Quantity,

@@ -34,8 +34,7 @@ public sealed class CartController : ExtendedApiController
         CancellationToken cancellationToken)
     {
         Result<CartSessionResponse> result =
-            await _mediator.Send(new CreateOrGetCartSessionCommand(clientAnonymousKey), cancellationToken)
-                .ConfigureAwait(false);
+            await _mediator.Send(new CreateOrGetCartSessionCommand(clientAnonymousKey), cancellationToken);
 
         return OkOrError(result);
     }
@@ -46,8 +45,7 @@ public sealed class CartController : ExtendedApiController
     public async Task<IActionResult> GetCart(Guid cartId, CancellationToken cancellationToken)
     {
         Result<CartResponse> result = await _mediator
-            .Send(new GetCartQuery(cartId), cancellationToken)
-            .ConfigureAwait(false);
+            .Send(new GetCartQuery(cartId), cancellationToken);
 
         return OkOrError(result);
     }
@@ -59,8 +57,7 @@ public sealed class CartController : ExtendedApiController
     public async Task<IActionResult> AddItem([FromBody] AddCartItemRequest request, CancellationToken cancellationToken)
     {
         Result<CartResponse> result = await _mediator
-            .Send(new AddCartItemCommand(request), cancellationToken)
-            .ConfigureAwait(false);
+            .Send(new AddCartItemCommand(request), cancellationToken);
 
         return OkOrError(result);
     }
@@ -75,8 +72,7 @@ public sealed class CartController : ExtendedApiController
         CancellationToken cancellationToken)
     {
         Result<CartResponse> result = await _mediator
-            .Send(new UpdateCartItemQuantityCommand(request, productId), cancellationToken)
-            .ConfigureAwait(false);
+            .Send(new UpdateCartItemQuantityCommand(request, productId), cancellationToken);
 
         return OkOrError(result);
     }
@@ -90,8 +86,7 @@ public sealed class CartController : ExtendedApiController
         CancellationToken cancellationToken)
     {
         Result<CartResponse> result = await _mediator
-            .Send(new RemoveCartItemCommand(request, productId), cancellationToken)
-            .ConfigureAwait(false);
+            .Send(new RemoveCartItemCommand(request, productId), cancellationToken);
 
         return OkOrError(result);
     }

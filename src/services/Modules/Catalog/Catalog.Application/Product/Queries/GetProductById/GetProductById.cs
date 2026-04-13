@@ -21,9 +21,8 @@ public sealed class GetProductByIdQueryHandler : IRequestHandler<GetProductByIdQ
         GetProductByIdQuery request,
         CancellationToken cancellationToken)
     {
-        var product = await _productReadRepository
-            .GetActiveProductByUidAsync(request.Uid, cancellationToken)
-            .ConfigureAwait(false);
+        ProductResponse? product = await _productReadRepository
+            .GetActiveProductByUidAsync(request.Uid, cancellationToken);
 
         if (product is null)
         {

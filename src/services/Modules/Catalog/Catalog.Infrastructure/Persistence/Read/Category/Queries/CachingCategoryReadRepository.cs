@@ -36,12 +36,11 @@ internal sealed class CachingCategoryReadRepository : ICategoryReadRepository
         CancellationToken cancellationToken = default)
     {
         byte[]? cached = await _cache
-            .GetAsync(CatalogCacheKeys.CategoryMenuSourceRows, cancellationToken)
-            .ConfigureAwait(false);
+            .GetAsync(CatalogCacheKeys.CategoryMenuSourceRows, cancellationToken);
         if (cached is not null)
         {
             _logger.LogDebug("Cache hit for {Key}", CatalogCacheKeys.CategoryMenuSourceRows);
-            var list = JsonSerializer.Deserialize<List<CategoryMenuSourceRow>>(cached, CatalogCacheJson.Options);
+            List<CategoryMenuSourceRow>? list = JsonSerializer.Deserialize<List<CategoryMenuSourceRow>>(cached, CatalogCacheJson.Options);
             if (list is not null)
             {
                 return list;
@@ -49,7 +48,7 @@ internal sealed class CachingCategoryReadRepository : ICategoryReadRepository
         }
 
         _logger.LogDebug("Cache miss for {Key}", CatalogCacheKeys.CategoryMenuSourceRows);
-        var fresh = await _inner.GetAllActiveCategoriesAsync(cancellationToken).ConfigureAwait(false);
+        IReadOnlyList<CategoryMenuSourceRow> fresh = await _inner.GetAllActiveCategoriesAsync(cancellationToken);
         await _cache.SetAsync(
                 CatalogCacheKeys.CategoryMenuSourceRows,
                 JsonSerializer.SerializeToUtf8Bytes(fresh, CatalogCacheJson.Options),
@@ -57,8 +56,7 @@ internal sealed class CachingCategoryReadRepository : ICategoryReadRepository
                 {
                     AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(_options.CategoryMenuTtlMinutes),
                 },
-                cancellationToken)
-            .ConfigureAwait(false);
+                cancellationToken);
         return fresh;
     }
 }

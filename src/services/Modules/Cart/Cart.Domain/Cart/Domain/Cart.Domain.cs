@@ -19,7 +19,7 @@ public sealed partial class Cart
                 "Quantity must be greater than zero.");
         }
 
-        var existing = Items.FirstOrDefault(i => i.IsActive && i.ProductId == productId);
+        CartItem? existing = Items.FirstOrDefault(i => i.IsActive && i.ProductId == productId);
 
         if (existing is not null)
         {
@@ -33,7 +33,7 @@ public sealed partial class Cart
                 $"Cart cannot contain more than {MaxDistinctItems} distinct products.");
         }
 
-        var itemResult = CartItem.Create(Id, productId, quantityToAdd, unitPrice, utcNow);
+        Result<CartItem> itemResult = CartItem.Create(Id, productId, quantityToAdd, unitPrice, utcNow);
 
         if (itemResult.IsFailure)
         {
@@ -47,7 +47,7 @@ public sealed partial class Cart
 
     public Result SetItemQuantity(int productId, int quantity, decimal unitPrice, DateTime utcNow)
     {
-        var existing = Items.FirstOrDefault(i => i.IsActive && i.ProductId == productId);
+        CartItem? existing = Items.FirstOrDefault(i => i.IsActive && i.ProductId == productId);
 
         if (existing is null)
         {
@@ -66,7 +66,7 @@ public sealed partial class Cart
 
     public void RemoveItem(int productId, DateTime utcNow)
     {
-        var existing = Items.FirstOrDefault(i => i.IsActive && i.ProductId == productId);
+        CartItem? existing = Items.FirstOrDefault(i => i.IsActive && i.ProductId == productId);
         if (existing is not null)
         {
             existing.SoftDelete(utcNow);

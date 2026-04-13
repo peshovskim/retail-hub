@@ -18,7 +18,7 @@ public sealed partial class OrderLine
                 "Quantity must be greater than zero.");
         }
 
-        var lineTotal = quantity * unitPrice;
+        decimal lineTotal = quantity * unitPrice;
 
         return Result<OrderLine>.Success(
             new OrderLine

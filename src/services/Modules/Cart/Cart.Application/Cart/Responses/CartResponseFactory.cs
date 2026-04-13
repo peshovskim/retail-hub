@@ -1,4 +1,5 @@
 using Catalog.Application.Product.Interfaces;
+using Catalog.Application.Product.Responses;
 using CartEntity = Cart.Domain.Cart.Domain.Cart;
 
 namespace Cart.Application.Cart.Responses;
@@ -16,13 +17,12 @@ internal static class CartResponseFactory
 
         foreach (var item in cart.Items.Where(static i => i.IsActive).OrderBy(static i => i.ProductId))
         {
-            var product = await productReadRepository
-                .GetActiveProductByInternalIdAsync(item.ProductId, cancellationToken)
-                .ConfigureAwait(false);
+            ProductResponse? product = await productReadRepository
+                .GetActiveProductByInternalIdAsync(item.ProductId, cancellationToken);
 
-            var name = product?.Name ?? "Unavailable";
-            var sku = product?.Sku ?? string.Empty;
-            var lineTotal = item.UnitPrice * item.Quantity;
+            string name = product?.Name ?? "Unavailable";
+            string sku = product?.Sku ?? string.Empty;
+            decimal lineTotal = item.UnitPrice * item.Quantity;
             subtotal += lineTotal;
             itemCount += item.Quantity;
             lines.Add(new CartLineResponse(product?.Id ?? Guid.Empty, name, sku, item.Quantity, item.UnitPrice, lineTotal));

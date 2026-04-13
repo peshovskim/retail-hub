@@ -18,8 +18,7 @@ internal sealed class CartRepository : ICartRepository
     {
         return await _dbContext.Carts
             .Include(c => c.Items)
-            .FirstOrDefaultAsync(c => c.Uid == id, cancellationToken)
-            .ConfigureAwait(false);
+            .FirstOrDefaultAsync(c => c.Uid == id, cancellationToken);
     }
 
     public async Task<CartEntity?> GetByAnonymousKeyAsNoTrackingAsync(
@@ -28,13 +27,12 @@ internal sealed class CartRepository : ICartRepository
     {
         return await _dbContext.Carts
             .AsNoTracking()
-            .FirstOrDefaultAsync(c => c.AnonymousKey == anonymousKey, cancellationToken)
-            .ConfigureAwait(false);
+            .FirstOrDefaultAsync(c => c.AnonymousKey == anonymousKey, cancellationToken);
     }
 
     public async Task AddAsync(CartEntity cart, CancellationToken cancellationToken = default)
     {
-        await _dbContext.Carts.AddAsync(cart, cancellationToken).ConfigureAwait(false);
+        await _dbContext.Carts.AddAsync(cart, cancellationToken);
     }
 
     public Task<int> SaveChangesAsync(CancellationToken cancellationToken = default) =>

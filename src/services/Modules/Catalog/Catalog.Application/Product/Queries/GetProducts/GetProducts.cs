@@ -29,9 +29,8 @@ public sealed class GetProductsQueryHandler : IRequestHandler<GetProductsQuery, 
         GetProductsQuery request,
         CancellationToken cancellationToken)
     {
-        var list = await _productReadRepository
-            .ListActiveProductsAsync(request, cancellationToken)
-            .ConfigureAwait(false);
+        ProductListResult list = await _productReadRepository
+            .ListActiveProductsAsync(request, cancellationToken);
 
         return Result<ProductListResult>.Success(list);
     }

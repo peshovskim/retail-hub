@@ -15,8 +15,8 @@ internal sealed class ProductListCacheInvalidation : IProductListCacheInvalidati
 
     public Task NotifyProductCatalogMutatedAsync(CancellationToken cancellationToken = default)
     {
-        var version = Guid.NewGuid().ToString("N");
-        var bytes = Encoding.UTF8.GetBytes(version);
+        string version = Guid.NewGuid().ToString("N");
+        byte[] bytes = Encoding.UTF8.GetBytes(version);
         var options = new DistributedCacheEntryOptions
         {
             AbsoluteExpirationRelativeToNow = TimeSpan.FromDays(365),

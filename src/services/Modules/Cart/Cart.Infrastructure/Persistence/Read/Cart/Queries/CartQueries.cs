@@ -14,8 +14,7 @@ internal sealed class CartQueries : ICartReadRepository
     public async Task<CartEntity?> GetByIdWithItemsAsync(Guid id, CancellationToken cancellationToken = default)
     {
         return await ActiveCartsWithActiveItems(_dbContext)
-            .FirstOrDefaultAsync(c => c.Uid == id, cancellationToken)
-            .ConfigureAwait(false);
+            .FirstOrDefaultAsync(c => c.Uid == id, cancellationToken);
     }
 
     private static IQueryable<CartEntity> ActiveCartsWithActiveItems(CartReadDbContext db) =>
@@ -27,7 +26,6 @@ internal sealed class CartQueries : ICartReadRepository
     {
         return await _dbContext.Carts
             .Where(c => c.DeletedOn == null && c.AnonymousKey == anonymousKey)
-            .FirstOrDefaultAsync(cancellationToken)
-            .ConfigureAwait(false);
+            .FirstOrDefaultAsync(cancellationToken);
     }
 }

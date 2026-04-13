@@ -1,5 +1,6 @@
 using System.Reflection;
 using FluentValidation;
+using FluentValidation.Results;
 using MediatR;
 using RetailHub.SharedKernel.Domain;
 
@@ -22,22 +23,21 @@ public sealed class ValidationBehavior<TRequest, TResponse> : IPipelineBehavior<
     {
         if (_validators is null || !_validators.Any())
         {
-            return await next().ConfigureAwait(false);
+            return await next();
         }
 
-        var context = new ValidationContext<TRequest>(request);
-        var failures = (await Task.WhenAll(_validators.Select(v => v.ValidateAsync(context, cancellationToken)))
-                .ConfigureAwait(false))
+        ValidationContext<TRequest> context = new(request);
+        List<ValidationFailure> failures = (await Task.WhenAll(_validators.Select(v => v.ValidateAsync(context, cancellationToken))))
             .SelectMany(r => r.Errors)
             .Where(f => f is not null)
             .ToList();
 
         if (failures.Count == 0)
         {
-            return await next().ConfigureAwait(false);
+            return await next();
         }
 
-        var message = string.Join("; ", failures.Select(f => f.ErrorMessage));
+        string message = string.Join("; ", failures.Select(f => f.ErrorMessage));
         return AdaptFailure(message);
     }
 
@@ -46,9 +46,9 @@ public sealed class ValidationBehavior<TRequest, TResponse> : IPipelineBehavior<
         if (typeof(TResponse).IsGenericType
             && typeof(TResponse).GetGenericTypeDefinition() == typeof(Result<>))
         {
-            var valueType = typeof(TResponse).GenericTypeArguments[0];
-            var resultType = typeof(Result<>).MakeGenericType(valueType);
-            var invalidMethod = resultType.GetMethod(
+            Type valueType = typeof(TResponse).GenericTypeArguments[0];
+            Type resultType = typeof(Result<>).MakeGenericType(valueType);
+            MethodInfo? invalidMethod = resultType.GetMethod(
                 nameof(Result<int>.Invalid),
                 BindingFlags.Public | BindingFlags.Static,
                 null,
@@ -56,7 +56,7 @@ public sealed class ValidationBehavior<TRequest, TResponse> : IPipelineBehavior<
                 null);
             if (invalidMethod is not null)
             {
-                var failureResult = invalidMethod.Invoke(null, new object[] { ResultCodes.Validation, message });
+                object? failureResult = invalidMethod.Invoke(null, new object[] { ResultCodes.Validation, message });
                 return (TResponse)(failureResult ?? throw new InvalidOperationException("Result failure could not be created."));
             }
         }

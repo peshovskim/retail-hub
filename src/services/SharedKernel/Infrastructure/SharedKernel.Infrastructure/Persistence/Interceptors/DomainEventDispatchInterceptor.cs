@@ -27,10 +27,10 @@ public sealed class DomainEventDispatchInterceptor<TDbContext> : SaveChangesInte
     {
         if (eventData.Context is not TDbContext db)
         {
-            return await base.SavedChangesAsync(eventData, result, cancellationToken).ConfigureAwait(false);
+            return await base.SavedChangesAsync(eventData, result, cancellationToken);
         }
 
-        var aggregates = db.ChangeTracker
+        List<AggregateRoot> aggregates = db.ChangeTracker
             .Entries<AggregateRoot>()
             .Where(e => e.Entity.DomainEvents.Count > 0)
             .Select(e => e.Entity)
@@ -42,11 +42,11 @@ public sealed class DomainEventDispatchInterceptor<TDbContext> : SaveChangesInte
             return result;
         }
 
-        await using var scope = _serviceProvider.CreateAsyncScope();
-        var dispatcher = scope.ServiceProvider.GetRequiredService<IDomainEventDispatcher>();
+        await using AsyncServiceScope scope = _serviceProvider.CreateAsyncScope();
+        IDomainEventDispatcher dispatcher = scope.ServiceProvider.GetRequiredService<IDomainEventDispatcher>();
         foreach (var aggregate in aggregates)
         {
-            await aggregate.DispatchDomainEventsAsync(dispatcher, cancellationToken).ConfigureAwait(false);
+            await aggregate.DispatchDomainEventsAsync(dispatcher, cancellationToken);
         }
 
         return result;

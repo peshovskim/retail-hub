@@ -27,10 +27,10 @@ public sealed class RequestLoggingBehavior<TRequest, TResponse> : IPipelineBehav
     {
         string requestName = typeof(TRequest).Name;
         bool isCommand = IsCommand(typeof(TRequest));
-        var sw = Stopwatch.StartNew();
+        Stopwatch sw = Stopwatch.StartNew();
         try
         {
-            var response = await next().ConfigureAwait(false);
+            TResponse response = await next();
             sw.Stop();
 
             if (response is Result { IsFailure: true } failed)

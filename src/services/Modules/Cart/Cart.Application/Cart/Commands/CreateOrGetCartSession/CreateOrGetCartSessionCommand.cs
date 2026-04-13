@@ -20,7 +20,7 @@ public sealed class CreateOrGetCartSessionCommandHandler : IRequestHandler<Creat
         CreateOrGetCartSessionCommand request,
         CancellationToken cancellationToken)
     {
-        var key = string.IsNullOrWhiteSpace(request.ClientAnonymousKey)
+        string key = string.IsNullOrWhiteSpace(request.ClientAnonymousKey)
             ? Guid.NewGuid().ToString("D")
             : request.ClientAnonymousKey.Trim();
 
@@ -31,19 +31,18 @@ public sealed class CreateOrGetCartSessionCommandHandler : IRequestHandler<Creat
                 "Anonymous session key must be at most 128 characters.");
         }
 
-        var existing = await _cartRepository
-            .GetByAnonymousKeyAsNoTrackingAsync(key, cancellationToken)
-            .ConfigureAwait(false);
+        CartEntity? existing = await _cartRepository
+            .GetByAnonymousKeyAsNoTrackingAsync(key, cancellationToken);
 
         if (existing is not null)
         {
             return Result<CartSessionResponse>.Success(new CartSessionResponse(existing.Uid, key));
         }
 
-        var cart = CartEntity.Create(DateTime.UtcNow, userId: null, anonymousKey: key);
+        CartEntity cart = CartEntity.Create(DateTime.UtcNow, userId: null, anonymousKey: key);
 
-        await _cartRepository.AddAsync(cart, cancellationToken).ConfigureAwait(false);
-        await _cartRepository.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+        await _cartRepository.AddAsync(cart, cancellationToken);
+        await _cartRepository.SaveChangesAsync(cancellationToken);
 
         return Result<CartSessionResponse>.Success(new CartSessionResponse(cart.Uid, key));
     }

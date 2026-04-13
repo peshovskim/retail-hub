@@ -15,6 +15,6 @@ internal sealed class ProductRepository : IProductRepository
 
     public async Task AddAsync(ProductEntity product, CancellationToken cancellationToken = default)
     {
-        await _dbContext.Products.AddAsync(product, cancellationToken).ConfigureAwait(false);
+        await _dbContext.Products.AddAsync(product, cancellationToken);
     }
 }

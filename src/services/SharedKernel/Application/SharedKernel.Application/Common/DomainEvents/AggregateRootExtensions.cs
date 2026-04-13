@@ -16,13 +16,13 @@ public static class AggregateRootExtensions
     {
         ArgumentNullException.ThrowIfNull(aggregate);
         ArgumentNullException.ThrowIfNull(dispatcher);
-        var events = aggregate.DomainEvents.ToList();
+        List<IDomainEvent> events = aggregate.DomainEvents.ToList();
         if (events.Count == 0)
         {
             return;
         }
 
-        await dispatcher.DispatchAsync(events, cancellationToken).ConfigureAwait(false);
+        await dispatcher.DispatchAsync(events, cancellationToken);
         foreach (var e in events)
         {
             aggregate.RemoveDomainEvent(e);

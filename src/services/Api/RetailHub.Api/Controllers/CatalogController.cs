@@ -26,8 +26,7 @@ public sealed class CatalogController : ExtendedApiController
     public async Task<IActionResult> GetCategories(CancellationToken cancellationToken)
     {
         Result<IReadOnlyList<CategoryResponse>> result = await _mediator
-            .Send(new GetCategoriesQuery(), cancellationToken)
-            .ConfigureAwait(false);
+            .Send(new GetCategoriesQuery(), cancellationToken);
 
         return OkOrError(result);
     }
@@ -37,8 +36,7 @@ public sealed class CatalogController : ExtendedApiController
     public async Task<IActionResult> GetCategoryMenu(CancellationToken cancellationToken)
     {
         Result<IReadOnlyList<CategoryMenuNodeResponse>> result = await _mediator
-            .Send(new GetCategoryMenuQuery(), cancellationToken)
-            .ConfigureAwait(false);
+            .Send(new GetCategoryMenuQuery(), cancellationToken);
 
         return OkOrError(result);
     }
@@ -49,8 +47,7 @@ public sealed class CatalogController : ExtendedApiController
     public async Task<IActionResult> GetProducts([FromQuery] GetProductsQuery query, CancellationToken cancellationToken)
     {
         Result<ProductListResult> result = await _mediator
-            .Send(query, cancellationToken)
-            .ConfigureAwait(false);
+            .Send(query, cancellationToken);
 
         return OkOrError(result);
     }
@@ -61,8 +58,7 @@ public sealed class CatalogController : ExtendedApiController
     public async Task<IActionResult> GetProduct(Guid id, CancellationToken cancellationToken)
     {
         Result<ProductResponse> result = await _mediator
-            .Send(new GetProductByIdQuery(id), cancellationToken)
-            .ConfigureAwait(false);
+            .Send(new GetProductByIdQuery(id), cancellationToken);
 
         return OkOrError(result);
     }

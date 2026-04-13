@@ -40,11 +40,11 @@ internal sealed class CachingProductReadRepository : IProductReadRepository
         GetProductsQuery criteria,
         CancellationToken cancellationToken = default)
     {
-        var version = await GetListVersionAsync(cancellationToken).ConfigureAwait(false);
-        var hashSuffix = ProductListCacheKeyBuilder.ComputeCriteriaHashSuffix(criteria);
-        var cacheKey = $"{CatalogCacheKeys.ProductListPrefix}{version}:{hashSuffix}";
+        string version = await GetListVersionAsync(cancellationToken);
+        string hashSuffix = ProductListCacheKeyBuilder.ComputeCriteriaHashSuffix(criteria);
+        string cacheKey = $"{CatalogCacheKeys.ProductListPrefix}{version}:{hashSuffix}";
 
-        byte[]? cached = await _cache.GetAsync(cacheKey, cancellationToken).ConfigureAwait(false);
+        byte[]? cached = await _cache.GetAsync(cacheKey, cancellationToken);
         if (cached is not null)
         {
             _logger.LogDebug("Cache hit for product list {KeySuffix}", hashSuffix);
@@ -56,8 +56,8 @@ internal sealed class CachingProductReadRepository : IProductReadRepository
         }
 
         _logger.LogDebug("Cache miss for product list {KeySuffix}", hashSuffix);
-        var fresh = await _inner.ListActiveProductsAsync(criteria, cancellationToken).ConfigureAwait(false);
-        var payload = new ProductListResultJson(fresh.Items.ToList(), fresh.TotalCount);
+        ProductListResult fresh = await _inner.ListActiveProductsAsync(criteria, cancellationToken);
+        ProductListResultJson payload = new(fresh.Items.ToList(), fresh.TotalCount);
         await _cache.SetAsync(
                 cacheKey,
                 JsonSerializer.SerializeToUtf8Bytes(payload, CatalogCacheJson.Options),
@@ -65,8 +65,7 @@ internal sealed class CachingProductReadRepository : IProductReadRepository
                 {
                     AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(_options.ProductListTtlMinutes),
                 },
-                cancellationToken)
-            .ConfigureAwait(false);
+                cancellationToken);
 
         return fresh;
     }
@@ -74,8 +73,7 @@ internal sealed class CachingProductReadRepository : IProductReadRepository
     private async Task<string> GetListVersionAsync(CancellationToken cancellationToken)
     {
         byte[]? versionBytes = await _cache
-            .GetAsync(CatalogCacheKeys.ProductListVersion, cancellationToken)
-            .ConfigureAwait(false);
+            .GetAsync(CatalogCacheKeys.ProductListVersion, cancellationToken);
         if (versionBytes is null || versionBytes.Length == 0)
         {
             return InitialListVersion;

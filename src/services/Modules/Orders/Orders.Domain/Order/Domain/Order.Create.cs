@@ -24,7 +24,7 @@ public sealed partial class Order
                 "Cannot place an order from a deleted cart.");
         }
 
-        var activeItems = placement.Lines.Where(i => i.IsActive).ToList();
+        List<CartPlacementLineSnapshot> activeItems = placement.Lines.Where(i => i.IsActive).ToList();
 
         if (activeItems.Count == 0)
         {
@@ -45,7 +45,7 @@ public sealed partial class Order
                     "One or more cart products could not be resolved.");
             }
 
-            var lineResult = OrderLine.Create(
+            Result<OrderLine> lineResult = OrderLine.Create(
                 item.ProductId,
                 productUid,
                 item.Quantity,
@@ -57,7 +57,7 @@ public sealed partial class Order
                 return Result.FromError<Order>(lineResult);
             }
 
-            var line = lineResult.Value!;
+            OrderLine line = lineResult.Value!;
             total += line.LineTotal;
             lines.Add(line);
         }

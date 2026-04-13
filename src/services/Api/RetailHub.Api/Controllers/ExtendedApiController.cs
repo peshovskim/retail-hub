@@ -45,7 +45,7 @@ public class ExtendedApiController : ControllerBase
             return Result<UploadedFile>.NotFound(ApiResultErrorCodes.FileValidationName, "Invalid file name.");
         }
 
-        var uploadedFile = new UploadedFile
+        UploadedFile uploadedFile = new()
         {
             FileName = postedFile.FileName,
             ContentType = string.IsNullOrEmpty(postedFile.ContentType)
@@ -53,8 +53,8 @@ public class ExtendedApiController : ControllerBase
                 : postedFile.ContentType,
         };
 
-        await using var memoryStream = new MemoryStream();
-        await postedFile.CopyToAsync(memoryStream, cancellationToken).ConfigureAwait(false);
+        await using MemoryStream memoryStream = new();
+        await postedFile.CopyToAsync(memoryStream, cancellationToken);
 
         byte[] content = memoryStream.ToArray();
 

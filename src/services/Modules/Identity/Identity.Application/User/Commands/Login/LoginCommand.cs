@@ -39,8 +39,7 @@ public sealed class LoginCommandHandler : IRequestHandler<LoginCommand, Result<A
         string normalizedEmail = request.Email.Trim();
 
         ApplicationUser? user = await _userManager
-            .FindByEmailAsync(normalizedEmail)
-            .ConfigureAwait(false);
+            .FindByEmailAsync(normalizedEmail);
 
         if (user is null)
         {
@@ -50,8 +49,7 @@ public sealed class LoginCommandHandler : IRequestHandler<LoginCommand, Result<A
         }
 
         bool validPassword = await _userManager
-            .CheckPasswordAsync(user, request.Password)
-            .ConfigureAwait(false);
+            .CheckPasswordAsync(user, request.Password);
 
         if (!validPassword)
         {
@@ -60,9 +58,8 @@ public sealed class LoginCommandHandler : IRequestHandler<LoginCommand, Result<A
                 "Invalid email or password.");
         }
 
-        var roles = await _userManager
-            .GetRolesAsync(user)
-            .ConfigureAwait(false);
+        IList<string> roles = await _userManager
+            .GetRolesAsync(user);
 
         AccessTokenResult token = _tokenIssuer.CreateAccessToken(
             user.Uid,

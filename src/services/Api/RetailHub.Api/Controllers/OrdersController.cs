@@ -27,8 +27,7 @@ public sealed class OrdersController : ExtendedApiController
     public async Task<IActionResult> PlaceOrder([FromBody] PlaceOrderRequest request, CancellationToken cancellationToken)
     {
         Result<OrderResponse> result = await _mediator
-            .Send(new PlaceOrderCommand(request.CartId, request.UserId), cancellationToken)
-            .ConfigureAwait(false);
+            .Send(new PlaceOrderCommand(request.CartId, request.UserId), cancellationToken);
 
         return OkOrError(result);
     }
@@ -39,8 +38,7 @@ public sealed class OrdersController : ExtendedApiController
     public async Task<IActionResult> GetOrder(Guid orderId, CancellationToken cancellationToken)
     {
         Result<OrderResponse> result = await _mediator
-            .Send(new GetOrderByIdQuery(orderId), cancellationToken)
-            .ConfigureAwait(false);
+            .Send(new GetOrderByIdQuery(orderId), cancellationToken);
 
         return OkOrError(result);
     }

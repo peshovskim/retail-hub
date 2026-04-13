@@ -15,7 +15,7 @@ internal sealed class OrderRepository : IOrderRepository
 
     public async Task AddAsync(OrderEntity order, CancellationToken cancellationToken = default)
     {
-        await _dbContext.Orders.AddAsync(order, cancellationToken).ConfigureAwait(false);
+        await _dbContext.Orders.AddAsync(order, cancellationToken);
     }
 
     public Task<int> SaveChangesAsync(CancellationToken cancellationToken = default) =>

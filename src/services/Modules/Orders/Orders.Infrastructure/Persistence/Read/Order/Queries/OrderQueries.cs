@@ -15,16 +15,15 @@ internal sealed class OrderQueries : IOrderReadRepository
 
     public async Task<OrderResponse?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)
     {
-        var order = await ActiveOrdersWithActiveLines(_dbContext)
-            .FirstOrDefaultAsync(o => o.Uid == id, cancellationToken)
-            .ConfigureAwait(false);
+        OrderEntity? order = await ActiveOrdersWithActiveLines(_dbContext)
+            .FirstOrDefaultAsync(o => o.Uid == id, cancellationToken);
 
         if (order is null)
         {
             return null;
         }
 
-        var lines = order.Lines
+        List<OrderLineResponse> lines = order.Lines
             .Select(l => new OrderLineResponse(l.ProductUid, l.Quantity, l.UnitPrice, l.LineTotal))
             .ToList();
 

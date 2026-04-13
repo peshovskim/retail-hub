@@ -15,6 +15,6 @@ internal sealed class CategoryRepository : ICategoryRepository
 
     public async Task AddAsync(CategoryEntity category, CancellationToken cancellationToken = default)
     {
-        await _dbContext.Categories.AddAsync(category, cancellationToken).ConfigureAwait(false);
+        await _dbContext.Categories.AddAsync(category, cancellationToken);
     }
 }

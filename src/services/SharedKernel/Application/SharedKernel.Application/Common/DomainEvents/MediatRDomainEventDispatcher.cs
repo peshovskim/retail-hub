@@ -17,10 +17,10 @@ public sealed class MediatRDomainEventDispatcher : IDomainEventDispatcher
     {
         foreach (var domainEvent in domainEvents)
         {
-            var wrapperType = typeof(DomainEventNotification<>).MakeGenericType(domainEvent.GetType());
-            var notification = Activator.CreateInstance(wrapperType, domainEvent)
+            Type wrapperType = typeof(DomainEventNotification<>).MakeGenericType(domainEvent.GetType());
+            object notification = Activator.CreateInstance(wrapperType, domainEvent)
                 ?? throw new InvalidOperationException($"Could not wrap domain event type {domainEvent.GetType().Name}.");
-            await _publisher.Publish((INotification)notification, cancellationToken).ConfigureAwait(false);
+            await _publisher.Publish((INotification)notification, cancellationToken);
         }
     }
 }

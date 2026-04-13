@@ -28,8 +28,7 @@ public sealed class AuthController : ExtendedApiController
     public async Task<IActionResult> Register([FromBody] RegisterUserRequest request, CancellationToken cancellationToken)
     {
         Result<AuthResponse> result = await _mediator
-            .Send(new RegisterUserCommand(request), cancellationToken)
-            .ConfigureAwait(false);
+            .Send(new RegisterUserCommand(request), cancellationToken);
 
         return OkOrError(result);
     }
@@ -41,8 +40,7 @@ public sealed class AuthController : ExtendedApiController
     public async Task<IActionResult> Login([FromBody] LoginRequest request, CancellationToken cancellationToken)
     {
         Result<AuthResponse> result = await _mediator
-            .Send(new LoginCommand(request), cancellationToken)
-            .ConfigureAwait(false);
+            .Send(new LoginCommand(request), cancellationToken);
 
         return OkOrError(result);
     }
@@ -54,8 +52,7 @@ public sealed class AuthController : ExtendedApiController
     public async Task<IActionResult> GetCurrentUser(CancellationToken cancellationToken)
     {
         Result<CurrentUserResponse> result = await _mediator
-            .Send(new GetCurrentUserQuery(), cancellationToken)
-            .ConfigureAwait(false);
+            .Send(new GetCurrentUserQuery(), cancellationToken);
 
         return OkOrError(result);
     }

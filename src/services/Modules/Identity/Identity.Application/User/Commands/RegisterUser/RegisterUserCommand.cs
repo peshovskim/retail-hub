@@ -52,32 +52,29 @@ public sealed class RegisterUserCommandHandler : IRequestHandler<RegisterUserCom
         };
 
         IdentityResult createResult = await _userManager
-            .CreateAsync(user, request.Password)
-            .ConfigureAwait(false);
+            .CreateAsync(user, request.Password);
 
         if (!createResult.Succeeded)
         {
             return MapIdentityFailure(createResult);
         }
 
-        if (await _roleManager.RoleExistsAsync(UserRoles.Customer).ConfigureAwait(false))
+        if (await _roleManager.RoleExistsAsync(UserRoles.Customer))
         {
             IdentityResult roleResult = await _userManager
-                .AddToRoleAsync(user, UserRoles.Customer)
-                .ConfigureAwait(false);
+                .AddToRoleAsync(user, UserRoles.Customer);
 
             if (!roleResult.Succeeded)
             {
-                await _userManager.DeleteAsync(user).ConfigureAwait(false);
+                await _userManager.DeleteAsync(user);
                 return Result<AuthResponse>.InternalError(
                     ResultCodes.InternalError,
                     string.Join(" ", roleResult.Errors.Select(static e => e.Description)));
             }
         }
 
-        var roles = await _userManager
-            .GetRolesAsync(user)
-            .ConfigureAwait(false);
+        IList<string> roles = await _userManager
+            .GetRolesAsync(user);
 
         AccessTokenResult token = _tokenIssuer.CreateAccessToken(user.Uid, user.Email ?? normalizedEmail, roles);
 

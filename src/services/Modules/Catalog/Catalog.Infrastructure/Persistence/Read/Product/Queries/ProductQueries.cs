@@ -4,6 +4,7 @@ using Catalog.Application.Product.Responses;
 using Catalog.Infrastructure.Persistence.Read.Product.Factories;
 using Microsoft.EntityFrameworkCore;
 using ProductEntity = Catalog.Domain.Product.Domain.Product;
+using ProductImageEntity = Catalog.Domain.Product.Domain.ProductImage;
 
 namespace Catalog.Infrastructure.Persistence.Read.Product.Queries;
 
@@ -22,7 +23,7 @@ internal sealed class ProductQueries : IProductReadRepository
         GetProductsQuery criteria,
         CancellationToken cancellationToken = default)
     {
-        var query = BaseActiveProducts();
+        IQueryable<ProductEntity> query = BaseActiveProducts();
 
         if (criteria.CategoryIds is { Count: > 0 } categoryIds)
         {
@@ -41,7 +42,7 @@ internal sealed class ProductQueries : IProductReadRepository
             query = query.Where(p => p.Price <= priceMax);
         }
 
-        var search = criteria.Search?.Trim();
+        string? search = criteria.Search?.Trim();
         if (!string.IsNullOrEmpty(search))
         {
             query = query.Where(p => p.Name.Contains(search) || p.Sku.Contains(search));
@@ -49,28 +50,26 @@ internal sealed class ProductQueries : IProductReadRepository
 
         query = ApplySort(query, criteria.Sort);
 
-        var totalCount = await query.CountAsync(cancellationToken).ConfigureAwait(false);
+        int totalCount = await query.CountAsync(cancellationToken);
 
         if (criteria.Page is { } page && criteria.PageSize is { } pageSize)
         {
-            var skip = (page - 1) * pageSize;
+            int skip = (page - 1) * pageSize;
             query = query.Skip(skip).Take(pageSize);
         }
 
-        var rows = await (
+        List<ProductEntity> rows = await (
                 from p in query
                 join c in _dbContext.Categories on p.CategoryId equals c.Id
                 where c.DeletedOn == null
                 select p)
-            .ToListAsync(cancellationToken)
-            .ConfigureAwait(false);
+            .ToListAsync(cancellationToken);
 
-        var imagesByProductId = await LoadImagesByProductIdAsync(
+        Dictionary<int, IReadOnlyList<ProductImageResponse>> imagesByProductId = await LoadImagesByProductIdAsync(
                 rows.ConvertAll(p => p.Id),
-                cancellationToken)
-            .ConfigureAwait(false);
+                cancellationToken);
 
-        var items = rows.ConvertAll(p =>
+        List<ProductResponse> items = rows.ConvertAll(p =>
             _readFactory.ToResponse(
                 p,
                 images: imagesByProductId.GetValueOrDefault(p.Id)));
@@ -99,15 +98,14 @@ internal sealed class ProductQueries : IProductReadRepository
                 join c in _dbContext.Categories on p.CategoryId equals c.Id
                 where p.Uid == uid && p.DeletedOn == null && c.DeletedOn == null
                 select new { Product = p, c.Name })
-            .FirstOrDefaultAsync(cancellationToken)
-            .ConfigureAwait(false);
+            .FirstOrDefaultAsync(cancellationToken);
 
         if (row is null)
         {
             return null;
         }
 
-        var images = await LoadImagesForProductAsync(row.Product.Id, cancellationToken).ConfigureAwait(false);
+        IReadOnlyList<ProductImageResponse> images = await LoadImagesForProductAsync(row.Product.Id, cancellationToken);
         return _readFactory.ToResponse(row.Product, row.Name, images);
     }
 
@@ -120,15 +118,14 @@ internal sealed class ProductQueries : IProductReadRepository
                 join c in _dbContext.Categories on p.CategoryId equals c.Id
                 where p.Id == productId && p.DeletedOn == null && c.DeletedOn == null
                 select new { Product = p, c.Name })
-            .FirstOrDefaultAsync(cancellationToken)
-            .ConfigureAwait(false);
+            .FirstOrDefaultAsync(cancellationToken);
 
         if (row is null)
         {
             return null;
         }
 
-        var images = await LoadImagesForProductAsync(row.Product.Id, cancellationToken).ConfigureAwait(false);
+        IReadOnlyList<ProductImageResponse> images = await LoadImagesForProductAsync(row.Product.Id, cancellationToken);
         return _readFactory.ToResponse(row.Product, row.Name, images);
     }
 
@@ -146,8 +143,7 @@ internal sealed class ProductQueries : IProductReadRepository
             .AsNoTracking()
             .Where(p => ids.Contains(p.Id) && p.DeletedOn == null)
             .Select(p => new { p.Id, p.Uid })
-            .ToListAsync(cancellationToken)
-            .ConfigureAwait(false);
+            .ToListAsync(cancellationToken);
 
         return rows.ToDictionary(r => r.Id, r => r.Uid);
     }
@@ -156,16 +152,15 @@ internal sealed class ProductQueries : IProductReadRepository
         int productId,
         CancellationToken cancellationToken)
     {
-        var rows = await _dbContext.ProductImages
+        List<ProductImageResponse> imageRows = await _dbContext.ProductImages
             .AsNoTracking()
             .Where(pi => pi.ProductId == productId && pi.DeletedOn == null)
             .OrderBy(pi => pi.SortOrder)
             .ThenBy(pi => pi.Uid)
             .Select(pi => new ProductImageResponse(pi.Uid, pi.SortOrder, pi.ImageUrl))
-            .ToListAsync(cancellationToken)
-            .ConfigureAwait(false);
+            .ToListAsync(cancellationToken);
 
-        return rows;
+        return imageRows;
     }
 
     private async Task<Dictionary<int, IReadOnlyList<ProductImageResponse>>> LoadImagesByProductIdAsync(
@@ -177,13 +172,12 @@ internal sealed class ProductQueries : IProductReadRepository
             return new Dictionary<int, IReadOnlyList<ProductImageResponse>>();
         }
 
-        var rows = await _dbContext.ProductImages
+        List<ProductImageEntity> imageEntities = await _dbContext.ProductImages
             .AsNoTracking()
             .Where(pi => productIds.Contains(pi.ProductId) && pi.DeletedOn == null)
-            .ToListAsync(cancellationToken)
-            .ConfigureAwait(false);
+            .ToListAsync(cancellationToken);
 
-        return rows
+        return imageEntities
             .GroupBy(pi => pi.ProductId)
             .ToDictionary(
                 g => g.Key,

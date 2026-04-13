@@ -12,7 +12,7 @@ public static class ResultExtensions
             return new OkObjectResult(result.Value);
         }
 
-        var error = result.Error!;
+        ResultError error = result.Error!;
 
         return error.Type switch
         {

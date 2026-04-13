@@ -16,7 +16,6 @@ internal sealed class UserIdentityLookup : IUserIdentityLookup
             .AsNoTracking()
             .Where(u => u.Uid == uid)
             .Select(u => (int?)u.Id)
-            .FirstOrDefaultAsync(cancellationToken)
-            .ConfigureAwait(false);
+            .FirstOrDefaultAsync(cancellationToken);
     }
 }

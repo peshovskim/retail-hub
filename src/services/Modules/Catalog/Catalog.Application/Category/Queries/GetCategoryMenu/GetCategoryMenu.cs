@@ -21,10 +21,10 @@ public sealed class GetCategoryMenuQueryHandler : IRequestHandler<GetCategoryMen
         GetCategoryMenuQuery request,
         CancellationToken cancellationToken)
     {
-        var rows = await _categoryReadRepository.GetAllActiveCategoriesAsync(cancellationToken).ConfigureAwait(false);
+        IReadOnlyList<CategoryMenuSourceRow> rows = await _categoryReadRepository.GetAllActiveCategoriesAsync(cancellationToken);
 
-        var orderedRows = rows.OrderBy(r => r.Name).ToList();
-        var byParent = orderedRows.ToLookup(r => r.ParentId);
+        List<CategoryMenuSourceRow> orderedRows = rows.OrderBy(r => r.Name).ToList();
+        ILookup<int?, CategoryMenuSourceRow> byParent = orderedRows.ToLookup(r => r.ParentId);
 
         return Result<IReadOnlyList<CategoryMenuNodeResponse>>.Success(BuildTree(byParent, null));
     }
@@ -33,13 +33,13 @@ public sealed class GetCategoryMenuQueryHandler : IRequestHandler<GetCategoryMen
         ILookup<int?, CategoryMenuSourceRow> byParent,
         int? parentId)
     {
-        var children = byParent[parentId].ToList();
+        List<CategoryMenuSourceRow> children = byParent[parentId].ToList();
         if (children.Count == 0)
         {
             return Array.Empty<CategoryMenuNodeResponse>();
         }
 
-        var nodes = new List<CategoryMenuNodeResponse>(children.Count);
+        List<CategoryMenuNodeResponse> nodes = new(children.Count);
         foreach (var row in children)
         {
             nodes.Add(new CategoryMenuNodeResponse(row.Id, row.Name, row.Slug, BuildTree(byParent, row.Id)));

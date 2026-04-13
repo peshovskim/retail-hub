@@ -26,9 +26,9 @@ using RetailHub.SharedKernel.Application.Common.Abstractions.DomainEvents;
 using RetailHub.SharedKernel.Application.Common.Behaviors;
 using RetailHub.SharedKernel.Application.Common.DomainEvents;
 
-var builder = WebApplication.CreateBuilder(args);
+WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
-var connectionString = builder.Configuration.GetConnectionString("RetailHubDatabase");
+string? connectionString = builder.Configuration.GetConnectionString("RetailHubDatabase");
 ArgumentException.ThrowIfNullOrEmpty(connectionString);
 
 builder.Services.Configure<JwtOptions>(builder.Configuration.GetSection(JwtOptions.SectionName));
@@ -36,14 +36,14 @@ builder.Services.Configure<AzureStorageOptions>(builder.Configuration.GetSection
 builder.Services.Configure<RedisOptions>(builder.Configuration.GetSection(RedisOptions.SectionName));
 builder.Services.Configure<CatalogCacheOptions>(builder.Configuration.GetSection(CatalogCacheOptions.SectionName));
 
-var azureStorageOptions = builder.Configuration.GetSection(AzureStorageOptions.SectionName).Get<AzureStorageOptions>()
+AzureStorageOptions azureStorageOptions = builder.Configuration.GetSection(AzureStorageOptions.SectionName).Get<AzureStorageOptions>()
     ?? new AzureStorageOptions();
 if (!string.IsNullOrWhiteSpace(azureStorageOptions.ConnectionString))
 {
     builder.Services.AddSingleton(_ => new BlobServiceClient(azureStorageOptions.ConnectionString));
 }
 
-var redisOptions = builder.Configuration.GetSection(RedisOptions.SectionName).Get<RedisOptions>()
+RedisOptions redisOptions = builder.Configuration.GetSection(RedisOptions.SectionName).Get<RedisOptions>()
     ?? new RedisOptions();
 if (!string.IsNullOrWhiteSpace(redisOptions.ConnectionString))
 {
@@ -66,7 +66,7 @@ builder.Services.AddSingleton<ITokenIssuer, JwtTokenIssuer>();
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<ICurrentUserAccessor, HttpContextCurrentUserAccessor>();
 
-var jwtOptions = builder.Configuration.GetSection(JwtOptions.SectionName).Get<JwtOptions>()
+JwtOptions jwtOptions = builder.Configuration.GetSection(JwtOptions.SectionName).Get<JwtOptions>()
     ?? throw new InvalidOperationException($"Configuration section '{JwtOptions.SectionName}' is missing.");
 ArgumentException.ThrowIfNullOrEmpty(jwtOptions.SigningKey, nameof(jwtOptions.SigningKey));
 ArgumentException.ThrowIfNullOrEmpty(jwtOptions.Issuer, nameof(jwtOptions.Issuer));
@@ -164,7 +164,7 @@ builder.Services.AddCors(options =>
     });
 });
 
-var app = builder.Build();
+WebApplication app = builder.Build();
 
 if (app.Environment.IsDevelopment())
 {
@@ -185,21 +185,21 @@ static void TryOpenSwaggerInBrowser(WebApplication webApp)
 {
     try
     {
-        var server = webApp.Services.GetRequiredService<IServer>();
-        var addresses = server.Features.Get<IServerAddressesFeature>()?.Addresses;
+        IServer server = webApp.Services.GetRequiredService<IServer>();
+        ICollection<string>? addresses = server.Features.Get<IServerAddressesFeature>()?.Addresses;
         if (addresses is null || addresses.Count == 0)
         {
             return;
         }
 
-        var baseUrl = addresses.FirstOrDefault(static a => a.StartsWith("https://", StringComparison.OrdinalIgnoreCase))
+        string? baseUrl = addresses.FirstOrDefault(static a => a.StartsWith("https://", StringComparison.OrdinalIgnoreCase))
             ?? addresses.FirstOrDefault();
         if (baseUrl is null)
         {
             return;
         }
 
-        var swaggerUrl = $"{baseUrl.TrimEnd('/')}/swagger";
+        string swaggerUrl = $"{baseUrl.TrimEnd('/')}/swagger";
         Process.Start(new ProcessStartInfo { FileName = swaggerUrl, UseShellExecute = true });
     }
     catch

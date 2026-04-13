@@ -1,10 +1,12 @@
 using Cart.Application.Cart.Interfaces;
+using CartEntity = Cart.Domain.Cart.Domain.Cart;
 using Catalog.Application.Product.Interfaces;
 using MediatR;
 using Microsoft.Extensions.Logging;
 using OrderAggregate = Orders.Domain.Order.Domain.Order;
 using Orders.Application.Order.Interfaces;
 using Orders.Application.Order.Responses;
+using Orders.Domain.Order.ValueObjects;
 using RetailHub.SharedKernel.Application.Common.Abstractions;
 using RetailHub.SharedKernel.Application.Common.Cqrs;
 using RetailHub.SharedKernel.Domain;
@@ -39,29 +41,26 @@ public sealed class PlaceOrderCommandHandler : IRequestHandler<PlaceOrderCommand
 
     public async Task<Result<OrderResponse>> Handle(PlaceOrderCommand request, CancellationToken cancellationToken)
     {
-        var cart = await _cartRepository
-            .GetByIdWithItemsAsync(request.CartId, cancellationToken)
-            .ConfigureAwait(false);
+        CartEntity? cart = await _cartRepository
+            .GetByIdWithItemsAsync(request.CartId, cancellationToken);
 
         if (cart is null)
         {
             return Result<OrderResponse>.NotFound(ResultCodes.NotFound, "Cart not found.");
         }
 
-        var utcNow = DateTime.UtcNow;
+        DateTime utcNow = DateTime.UtcNow;
 
         int? userId = null;
         if (request.UserId is { } userUid)
         {
             userId = await _userIdentityLookup
-                .GetUserIdByUidAsync(userUid, cancellationToken)
-                .ConfigureAwait(false);
+                .GetUserIdByUidAsync(userUid, cancellationToken);
         }
 
-        var activeProductIds = cart.Items.Where(i => i.IsActive).Select(i => i.ProductId).Distinct().ToList();
-        var productUidById = await _productReadRepository
-            .GetProductUidsByIdsAsync(activeProductIds, cancellationToken)
-            .ConfigureAwait(false);
+        List<int> activeProductIds = cart.Items.Where(i => i.IsActive).Select(i => i.ProductId).Distinct().ToList();
+        IReadOnlyDictionary<int, Guid> productUidById = await _productReadRepository
+            .GetProductUidsByIdsAsync(activeProductIds, cancellationToken);
 
         if (productUidById.Count != activeProductIds.Count)
         {
@@ -70,8 +69,8 @@ public sealed class PlaceOrderCommandHandler : IRequestHandler<PlaceOrderCommand
                 "One or more cart products could not be resolved.");
         }
 
-        var placement = CartPlacementSnapshotMapper.FromCart(cart);
-        var orderResult = OrderAggregate.PlaceFromCartPlacement(
+        CartPlacementSnapshot placement = CartPlacementSnapshotMapper.FromCart(cart);
+        Result<OrderAggregate> orderResult = OrderAggregate.PlaceFromCartPlacement(
             placement,
             userId,
             request.UserId,
@@ -84,13 +83,13 @@ public sealed class PlaceOrderCommandHandler : IRequestHandler<PlaceOrderCommand
             return Result.FromError<OrderResponse>(orderResult);
         }
 
-        var order = orderResult.Value!;
+        OrderAggregate order = orderResult.Value!;
 
-        await _orderRepository.AddAsync(order, cancellationToken).ConfigureAwait(false);
-        await _orderRepository.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+        await _orderRepository.AddAsync(order, cancellationToken);
+        await _orderRepository.SaveChangesAsync(cancellationToken);
 
         cart.ClearAllActiveItems(utcNow);
-        await _cartRepository.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+        await _cartRepository.SaveChangesAsync(cancellationToken);
 
         _logger.LogInformation(
             "Order {OrderUid} placed from cart {CartUid} for {TotalAmount} with {LineCount} line(s)",
@@ -104,7 +103,7 @@ public sealed class PlaceOrderCommandHandler : IRequestHandler<PlaceOrderCommand
 
     private static OrderResponse ToResponse(OrderAggregate order)
     {
-        var lines = order.Lines
+        List<OrderLineResponse> lines = order.Lines
             .OrderBy(l => l.ProductId)
             .Select(l => new OrderLineResponse(l.ProductUid, l.Quantity, l.UnitPrice, l.LineTotal))
             .ToList();

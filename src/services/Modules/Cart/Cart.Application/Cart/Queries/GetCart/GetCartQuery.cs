@@ -1,5 +1,6 @@
 using Cart.Application.Cart.Interfaces;
 using Cart.Application.Cart.Responses;
+using CartEntity = Cart.Domain.Cart.Domain.Cart;
 using Catalog.Application.Product.Interfaces;
 using MediatR;
 using RetailHub.SharedKernel.Application.Common.Cqrs;
@@ -22,9 +23,8 @@ public sealed class GetCartQueryHandler : IRequestHandler<GetCartQuery, Result<C
 
     public async Task<Result<CartResponse>> Handle(GetCartQuery request, CancellationToken cancellationToken)
     {
-        var cart = await _cartReadRepository
-            .GetByIdWithItemsAsync(request.CartId, cancellationToken)
-            .ConfigureAwait(false);
+        CartEntity? cart = await _cartReadRepository
+            .GetByIdWithItemsAsync(request.CartId, cancellationToken);
 
         if (cart is null)
         {
@@ -32,8 +32,7 @@ public sealed class GetCartQueryHandler : IRequestHandler<GetCartQuery, Result<C
         }
 
         CartResponse dto = await CartResponseFactory
-            .CreateAsync(cart, _productReadRepository, cancellationToken)
-            .ConfigureAwait(false);
+            .CreateAsync(cart, _productReadRepository, cancellationToken);
 
         return Result<CartResponse>.Success(dto);
     }
