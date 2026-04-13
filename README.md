@@ -7,7 +7,7 @@ Install the following on your machine before you run anything.
 | Requirement | Notes |
 |-------------|--------|
 | **.NET 8 SDK** | Required to build and run the API. [Download .NET 8](https://dotnet.microsoft.com/download/dotnet/8.0). |
-| **SQL Server 2025** | The database project targets **SQL Server 2025** (`Sql170`). Install **SQL Server 2025** (e.g. **Developer** edition) and use the **default instance** so the server is reachable as **`localhost`**. |
+| **SQL Server 2025** (local runtime) | The **`.sqlproj` target platform is Azure SQL Database** so you can publish to Azure SQL; scripts remain compatible with **SQL Server 2025** for local dev. Install **SQL Server 2025** (e.g. **Developer** edition) and use the **default instance** so the server is reachable as **`localhost`**. |
 | **Visual Studio 2022 or later** | Recommended: open the solution, publish the SQL project, and run the API. Install the **SQL Server Data Tools** (or **Data storage and processing**) workload so the `.sqlproj` loads and **Publish** works. |
 | **SQL Server Management Studio** (optional) | Useful for running queries and checking data; not required to run the API. Use a recent SSMS build for best compatibility with SQL Server 2025. |
 
