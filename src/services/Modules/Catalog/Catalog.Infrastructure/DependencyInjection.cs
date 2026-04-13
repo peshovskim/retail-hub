@@ -1,7 +1,9 @@
+using Catalog.Application.Caching;
 using Catalog.Application.Category.Interfaces;
 using Catalog.Application.Product.Interfaces;
 using Catalog.Infrastructure.Persistence.Read.Category.Factories;
 using Catalog.Infrastructure.Persistence.Read.Category.Queries;
+using Catalog.Infrastructure.Caching;
 using Catalog.Infrastructure.Persistence.Read.Product.Factories;
 using Catalog.Infrastructure.Persistence.Read.Product.Queries;
 using Catalog.Infrastructure.Persistence.Write.Category.Repository;
@@ -34,8 +36,10 @@ public static class DependencyInjection
         services.AddScoped<ICategoryRepository, CategoryRepository>();
 
         services.AddScoped<ProductReadFactory>();
-        services.AddScoped<IProductReadRepository, ProductQueries>();
+        services.AddScoped<ProductQueries>();
+        services.AddScoped<IProductReadRepository, CachingProductReadRepository>();
         services.AddScoped<IProductRepository, ProductRepository>();
+        services.AddScoped<IProductListCacheInvalidation, ProductListCacheInvalidation>();
 
         return services;
     }
