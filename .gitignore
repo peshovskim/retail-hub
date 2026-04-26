@@ -25,6 +25,9 @@
 # Local tool/cache artifacts
 .cursor/
 
+# Generated dummy product images (regenerate with tools/Generate-ProductBlobPlaceholders.ps1)
+tools/blob-product-images/
+
 # OS files
 .DS_Store
 Thumbs.db

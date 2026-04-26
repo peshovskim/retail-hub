@@ -7,13 +7,13 @@ Install the following on your machine before you run anything.
 | Requirement | Notes |
 |-------------|--------|
 | **.NET 8 SDK** | Required to build and run the API. [Download .NET 8](https://dotnet.microsoft.com/download/dotnet/8.0). |
-| **SQL Server 2025** (local runtime) | The **`.sqlproj` target platform is Azure SQL Database** so you can publish to Azure SQL; scripts remain compatible with **SQL Server 2025** for local dev. Install **SQL Server 2025** (e.g. **Developer** edition) and use the **default instance** so the server is reachable as **`localhost`**. |
+| **SQL Server 2025** (local runtime) | The **`.sqlproj` target platform is Azure SQL Database** so you can publish to Azure SQL; scripts remain compatible with **SQL Server 2025** for local dev. Install **SQL Server 2025** (e.g. **Express** or **Developer**). **Express** uses a **named instance**; the repo defaults to **`localhost\SQLEXPRESS`**. A **default** instance is reachable as **`localhost`** (no instance name). |
 | **Visual Studio 2022 or later** | Recommended: open the solution, publish the SQL project, and run the API. Install the **SQL Server Data Tools** (or **Data storage and processing**) workload so the `.sqlproj` loads and **Publish** works. |
 | **SQL Server Management Studio** (optional) | Useful for running queries and checking data; not required to run the API. Use a recent SSMS build for best compatibility with SQL Server 2025. |
 
-### Why `localhost`?
+### Server name: `localhost` vs `localhost\INSTANCE`
 
-The API and the checked-in publish profile use **`Server=localhost`** / **`Data Source=localhost`**, which means the **default** SQL Server instance on your PC (the Windows service **SQL Server (MSSQLSERVER)**). If you only install a **named** instance (for example `MSSQLSERVER01`), you must change the connection string to match (see below).
+The checked-in settings target **`localhost\SQLEXPRESS`**, the usual name for a **local SQL Express** install. The API uses **`Server=localhost\\SQLEXPRESS;…`** in JSON (backslash escaped as `\\`). If you use the **default** instance only, set **`Server=localhost;…`** and adjust the [publish profile](src/services/Database/RetailHub.Database/RetailHub.Database.publish.xml) `Data Source` the same way.
 
 ---
 
@@ -33,9 +33,9 @@ The schema and test seed data live in the SQL Server Database project.
 1. Open **`src/services/RetailHub.sln`** in Visual Studio.
 2. Open the **`RetailHub.Database`** project (`src/services/Database/RetailHub.Database/`).
 3. Right‑click the project → **Publish**.
-4. Use the profile **`RetailHub.Database.publish.xml`**, which deploys to **`localhost`** and database **`RetailHub`** (and creates the database if needed). Post‑deployment scripts apply seed data (for example categories).
+4. Use the profile **`RetailHub.Database.publish.xml`**, which deploys to **`localhost\SQLEXPRESS`** and database **`RetailHub`** (and creates the database if needed). Post‑deployment scripts apply seed data (for example categories).
 
-Ensure SQL Server 2025 is running and that you can connect to **`localhost`** with **Windows Authentication** before publishing.
+Ensure SQL Server 2025 is running and that you can connect to **`localhost\SQLEXPRESS`** (or your instance name) with **Windows Authentication** before publishing.
 
 **Command line (optional):** From the database project folder you can build a DACPAC with `dotnet build`, then publish with **`sqlpackage.exe`** using the same target server and database name. The publish profile in the repo is the source of truth for the intended connection string.
 
@@ -45,9 +45,9 @@ Ensure SQL Server 2025 is running and that you can connect to **`localhost`** wi
 
 Default configuration is in **`src/services/Api/RetailHub.Api/appsettings.json`**:
 
-- **`ConnectionStrings:RetailHubDatabase`** → `Server=localhost;Database=RetailHub;...` (Windows authentication).
+- **`ConnectionStrings:RetailHubDatabase`** → `Server=localhost\\SQLEXPRESS;Database=RetailHub;...` (Windows authentication; matches typical **Express**).
 
-If your instance is **not** the default (for example **`localhost\SQLEXPRESS`** or **`localhost\MSSQLSERVER01`**), do **not** commit machine-specific values. Use **User Secrets** (Visual Studio: right‑click the API project → **Manage User Secrets**) or environment variables, for example:
+If your instance name differs, do **not** commit machine-specific values. Use **User Secrets** (Visual Studio: right‑click the API project → **Manage User Secrets**) or environment variables, for example:
 
 ```json
 {
@@ -148,6 +148,7 @@ An Angular client lives under **`src/clients/angular`**. Running it is separate 
 | **`Cannot connect to localhost`** | Confirm the **SQL Server (MSSQLSERVER)** service exists and is **Running** in **`services.msc`**. If you only have a **named** instance, update the connection string (see above). |
 | **`dotnet run` / build fails** with **MSB3027** or **“file is locked by RetailHub.Api”** | Another API instance is still running (terminal, **dotnet run**, or Visual Studio debug). Stop it first: end **`RetailHub.Api`** in Task Manager, or press **Shift+F5** in Visual Studio, or close the terminal that is hosting the API. Then build or run again. |
 | API returns **empty** category lists | Confirm you published to the **same** server and database as **`RetailHubDatabase`**, and that seed scripts ran. In SSMS, query **`catalog.Category`** on database **`RetailHub`**. |
+| Product images show as broken links | The seed script maps each product to `https://retailhubphotos.blob.core.windows.net/product-images/{slug}.jpg`. Upload blobs with filenames that match **`catalog.Product.Slug + ".jpg"`** exactly, or update `@BaseUrl`/filename convention in `ProductImage.Test.Seed.sql` and republish. To download one image per product by slug query, run `tools/Generate-ProductBlobPlaceholders.ps1 -Mode Pexels` with `PEXELS_API_KEY` set. For API-free placeholders, use `-Mode LoremFlickr`, or `-Mode Replicate` for one image copied to all names. Output: `tools/blob-product-images/` (gitignored). |
 | **Database diagrams** in SSMS fail on SQL 2025 | Update SSMS to the latest version, or manage schema through the **RetailHub.Database** project instead of the diagram designer. |
 
 ---
