@@ -157,7 +157,7 @@ internal sealed class ProductQueries : IProductReadRepository
             .Where(pi => pi.ProductId == productId && pi.DeletedOn == null)
             .OrderBy(pi => pi.SortOrder)
             .ThenBy(pi => pi.Uid)
-            .Select(pi => new ProductImageResponse(pi.Uid, pi.SortOrder, pi.ImageUrl))
+            .Select(pi => new ProductImageResponse(pi.Uid, pi.SortOrder, pi.ImageUrl, pi.ThumbnailImageUrl))
             .ToListAsync(cancellationToken);
 
         return imageRows;
@@ -184,7 +184,7 @@ internal sealed class ProductQueries : IProductReadRepository
                 g => (IReadOnlyList<ProductImageResponse>)g
                     .OrderBy(pi => pi.SortOrder)
                     .ThenBy(pi => pi.Uid)
-                    .Select(pi => new ProductImageResponse(pi.Uid, pi.SortOrder, pi.ImageUrl))
+                    .Select(pi => new ProductImageResponse(pi.Uid, pi.SortOrder, pi.ImageUrl, pi.ThumbnailImageUrl))
                     .ToList());
     }
 }

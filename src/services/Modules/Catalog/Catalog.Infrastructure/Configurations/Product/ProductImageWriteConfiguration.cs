@@ -28,6 +28,8 @@ internal sealed class ProductImageWriteConfiguration : IEntityTypeConfiguration<
 
         builder.Property(pi => pi.ImageUrl).HasMaxLength(2048).IsRequired();
 
+        builder.Property(pi => pi.ThumbnailImageUrl).HasMaxLength(2048).IsRequired();
+
         builder.HasOne(pi => pi.Product)
             .WithMany(p => p.Images)
             .HasForeignKey(pi => pi.ProductId)

@@ -3,6 +3,7 @@ export interface ProductImage {
   uid: string;
   sortOrder: number;
   imageUrl: string;
+  thumbnailImageUrl?: string;
 }
 
 /** Product from catalog API (camelCase JSON). */
@@ -32,4 +33,22 @@ export function primaryImageUrl(product: Product): string | null {
   const primary = images.find((i) => i.sortOrder === 0) ?? images[0];
   const url = primary?.imageUrl?.trim();
   return url || null;
+}
+
+/**
+ * Public URL for the primary listing thumbnail, or null when none.
+ * Falls back to full image URL when thumbnail is missing.
+ */
+export function primaryThumbnailImageUrl(product: Product): string | null {
+  const images = product.images;
+  if (!images?.length) {
+    return null;
+  }
+  const primary = images.find((i) => i.sortOrder === 0) ?? images[0];
+  const thumbUrl = primary?.thumbnailImageUrl?.trim();
+  if (thumbUrl) {
+    return thumbUrl;
+  }
+  const fullUrl = primary?.imageUrl?.trim();
+  return fullUrl || null;
 }

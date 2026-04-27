@@ -1,6 +1,9 @@
 #Requires -Version 5.1
 <#
-  Downloads one image per catalog product slug as "{slug}.jpg" for Azure Blob.
+  Downloads one image per catalog product slug as:
+    - "{slug}.jpg" (full)
+    - "{slug}-thumb.jpg" (thumbnail)
+  for Azure Blob.
 
   Modes:
     -Mode Pexels      (recommended) uses slug-based search via Pexels API
@@ -18,7 +21,9 @@ param(
     [string] $OutDir = "",
     [int] $DelayMs = 1200,
     [string] $SourceUrl = "https://picsum.photos/600/400",
-    [string] $PexelsApiKey = ""
+    [string] $PexelsApiKey = "2zvhGEiEupoLZ8b8YFjzzcpIfiFx4lpQNtQxp5PdylOhXXtYEwrPRfUE",
+    [int] $ThumbWidth = 360,
+    [int] $ThumbHeight = 240
 )
 
 $ErrorActionPreference = "Stop"
@@ -66,6 +71,52 @@ function Test-IsJpeg {
         return ($b[0] -eq 0xFF -and $b[1] -eq 0xD8)
     } finally {
         $fs.Close()
+    }
+}
+
+function Write-JpegThumbnail {
+    param(
+        [string] $SourcePath,
+        [string] $TargetPath,
+        [int] $Width,
+        [int] $Height
+    )
+
+    Add-Type -AssemblyName System.Drawing
+    $srcImage = [System.Drawing.Image]::FromFile($SourcePath)
+    try {
+        $thumb = New-Object System.Drawing.Bitmap($Width, $Height)
+        try {
+            $gfx = [System.Drawing.Graphics]::FromImage($thumb)
+            try {
+                $gfx.InterpolationMode = [System.Drawing.Drawing2D.InterpolationMode]::HighQualityBicubic
+                $gfx.SmoothingMode = [System.Drawing.Drawing2D.SmoothingMode]::HighQuality
+                $gfx.CompositingQuality = [System.Drawing.Drawing2D.CompositingQuality]::HighQuality
+                $gfx.DrawImage($srcImage, 0, 0, $Width, $Height)
+            } finally {
+                $gfx.Dispose()
+            }
+
+            $jpegCodec = [System.Drawing.Imaging.ImageCodecInfo]::GetImageEncoders() |
+                Where-Object { $_.MimeType -eq "image/jpeg" } |
+                Select-Object -First 1
+            if ($null -eq $jpegCodec) {
+                $thumb.Save($TargetPath, [System.Drawing.Imaging.ImageFormat]::Jpeg)
+            } else {
+                $enc = [System.Drawing.Imaging.Encoder]::Quality
+                $encParams = New-Object System.Drawing.Imaging.EncoderParameters(1)
+                $encParams.Param[0] = New-Object System.Drawing.Imaging.EncoderParameter($enc, 82L)
+                try {
+                    $thumb.Save($TargetPath, $jpegCodec, $encParams)
+                } finally {
+                    $encParams.Dispose()
+                }
+            }
+        } finally {
+            $thumb.Dispose()
+        }
+    } finally {
+        $srcImage.Dispose()
     }
 }
 
@@ -119,10 +170,13 @@ if ($Mode -eq "Replicate") {
     }
     $n = 0
     foreach ($slug in $sorted) {
-        Copy-Item -LiteralPath $template -Destination (Join-Path $OutDir "$slug.jpg") -Force
+        $fullPath = Join-Path $OutDir "$slug.jpg"
+        $thumbPath = Join-Path $OutDir "$slug-thumb.jpg"
+        Copy-Item -LiteralPath $template -Destination $fullPath -Force
+        Write-JpegThumbnail -SourcePath $fullPath -TargetPath $thumbPath -Width $ThumbWidth -Height $ThumbHeight
         $n++
     }
-    Write-Host "Wrote $n files (replicate) to $OutDir" -ForegroundColor Green
+    Write-Host "Wrote $n full images + $n thumbnails (replicate) to $OutDir" -ForegroundColor Green
     return
 }
 
@@ -136,6 +190,7 @@ $total = $sorted.Count
 foreach ($slug in $sorted) {
     $idx++
     $dest = Join-Path $OutDir "$slug.jpg"
+    $thumbDest = Join-Path $OutDir "$slug-thumb.jpg"
     Write-Progress -Activity "$Mode image download" -Status "$idx / $total  $slug" -PercentComplete ([Math]::Min(100, [int](100.0 * $idx / $total)))
     try {
         if ($Mode -eq "Pexels") {
@@ -153,6 +208,8 @@ foreach ($slug in $sorted) {
             $fallback = "https://picsum.photos/seed/{0}/600/400" -f $slug
             Invoke-WebRequest -Uri $fallback -OutFile $dest -UseBasicParsing -UserAgent $UserAgent -MaximumRedirection 5 -TimeoutSec 90
         }
+
+        Write-JpegThumbnail -SourcePath $dest -TargetPath $thumbDest -Width $ThumbWidth -Height $ThumbHeight
     } catch {
         Write-Error "Failed for ${slug}: $_"
     }
@@ -160,5 +217,5 @@ foreach ($slug in $sorted) {
     $n++
 }
 Write-Progress -Activity "$Mode image download" -Completed
-Write-Host "Wrote $n files to $OutDir" -ForegroundColor Green
-Write-Host "Upload *.jpg to Azure container 'product-images'. Check image licensing before production use."
+Write-Host "Wrote $n full images + $n thumbnails to $OutDir" -ForegroundColor Green
+Write-Host "Upload both '{slug}.jpg' and '{slug}-thumb.jpg' to Azure container 'product-images'. Check image licensing before production use."

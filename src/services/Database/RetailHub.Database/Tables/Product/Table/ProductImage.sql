@@ -6,6 +6,7 @@ CREATE TABLE [catalog].[ProductImage](
     [ProductId]  INT                 NOT NULL,
     [SortOrder]  INT                 NOT NULL CONSTRAINT [DF_ProductImage_SortOrder] DEFAULT (0),
     [ImageUrl]   NVARCHAR(2048)      NOT NULL,
+    [ThumbnailImageUrl] NVARCHAR(2048) NOT NULL,
     CONSTRAINT [PK_ProductImage] PRIMARY KEY CLUSTERED ([Id]),
     CONSTRAINT [UQ_ProductImage_Uid] UNIQUE ([Uid]),
     CONSTRAINT [FK_ProductImage_Product] FOREIGN KEY ([ProductId]) REFERENCES [catalog].[Product] ([Id]) ON DELETE CASCADE
